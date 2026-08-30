@@ -1,0 +1,36 @@
+function Signup() {
+    return (
+        <div>
+            <h1>Create Your Account</h1>
+
+            <form>
+                <input
+                    type="text"
+                    placeholder="Full Name"
+                />
+
+                <br /><br />
+
+                <input
+                    type="email"
+                    placeholder="Email"
+                />
+
+                <br /><br />
+
+                <input
+                    type="password"
+                    placeholder="Password"
+                />
+
+                <br /><br />
+
+                <button type="submit">
+                    Create Account
+                </button>
+            </form>
+        </div>
+    );
+}
+
+export default Signup;

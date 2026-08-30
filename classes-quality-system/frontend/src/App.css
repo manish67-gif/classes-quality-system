@@ -1,0 +1,85 @@
+/* Main application */
+.app {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px;
+  font-family: Arial, sans-serif;
+  background-color: #f5f7fa;
+  min-height: 100vh;
+}
+
+/* Main heading */
+.app h1 {
+  text-align: center;
+  color: #1f2937;
+  margin-bottom: 30px;
+}
+
+/* Filter section */
+.filters {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Filter heading */
+.filters h2 {
+  margin-top: 0;
+  color: #374151;
+}
+
+/* Inputs and selects */
+.filters input,
+.filters select {
+  padding: 10px;
+  margin: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* Verified checkbox */
+.verified-filter {
+  margin: 10px;
+}
+
+/* Institute list */
+.institutes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* Institute card */
+.institute-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s;
+}
+
+/* Small hover effect */
+.institute-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Institute name */
+.institute-card h2 {
+  color: #2563eb;
+  margin-top: 0;
+}
+
+/* Verified text */
+.verified {
+  color: #16a34a;
+  font-weight: bold;
+}
+
+/* Unverified text */
+.not-verified {
+  color: #dc2626;
+  font-weight: bold;
+}
