@@ -4,7 +4,7 @@ function Home() {
     return (
         <div className="home-page">
 
-            {/* HERO */}
+            {/* Hero */}
             <section className="home-hero">
 
                 <div className="home-hero-content">
@@ -35,7 +35,7 @@ function Home() {
                         </Link>
 
                         <Link
-                            to="/classes"
+                            to="/compare"
                             className="secondary-btn"
                         >
                             Compare Classes
@@ -48,17 +48,32 @@ function Home() {
                 <div className="hero-visual">
 
                     <div className="hero-card main-stat-card">
-                        <div className="stat-icon">🏫</div>
+
+                        <div className="stat-icon">
+                            🏫
+                        </div>
+
                         <div>
                             <strong>Find Better</strong>
                             <span>Coaching Classes</span>
                         </div>
+
                     </div>
 
                     <div className="hero-card rating-stat-card">
-                        <span className="stat-stars">★★★★★</span>
-                        <strong>Student Reviews</strong>
-                        <span>Make informed decisions</span>
+
+                        <span className="stat-stars">
+                            ★★★★★
+                        </span>
+
+                        <strong>
+                            Student Reviews
+                        </strong>
+
+                        <span>
+                            Make informed decisions
+                        </span>
+
                     </div>
 
                     <div className="floating-circle circle-one">
@@ -74,7 +89,7 @@ function Home() {
             </section>
 
 
-            {/* FEATURES */}
+            {/* Features */}
             <section className="home-features">
 
                 <div className="section-heading">
@@ -171,7 +186,7 @@ function Home() {
             </section>
 
 
-            {/* HOW IT WORKS */}
+            {/* How it works */}
             <section className="how-section">
 
                 <div className="section-heading">

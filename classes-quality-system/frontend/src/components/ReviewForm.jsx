@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 function ReviewForm({ subjectId, onReviewSubmitted }) {
-
     const [formData, setFormData] = useState({
         teachingQuality: 5,
         conceptClarity: 5,
@@ -15,77 +14,68 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-
-    // Handle input changes
     const handleChange = (e) => {
-
         const { name, value } = e.target;
 
-        setFormData({
-            ...formData,
-            [name]:
-                name === "comment"
-                    ? value
-                    : Number(value)
-        });
+        setFormData((previous) => ({
+            ...previous,
+            [name]: name === "comment" ? value : Number(value)
+        }));
     };
 
-
-    // Submit review
     const handleSubmit = async (e) => {
-
         e.preventDefault();
 
         setMessage("");
         setError("");
+
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            setError("Please login before submitting a review.");
+            return;
+        }
+
+        if (!subjectId) {
+            setError("Subject information is missing.");
+            return;
+        }
+
+        if (!formData.comment.trim()) {
+            setError("Please write a comment.");
+            return;
+        }
+
         setLoading(true);
 
-
         try {
-
-            const token = localStorage.getItem("token");
-
-
-            if (!token) {
-
-                setError(
-                    "Please login before submitting a review."
-                );
-
-                return;
-            }
-
-
             const response = await fetch(
                 "http://localhost:8080/api/reviews",
                 {
                     method: "POST",
-
                     headers: {
                         "Content-Type": "application/json",
-
-                        Authorization:
-                            `Bearer ${token}`
+                        Authorization: `Bearer ${token}`
                     },
-
                     body: JSON.stringify({
                         subjectId,
-                        ...formData
+                        teachingQuality: formData.teachingQuality,
+                        conceptClarity: formData.conceptClarity,
+                        doubtSolving: formData.doubtSolving,
+                        studyMaterial: formData.studyMaterial,
+                        overallRating: formData.overallRating,
+                        comment: formData.comment.trim()
                     })
                 }
             );
 
-
-            const data =
-                await response.json();
-
+            const data = await response.json();
 
             if (!response.ok) {
-
-                if (
-                    response.status === 401
-                ) {
+                if (response.status === 401) {
                     localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+                    window.dispatchEvent(new Event("authChanged"));
 
                     throw new Error(
                         "Your session has expired. Please login again."
@@ -93,16 +83,11 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                 }
 
                 throw new Error(
-                    data.message ||
-                    "Failed to submit review"
+                    data.message || "Failed to submit review"
                 );
             }
 
-
-            setMessage(
-                "Review submitted successfully!"
-            );
-
+            setMessage("Review submitted successfully!");
 
             setFormData({
                 teachingQuality: 5,
@@ -113,35 +98,21 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                 comment: ""
             });
 
-
             if (onReviewSubmitted) {
-                onReviewSubmitted();
+                onReviewSubmitted(data.review);
             }
-
-
         } catch (error) {
-
-            console.error(
-                "Review submission error:",
-                error
-            );
-
-            setError(
-                error.message
-            );
-
+            console.error("Review submission error:", error);
+            setError(error.message || "Failed to submit review");
         } finally {
-
             setLoading(false);
         }
     };
-
 
     return (
         <div className="review-form-card">
 
             <div className="review-form-header">
-
                 <span className="details-label">
                     SHARE YOUR EXPERIENCE
                 </span>
@@ -154,11 +125,7 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                     Help other students choose the right
                     coaching class by sharing your experience.
                 </p>
-
             </div>
-
-
-            {/* Success message */}
 
             {message && (
                 <p className="review-success">
@@ -166,28 +133,19 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                 </p>
             )}
 
-
-            {/* Error message */}
-
             {error && (
                 <p className="review-error">
                     {error}
                 </p>
             )}
 
-
             <form
                 onSubmit={handleSubmit}
                 className="review-form"
             >
-
                 <div className="rating-fields">
 
-
-                    {/* Teaching Quality */}
-
                     <div className="rating-field">
-
                         <label>
                             Teaching Quality
                         </label>
@@ -196,37 +154,17 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                             name="teachingQuality"
                             value={formData.teachingQuality}
                             onChange={handleChange}
+                            disabled={loading}
                         >
-
-                            <option value="1">
-                                1 - Poor
-                            </option>
-
-                            <option value="2">
-                                2
-                            </option>
-
-                            <option value="3">
-                                3 - Average
-                            </option>
-
-                            <option value="4">
-                                4
-                            </option>
-
-                            <option value="5">
-                                5 - Excellent
-                            </option>
-
+                            <option value="1">1 - Poor</option>
+                            <option value="2">2</option>
+                            <option value="3">3 - Average</option>
+                            <option value="4">4</option>
+                            <option value="5">5 - Excellent</option>
                         </select>
-
                     </div>
 
-
-                    {/* Concept Clarity */}
-
                     <div className="rating-field">
-
                         <label>
                             Concept Clarity
                         </label>
@@ -235,37 +173,17 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                             name="conceptClarity"
                             value={formData.conceptClarity}
                             onChange={handleChange}
+                            disabled={loading}
                         >
-
-                            <option value="1">
-                                1 - Poor
-                            </option>
-
-                            <option value="2">
-                                2
-                            </option>
-
-                            <option value="3">
-                                3 - Average
-                            </option>
-
-                            <option value="4">
-                                4
-                            </option>
-
-                            <option value="5">
-                                5 - Excellent
-                            </option>
-
+                            <option value="1">1 - Poor</option>
+                            <option value="2">2</option>
+                            <option value="3">3 - Average</option>
+                            <option value="4">4</option>
+                            <option value="5">5 - Excellent</option>
                         </select>
-
                     </div>
 
-
-                    {/* Doubt Solving */}
-
                     <div className="rating-field">
-
                         <label>
                             Doubt Solving
                         </label>
@@ -274,37 +192,17 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                             name="doubtSolving"
                             value={formData.doubtSolving}
                             onChange={handleChange}
+                            disabled={loading}
                         >
-
-                            <option value="1">
-                                1 - Poor
-                            </option>
-
-                            <option value="2">
-                                2
-                            </option>
-
-                            <option value="3">
-                                3 - Average
-                            </option>
-
-                            <option value="4">
-                                4
-                            </option>
-
-                            <option value="5">
-                                5 - Excellent
-                            </option>
-
+                            <option value="1">1 - Poor</option>
+                            <option value="2">2</option>
+                            <option value="3">3 - Average</option>
+                            <option value="4">4</option>
+                            <option value="5">5 - Excellent</option>
                         </select>
-
                     </div>
 
-
-                    {/* Study Material */}
-
                     <div className="rating-field">
-
                         <label>
                             Study Material
                         </label>
@@ -313,37 +211,17 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                             name="studyMaterial"
                             value={formData.studyMaterial}
                             onChange={handleChange}
+                            disabled={loading}
                         >
-
-                            <option value="1">
-                                1 - Poor
-                            </option>
-
-                            <option value="2">
-                                2
-                            </option>
-
-                            <option value="3">
-                                3 - Average
-                            </option>
-
-                            <option value="4">
-                                4
-                            </option>
-
-                            <option value="5">
-                                5 - Excellent
-                            </option>
-
+                            <option value="1">1 - Poor</option>
+                            <option value="2">2</option>
+                            <option value="3">3 - Average</option>
+                            <option value="4">4</option>
+                            <option value="5">5 - Excellent</option>
                         </select>
-
                     </div>
 
-
-                    {/* Overall Rating */}
-
                     <div className="rating-field overall-rating-field">
-
                         <label>
                             Overall Rating
                         </label>
@@ -352,39 +230,19 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                             name="overallRating"
                             value={formData.overallRating}
                             onChange={handleChange}
+                            disabled={loading}
                         >
-
-                            <option value="1">
-                                1 - Poor
-                            </option>
-
-                            <option value="2">
-                                2
-                            </option>
-
-                            <option value="3">
-                                3 - Average
-                            </option>
-
-                            <option value="4">
-                                4
-                            </option>
-
-                            <option value="5">
-                                5 - Excellent
-                            </option>
-
+                            <option value="1">1 - Poor</option>
+                            <option value="2">2</option>
+                            <option value="3">3 - Average</option>
+                            <option value="4">4</option>
+                            <option value="5">5 - Excellent</option>
                         </select>
-
                     </div>
 
                 </div>
 
-
-                {/* Comment */}
-
                 <div className="comment-field">
-
                     <label>
                         Your Experience
                     </label>
@@ -395,31 +253,25 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                         onChange={handleChange}
                         placeholder="Describe your experience..."
                         rows="5"
+                        maxLength="2000"
                         required
+                        disabled={loading}
                     />
-
                 </div>
-
-
-                {/* Submit */}
 
                 <button
                     type="submit"
                     className="review-submit-btn"
                     disabled={loading}
                 >
-
                     {loading
                         ? "Submitting..."
                         : "Submit Review →"}
-
                 </button>
 
             </form>
-
         </div>
     );
 }
-
 
 export default ReviewForm;

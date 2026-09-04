@@ -8,7 +8,8 @@ function Signup() {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
-        password: ""
+        password: "",
+        role: "student"
     });
 
     const [message, setMessage] = useState("");
@@ -68,7 +69,8 @@ function Signup() {
             setFormData({
                 name: "",
                 email: "",
-                password: ""
+                password: "",
+                role: "student"
             });
 
 
@@ -107,7 +109,7 @@ function Signup() {
                 </h1>
 
                 <p className="auth-subtitle">
-                    Create your CQCS student account
+                    Create your CQCS student or institute account
                 </p>
 
 
@@ -159,6 +161,21 @@ function Signup() {
                             required
                             minLength={6}
                         />
+                    </div>
+
+                    <div>
+                        <label>
+                            Account type
+                        </label>
+
+                        <select
+                            name="role"
+                            value={formData.role}
+                            onChange={handleChange}
+                        >
+                            <option value="student">Student</option>
+                            <option value="class">Institute / Class</option>
+                        </select>
                     </div>
 
 

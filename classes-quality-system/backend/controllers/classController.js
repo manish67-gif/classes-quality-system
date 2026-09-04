@@ -1,7 +1,5 @@
 const Class = require("../models/Class");
 
-
-// CREATE CLASS
 const createClass = async (req, res) => {
     try {
         const {
@@ -20,6 +18,7 @@ const createClass = async (req, res) => {
         }
 
         const newClass = await Class.create({
+            ownerId: req.user.userId,
             name,
             description,
             location,
@@ -42,8 +41,6 @@ const createClass = async (req, res) => {
     }
 };
 
-
-// GET ALL CLASSES
 const getClasses = async (req, res) => {
     try {
         const classes = await Class.find()
@@ -63,13 +60,9 @@ const getClasses = async (req, res) => {
     }
 };
 
-
-// GET ONE CLASS
 const getClassById = async (req, res) => {
     try {
-        const classItem = await Class.findById(
-            req.params.id
-        );
+        const classItem = await Class.findById(req.params.id);
 
         if (!classItem) {
             return res.status(404).json({
@@ -91,9 +84,50 @@ const getClassById = async (req, res) => {
     }
 };
 
-
 module.exports = {
     createClass,
     getClasses,
-    getClassById
+    getClassById,
+    updateClass: async (req, res) => {
+        try {
+            const classItem = await Class.findById(req.params.id);
+
+            if (!classItem) {
+                return res.status(404).json({ message: "Class not found" });
+            }
+
+            if (req.user.role !== "admin" && classItem.ownerId.toString() !== req.user.userId) {
+                return res.status(403).json({ message: "You do not have permission to modify this resource" });
+            }
+
+            ["name", "description", "location", "address", "contactNumber", "website"].forEach((field) => {
+                if (req.body[field] !== undefined) classItem[field] = req.body[field];
+            });
+
+            await classItem.save();
+            return res.status(200).json({ message: "Class updated successfully", class: classItem });
+        } catch (error) {
+            console.error("Update class error:", error);
+            return res.status(500).json({ message: "Server error" });
+        }
+    },
+    deleteClass: async (req, res) => {
+        try {
+            const classItem = await Class.findById(req.params.id);
+
+            if (!classItem) {
+                return res.status(404).json({ message: "Class not found" });
+            }
+
+            if (req.user.role !== "admin" && classItem.ownerId.toString() !== req.user.userId) {
+                return res.status(403).json({ message: "You do not have permission to modify this resource" });
+            }
+
+            await Class.findByIdAndDelete(req.params.id);
+            return res.status(200).json({ message: "Class deleted successfully" });
+        } catch (error) {
+            console.error("Delete class error:", error);
+            return res.status(500).json({ message: "Server error" });
+        }
+    }
 };

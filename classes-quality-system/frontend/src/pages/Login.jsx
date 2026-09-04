@@ -73,11 +73,8 @@ function Login() {
             );
 
 
-            setTimeout(() => {
-
-                navigate("/");
-
-            }, 500);
+            const role = data.user?.role === "institute" ? "class" : data.user?.role;
+            setTimeout(() => navigate(role ? `/${role}/dashboard` : "/"), 500);
 
 
         } catch (error) {

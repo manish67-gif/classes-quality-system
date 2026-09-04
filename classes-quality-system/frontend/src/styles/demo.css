@@ -1,0 +1,703 @@
+/* =========================================
+   DEMO PAGE
+========================================= */
+
+.demo-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 35px 24px 60px;
+  color: #1f2937;
+}
+
+
+/* =========================================
+   BREADCRUMB
+========================================= */
+
+.demo-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+.demo-breadcrumb a {
+  color: #2563eb;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.demo-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.demo-breadcrumb strong {
+  color: #475569;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.demo-header {
+  max-width: 700px;
+  margin-bottom: 25px;
+}
+
+.demo-header .small-title {
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.demo-header h1 {
+  margin: 8px 0;
+
+  color: #111827;
+  font-size: 38px;
+  line-height: 1.15;
+  letter-spacing: -0.7px;
+}
+
+.demo-header p {
+  margin: 0;
+
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.demo-header strong {
+  color: #334155;
+}
+
+
+/* =========================================
+   COURSE / INSTITUTE CONTEXT
+========================================= */
+
+.demo-context {
+  display: flex;
+  align-items: center;
+
+  padding: 15px 18px;
+  margin-bottom: 20px;
+
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 13px;
+}
+
+.demo-context-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  flex: 1;
+  min-width: 0;
+}
+
+.context-icon {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+  background: white;
+  border: 1px solid #e5e7eb;
+
+  font-size: 17px;
+}
+
+.demo-context-item div {
+  min-width: 0;
+}
+
+.demo-context-item span:not(.context-icon) {
+  display: block;
+
+  margin-bottom: 3px;
+
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.demo-context-item strong {
+  display: block;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #334155;
+  font-size: 13px;
+}
+
+.context-divider {
+  width: 1px;
+  height: 35px;
+
+  margin: 0 18px;
+
+  background: #e2e8f0;
+}
+
+
+/* =========================================
+   INFO BOX
+========================================= */
+
+.demo-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  padding: 15px 18px;
+  margin-bottom: 30px;
+
+  background: linear-gradient(135deg,
+      #eff6ff,
+      #f8fbff);
+
+  border: 1px solid #dbeafe;
+  border-radius: 13px;
+}
+
+.demo-info-icon {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 11px;
+
+  background: #2563eb;
+  color: white;
+
+  font-size: 16px;
+
+  box-shadow:
+    0 5px 14px rgba(37, 99, 235, 0.18);
+}
+
+.demo-info h3 {
+  margin: 0 0 3px;
+
+  color: #1e3a8a;
+  font-size: 14px;
+}
+
+.demo-info p {
+  margin: 0;
+
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+
+/* =========================================
+   SECTION HEADING
+========================================= */
+
+.demo-lectures-section {
+  margin-top: 5px;
+}
+
+.demo-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+
+  margin-bottom: 12px;
+}
+
+.demo-section-heading span:first-child {
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+}
+
+.demo-section-heading h2 {
+  margin: 4px 0 0;
+
+  color: #111827;
+  font-size: 21px;
+}
+
+.lecture-count {
+  padding: 5px 9px;
+
+  border-radius: 7px;
+
+  background: #eff6ff;
+  color: #2563eb;
+
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* =========================================
+   LECTURE LIST
+========================================= */
+
+.compact-lectures {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+
+/* =========================================
+   LECTURE CARD
+========================================= */
+
+.compact-lecture {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  padding: 13px 15px;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+
+  transition: all 0.2s ease;
+}
+
+.compact-lecture:hover {
+  border-color: #bfdbfe;
+
+  box-shadow:
+    0 7px 20px rgba(15, 23, 42, 0.06);
+
+  transform: translateY(-2px);
+}
+
+
+/* =========================================
+   LECTURE LEFT
+========================================= */
+
+.compact-lecture-left {
+  display: flex;
+  align-items: center;
+
+  min-width: 0;
+  flex: 1;
+}
+
+.lecture-number {
+  width: 32px;
+
+  color: #cbd5e1;
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.lecture-mini-icon {
+  width: 40px;
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  border-radius: 10px;
+
+  background: #eff6ff;
+
+  font-size: 18px;
+}
+
+.compact-lecture-info {
+  min-width: 0;
+
+  margin-left: 12px;
+}
+
+.compact-lecture-info h3 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  margin: 0 0 5px;
+
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.compact-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 10px;
+}
+
+.compact-meta span {
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+
+/* =========================================
+   WATCH BUTTON / LINK
+========================================= */
+
+.compact-watch-btn {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  flex-shrink: 0;
+
+  padding: 8px 13px;
+
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+
+  background: #eff6ff;
+  color: #2563eb;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+
+  text-decoration: none;
+}
+
+.compact-watch-btn:hover {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+}
+
+.compact-watch-btn span {
+  font-size: 9px;
+}
+
+
+/* =========================================
+   DISABLED WATCH BUTTON
+========================================= */
+
+.compact-watch-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.compact-watch-btn:disabled:hover {
+  background: #eff6ff;
+  border-color: #dbeafe;
+  color: #2563eb;
+}
+
+
+/* =========================================
+   EMPTY STATE
+========================================= */
+
+.demo-empty {
+  padding: 45px 20px;
+
+  text-align: center;
+
+  background: #f8fafc;
+
+  border: 1px dashed #cbd5e1;
+  border-radius: 13px;
+}
+
+.demo-empty>div {
+  font-size: 28px;
+}
+
+.demo-empty h3 {
+  margin: 10px 0 5px;
+
+  color: #334155;
+  font-size: 15px;
+}
+
+.demo-empty p {
+  margin: 0;
+
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+
+/* =========================================
+   LOADING
+========================================= */
+
+.demo-loading {
+  padding: 80px 20px;
+
+  text-align: center;
+
+  color: #64748b;
+  font-size: 14px;
+}
+
+
+/* =========================================
+   ERROR
+========================================= */
+
+.demo-error {
+  max-width: 500px;
+
+  margin: 70px auto;
+
+  padding: 30px;
+
+  text-align: center;
+
+  background: white;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+
+  box-shadow:
+    0 8px 25px rgba(15, 23, 42, 0.05);
+}
+
+.demo-error h2 {
+  margin: 0 0 8px;
+
+  color: #111827;
+  font-size: 20px;
+}
+
+.demo-error p {
+  margin: 0;
+
+  color: #64748b;
+  font-size: 13px;
+}
+
+
+/* =========================================
+   BACK
+========================================= */
+
+.demo-back {
+  margin-top: 22px;
+}
+
+.demo-back a {
+  color: #2563eb;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+.demo-back a:hover {
+  text-decoration: underline;
+}
+
+
+/* =========================================
+   MOBILE - 700px
+========================================= */
+
+@media (max-width: 700px) {
+
+  .demo-page {
+    padding: 28px 16px 55px;
+  }
+
+  .demo-header h1 {
+    font-size: 31px;
+  }
+
+  .demo-context {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 13px;
+  }
+
+  .context-divider {
+    width: 100%;
+    height: 1px;
+
+    margin: 0;
+  }
+
+  .demo-info {
+    align-items: flex-start;
+  }
+
+  .compact-lecture {
+    align-items: flex-start;
+  }
+
+  .lecture-number {
+    display: none;
+  }
+
+  .compact-watch-btn {
+    padding: 8px 10px;
+  }
+
+}
+
+
+/* =========================================
+   MOBILE - 500px
+========================================= */
+
+@media (max-width: 500px) {
+
+  .demo-page {
+    padding: 25px 13px 50px;
+  }
+
+  .demo-breadcrumb {
+    font-size: 11px;
+    gap: 6px;
+  }
+
+  .demo-header h1 {
+    font-size: 28px;
+  }
+
+  .demo-header p {
+    font-size: 13px;
+  }
+
+  .demo-context {
+    padding: 13px;
+  }
+
+  .demo-info {
+    padding: 14px;
+  }
+
+  .demo-info-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .demo-info h3 {
+    font-size: 13px;
+  }
+
+  .demo-info p {
+    font-size: 11px;
+  }
+
+  .demo-section-heading h2 {
+    font-size: 19px;
+  }
+
+  .lecture-count {
+    font-size: 10px;
+  }
+
+  .compact-lecture {
+    padding: 11px;
+    gap: 9px;
+  }
+
+  .compact-lecture-info {
+    margin-left: 9px;
+  }
+
+  .compact-lecture-info h3 {
+    font-size: 12px;
+    white-space: normal;
+    line-height: 1.4;
+  }
+
+  .compact-meta {
+    gap: 7px;
+  }
+
+  .compact-meta span {
+    font-size: 9px;
+  }
+
+  .compact-watch-btn {
+    padding: 7px 9px;
+    font-size: 10px;
+  }
+
+  .compact-watch-btn span {
+    font-size: 8px;
+  }
+
+}
+
+
+/* =========================================
+   VERY SMALL MOBILE
+========================================= */
+
+@media (max-width: 380px) {
+
+  .demo-header h1 {
+    font-size: 25px;
+  }
+
+  .demo-info {
+    gap: 10px;
+  }
+
+  .demo-info-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 13px;
+  }
+
+  .compact-lecture {
+    padding: 9px;
+  }
+
+  .lecture-mini-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+
+  .compact-watch-btn {
+    padding: 7px 8px;
+    font-size: 9px;
+  }
+
+}

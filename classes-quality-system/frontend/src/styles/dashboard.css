@@ -1,0 +1,348 @@
+/* =========================================
+   DEMO LECTURE CTA
+========================================= */
+
+.demo-lectures-cta {
+
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    margin: 25px 0 30px;
+    padding: 20px 22px;
+
+    background: linear-gradient(135deg,
+            #eff6ff,
+            #f8fbff);
+
+    border: 1px solid #dbeafe;
+    border-radius: 16px;
+
+    box-shadow:
+        0 6px 20px rgba(37, 99, 235, .06);
+
+}
+
+
+/* ICON */
+
+.demo-cta-icon {
+
+    width: 50px;
+    height: 50px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 17px;
+
+    box-shadow:
+        0 7px 16px rgba(37, 99, 235, .22);
+
+}
+
+
+/* CONTENT */
+
+.demo-cta-content {
+    flex: 1;
+}
+
+.demo-cta-label {
+
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #2563eb;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+
+}
+
+.demo-cta-content h3 {
+
+    margin: 0 0 4px;
+
+    color: #111827;
+
+    font-size: 17px;
+
+}
+
+.demo-cta-content p {
+
+    margin: 0;
+
+    color: #6b7280;
+
+    font-size: 13px;
+    line-height: 1.5;
+
+}
+
+
+/* BUTTON */
+
+.demo-cta-btn {
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    flex-shrink: 0;
+
+    padding: 11px 17px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+
+    box-shadow:
+        0 6px 15px rgba(37, 99, 235, .18);
+
+}
+
+.demo-cta-btn span {
+
+    font-size: 16px;
+
+    transition: .2s ease;
+
+}
+
+.demo-cta-btn:hover {
+
+    background: #1d4ed8;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 9px 20px rgba(37, 99, 235, .25);
+
+}
+
+.demo-cta-btn:hover span {
+
+    transform: translateX(3px);
+
+}
+
+
+/* =========================================
+   DEMO SECTION SCROLL OFFSET
+========================================= */
+
+#demo-lectures {
+
+    scroll-margin-top: 25px;
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 650px) {
+
+    .demo-lectures-cta {
+
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+
+        padding: 18px;
+
+    }
+
+    .demo-cta-content {
+
+        min-width: 0;
+
+    }
+
+    .demo-cta-btn {
+
+        width: 100%;
+
+        margin-top: 3px;
+
+    }
+
+}
+
+.management-page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 56px 7%;
+}
+
+.management-header {
+    margin-bottom: 28px;
+}
+
+.management-kicker {
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.management-header h1 {
+    margin: 8px 0;
+    color: #111827;
+}
+
+.management-header p,
+.management-panel>p {
+    color: #64748b;
+}
+
+.management-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.management-panel {
+    min-width: 0;
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+}
+
+.management-panel h2 {
+    margin: 0 0 16px;
+    color: #0f172a;
+    font-size: 20px;
+}
+
+.management-panel h3 {
+    margin: 24px 0 10px;
+    color: #334155;
+    font-size: 14px;
+}
+
+.management-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.management-row>button:first-child {
+    min-width: 0;
+    overflow: hidden;
+    border: 0;
+    background: transparent;
+    color: #334155;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.management-row.is-selected>button:first-child {
+    color: #2563eb;
+    font-weight: 700;
+}
+
+.management-panel input,
+.management-panel textarea {
+    width: 100%;
+    margin-bottom: 9px;
+    padding: 10px 11px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font: inherit;
+}
+
+.management-panel textarea {
+    min-height: 70px;
+    resize: vertical;
+}
+
+.management-panel .primary-btn {
+    border: 0;
+    cursor: pointer;
+}
+
+.danger-button {
+    flex-shrink: 0;
+    padding: 6px 9px;
+    border: 1px solid #fecaca;
+    border-radius: 5px;
+    background: #fff1f2;
+    color: #b91c1c;
+    cursor: pointer;
+}
+
+.management-success,
+.management-error {
+    padding: 11px 14px;
+    border-radius: 6px;
+}
+
+.management-success {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.management-error {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.users-panel {
+    margin-top: 18px;
+}
+
+.management-row small {
+    display: block;
+    color: #64748b;
+    font-size: 11px;
+}
+
+@media (max-width: 1000px) {
+    .management-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .management-page {
+        padding: 36px 5%;
+    }
+
+    .management-grid {
+        grid-template-columns: 1fr;
+    }
+}

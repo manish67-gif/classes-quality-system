@@ -7,10 +7,17 @@ function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(
         !!localStorage.getItem("token")
     );
+    const [role, setRole] = useState(null);
 
     useEffect(() => {
         const checkLogin = () => {
             setIsLoggedIn(!!localStorage.getItem("token"));
+            try {
+                const user = JSON.parse(localStorage.getItem("user") || "null");
+                setRole(user?.role === "institute" ? "class" : user?.role || null);
+            } catch {
+                setRole(null);
+            }
         };
 
         checkLogin();
@@ -38,12 +45,10 @@ function Navbar() {
     return (
         <nav className="navbar">
 
-            {/* LOGO */}
             <Link to="/" className="logo">
                 CQCS
             </Link>
 
-            {/* NAVIGATION */}
             <div className="nav-links">
 
                 <Link to="/">
@@ -56,19 +61,24 @@ function Navbar() {
 
                 {isLoggedIn ? (
                     <>
-                        <Link to="/dashboard">
-                            Dashboard
-                        </Link>
-
                         <Link to="/profile">
                             Profile
                         </Link>
 
-                        <Link to="/compare">
-                            Compare
+                        <Link to={`/${role || "student"}/dashboard`}>
+                            Dashboard
                         </Link>
 
+                        {role === "class" && (
+                            <Link to="/classes">My Institute</Link>
+                        )}
+
+                        {role === "admin" && (
+                            <Link to="/classes">Institutes</Link>
+                        )}
+
                         <button
+                            type="button"
                             className="nav-logout-btn"
                             onClick={handleLogout}
                         >

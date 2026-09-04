@@ -24,31 +24,35 @@ function ClassDetails() {
             setLoading(true);
             setError("");
 
-            // Get class details
+            // =========================================
+            // FETCH INSTITUTE
+            // =========================================
+
             const classResponse = await fetch(
                 `http://localhost:8080/api/classes/${id}`
             );
 
-            const classResult =
-                await classResponse.json();
+            const classResult = await classResponse.json();
 
             if (!classResponse.ok) {
                 throw new Error(
                     classResult.message ||
-                    "Failed to fetch class"
+                    "Failed to fetch institute"
                 );
             }
 
             setClassData(classResult.class);
 
 
-            // Get courses belonging to this class
+            // =========================================
+            // FETCH COURSES
+            // =========================================
+
             const courseResponse = await fetch(
                 `http://localhost:8080/api/courses/class/${id}`
             );
 
-            const courseResult =
-                await courseResponse.json();
+            const courseResult = await courseResponse.json();
 
             if (!courseResponse.ok) {
                 throw new Error(
@@ -57,12 +61,12 @@ function ClassDetails() {
                 );
             }
 
-            setCourses(courseResult.courses);
+            setCourses(courseResult.courses || []);
 
         } catch (error) {
 
             console.error(
-                "Class details error:",
+                "Institute details error:",
                 error
             );
 
@@ -75,33 +79,69 @@ function ClassDetails() {
     };
 
 
+    // =========================================
+    // LOADING
+    // =========================================
+
     if (loading) {
         return (
             <div className="message">
-                <h1>Loading...</h1>
-                <p>Please wait while we load the class details.</p>
+
+                <h1>
+                    Loading...
+                </h1>
+
+                <p>
+                    Please wait while we load the institute details.
+                </p>
+
             </div>
         );
     }
 
+
+    // =========================================
+    // ERROR
+    // =========================================
 
     if (error) {
         return (
             <div className="details-page">
+
                 <div className="error-message">
-                    <h2>Something went wrong</h2>
-                    <p>{error}</p>
+
+                    <h2>
+                        Something went wrong
+                    </h2>
+
+                    <p>
+                        {error}
+                    </p>
+
                 </div>
+
             </div>
         );
     }
 
 
+    // =========================================
+    // NOT FOUND
+    // =========================================
+
     if (!classData) {
         return (
             <div className="message">
-                <h1>Class not found</h1>
-                <p>The requested coaching class could not be found.</p>
+
+                <h1>
+                    Institute not found
+                </h1>
+
+                <p>
+                    The requested coaching institute
+                    could not be found.
+                </p>
+
             </div>
         );
     }
@@ -110,11 +150,15 @@ function ClassDetails() {
     return (
         <div className="details-page">
 
-            {/* CLASS INFORMATION */}
+
+            {/* =========================================
+                INSTITUTE HEADER
+            ========================================= */}
 
             <div className="class-details-header">
 
                 <div>
+
                     <span className="details-label">
                         COACHING INSTITUTE
                     </span>
@@ -124,55 +168,124 @@ function ClassDetails() {
                     </h1>
 
                     <p className="class-description">
-                        {classData.description}
+                        {classData.description ||
+                            "Explore courses and subjects offered by this institute."}
                     </p>
+
+
+                    {/* INSTITUTE RATING */}
+
+                    {classData.rating !== undefined &&
+                        classData.rating !== null && (
+                            <div className="details-rating">
+
+                                <span className="rating-star">
+                                    ★
+                                </span>
+
+                                <strong>
+                                    {Number(classData.rating).toFixed(1)}
+                                </strong>
+
+                                <span>
+                                    / 5
+                                </span>
+
+                                <span className="rating-text">
+                                    Institute Rating
+                                </span>
+
+                            </div>
+                        )}
+
                 </div>
 
             </div>
 
 
-            {/* CONTACT INFORMATION */}
+            {/* =========================================
+                INSTITUTE INFORMATION
+            ========================================= */}
 
             <div className="class-info-grid">
 
+
                 <div className="class-info-card">
-                    <span className="info-icon">📍</span>
+
+                    <span className="info-icon">
+                        📍
+                    </span>
 
                     <div>
-                        <h3>Location</h3>
-                        <p>{classData.location}</p>
+
+                        <h3>
+                            Location
+                        </h3>
+
+                        <p>
+                            {classData.location || "Not available"}
+                        </p>
+
                     </div>
+
                 </div>
 
 
                 <div className="class-info-card">
-                    <span className="info-icon">🏠</span>
+
+                    <span className="info-icon">
+                        🏠
+                    </span>
 
                     <div>
-                        <h3>Address</h3>
-                        <p>{classData.address}</p>
+
+                        <h3>
+                            Address
+                        </h3>
+
+                        <p>
+                            {classData.address || "Not available"}
+                        </p>
+
                     </div>
+
                 </div>
 
 
                 <div className="class-info-card">
-                    <span className="info-icon">📞</span>
+
+                    <span className="info-icon">
+                        📞
+                    </span>
 
                     <div>
-                        <h3>Contact</h3>
-                        <p>{classData.contactNumber}</p>
+
+                        <h3>
+                            Contact
+                        </h3>
+
+                        <p>
+                            {classData.contactNumber || "Not available"}
+                        </p>
+
                     </div>
+
                 </div>
 
             </div>
 
 
-            {/* COURSES */}
+            {/* =========================================
+                COURSES
+            ========================================= */}
 
             <div className="courses-section">
 
+
                 <div className="section-heading">
+
                     <div>
+
                         <span className="details-label">
                             AVAILABLE PROGRAMS
                         </span>
@@ -182,28 +295,53 @@ function ClassDetails() {
                         </h2>
 
                         <p>
-                            Explore the courses available at this institute.
+                            Choose a course to explore its
+                            subjects and demo lectures.
                         </p>
+
                     </div>
 
+
                     <span className="course-count">
-                        {courses.length}{" "}
-                        {courses.length === 1 ? "Course" : "Courses"}
+
+                        {courses.length}
+
+                        {" "}
+
+                        {courses.length === 1
+                            ? "Course"
+                            : "Courses"}
+
                     </span>
+
                 </div>
 
+
+                {/* =========================================
+                    NO COURSES
+                ========================================= */}
 
                 {courses.length === 0 ? (
 
                     <div className="empty-state">
-                        <h3>No courses available</h3>
+
+                        <h3>
+                            No courses available
+                        </h3>
 
                         <p>
-                            This coaching class hasn't added any courses yet.
+                            This institute hasn't added
+                            any courses yet.
                         </p>
+
                     </div>
 
                 ) : (
+
+
+                    /* =====================================
+                       COURSE GRID
+                    ===================================== */
 
                     <div className="course-grid">
 
@@ -214,7 +352,11 @@ function ClassDetails() {
                                 className="course-card"
                             >
 
+
+                                {/* COURSE TOP */}
+
                                 <div className="course-card-top">
+
                                     <div className="course-icon">
                                         📚
                                     </div>
@@ -222,45 +364,98 @@ function ClassDetails() {
                                     <span className="course-tag">
                                         COURSE
                                     </span>
+
                                 </div>
 
+
+                                {/* COURSE NAME */}
 
                                 <h3>
                                     {course.name}
                                 </h3>
 
+                                <div className="course-rating">
+                                    <span className="course-rating-star">
+                                        ★
+                                    </span>
+
+                                    <strong>
+                                        {course.rating !== undefined && course.rating !== null
+                                            ? Number(course.rating).toFixed(1)
+                                            : "N/A"}
+                                    </strong>
+
+                                    <span className="course-rating-max">
+                                        / 5
+                                    </span>
+                                </div>
+
+
+                                {/* DESCRIPTION */}
 
                                 <p className="course-description">
-                                    {course.description}
+
+                                    {course.description ||
+                                        "Explore subjects, learning resources and demo lectures available for this course."}
+
                                 </p>
 
 
+                                {/* COURSE META */}
+
                                 <div className="course-meta">
 
-                                    <div>
-                                        <span>Duration</span>
-                                        <strong>
-                                            ⏱ {course.duration}
-                                        </strong>
-                                    </div>
 
                                     <div>
-                                        <span>Fees</span>
+
+                                        <span>
+                                            Duration
+                                        </span>
+
                                         <strong>
-                                            ₹{course.fees?.toLocaleString("en-IN")}
+                                            ⏱ {course.duration || "N/A"}
                                         </strong>
+
+                                    </div>
+
+
+                                    <div>
+
+                                        <span>
+                                            Fees
+                                        </span>
+
+                                        <strong>
+
+                                            {course.fees !== undefined &&
+                                                course.fees !== null
+                                                ? `₹${Number(course.fees).toLocaleString("en-IN")}`
+                                                : "N/A"}
+
+                                        </strong>
+
                                     </div>
 
                                 </div>
 
 
+                                {/* VIEW COURSE */}
+
                                 <Link
                                     to={`/courses/${course._id}`}
                                     className="course-btn"
                                 >
-                                    View Course
-                                    <span>→</span>
+
+                                    <span>
+                                        Explore Course
+                                    </span>
+
+                                    <span>
+                                        →
+                                    </span>
+
                                 </Link>
+
 
                             </div>
 

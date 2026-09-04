@@ -1,0 +1,224 @@
+/* =================================
+   REVIEW FORM
+================================= */
+
+.review-form-card {
+  background: white;
+
+  padding: 30px;
+
+  border-radius: 14px;
+
+  border: 1px solid #e5e7eb;
+
+  box-shadow:
+    0 4px 15px rgba(0, 0, 0, 0.05);
+
+  margin-top: 25px;
+}
+
+.review-form-header {
+  margin-bottom: 25px;
+}
+
+.review-form-header h2 {
+  margin: 4px 0 8px;
+
+  font-size: 28px;
+
+  color: #1f2937;
+}
+
+.review-form-header p {
+  margin: 0;
+
+  color: #6b7280;
+
+  line-height: 1.6;
+}
+
+
+/* MESSAGES */
+
+.review-success {
+  padding: 12px 15px;
+
+  background: #dcfce7;
+
+  color: #15803d;
+
+  border-radius: 8px;
+
+  font-weight: 600;
+
+  margin-bottom: 20px;
+}
+
+.review-error {
+  padding: 12px 15px;
+
+  background: #fee2e2;
+
+  color: #b91c1c;
+
+  border-radius: 8px;
+
+  font-weight: 600;
+
+  margin-bottom: 20px;
+}
+
+
+/* FORM */
+
+.review-form {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 22px;
+}
+
+.rating-fields {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, 1fr);
+
+  gap: 18px;
+}
+
+.rating-field,
+.comment-field {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+}
+
+.rating-field label,
+.comment-field label {
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: #374151;
+}
+
+.rating-field select,
+.comment-field textarea {
+  width: 100%;
+
+  padding: 12px 13px;
+
+  border: 1px solid #d1d5db;
+
+  border-radius: 8px;
+
+  background: white;
+
+  color: #374151;
+
+  font-size: 14px;
+
+  outline: none;
+
+  transition: 0.2s;
+}
+
+.rating-field select:focus,
+.comment-field textarea:focus {
+  border-color: #2563eb;
+
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.comment-field textarea {
+  resize: vertical;
+
+  min-height: 120px;
+
+  font-family: Arial, sans-serif;
+
+  line-height: 1.5;
+}
+
+
+/* OVERALL RATING */
+
+.overall-rating-field {
+  grid-column: 1 / -1;
+
+  max-width: 50%;
+}
+
+.overall-rating-field select {
+  border-color: #2563eb;
+
+  background: #eff6ff;
+}
+
+
+/* SUBMIT */
+
+.review-submit-btn {
+  width: 100%;
+
+  padding: 13px 20px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #2563eb;
+
+  color: white;
+
+  font-size: 15px;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.review-submit-btn:hover {
+  background: #1d4ed8;
+
+  transform: translateY(-1px);
+}
+
+.review-submit-btn:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+
+  transform: none;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+  .review-form-card {
+    padding: 22px 18px;
+  }
+
+  .rating-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .overall-rating-field {
+    grid-column: auto;
+
+    max-width: 100%;
+  }
+
+  .review-form-header h2 {
+    font-size: 24px;
+  }
+}

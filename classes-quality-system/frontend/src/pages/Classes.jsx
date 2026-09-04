@@ -18,6 +18,10 @@ function Classes() {
     const [sortBy, setSortBy] = useState("");
 
 
+    /* ================================
+       FETCH CLASSES
+    ================================ */
+
     useEffect(() => {
         fetchClasses();
     }, []);
@@ -26,6 +30,9 @@ function Classes() {
     const fetchClasses = async () => {
 
         try {
+
+            setLoading(true);
+            setError("");
 
             const response = await fetch(
                 "http://localhost:8080/api/classes"
@@ -39,11 +46,14 @@ function Classes() {
                 );
             }
 
-            setClasses(data.classes);
+            setClasses(data.classes || []);
 
         } catch (error) {
 
-            console.error("Fetch classes error:", error);
+            console.error(
+                "Fetch classes error:",
+                error
+            );
 
             setError(error.message);
 
@@ -54,31 +64,42 @@ function Classes() {
     };
 
 
-    /*
-     * SEARCH + FILTER + SORT
-     */
+    /* ================================
+       SEARCH + FILTER + SORT
+    ================================ */
 
     const filteredClasses = useMemo(() => {
 
         let result = [...classes];
 
-        const searchValue = search
-            .trim()
-            .toLowerCase();
+        const searchValue =
+            search.trim().toLowerCase();
 
 
-        // SEARCH
+        /* SEARCH */
+
         if (searchValue) {
 
             result = result.filter((item) =>
-                item.name?.toLowerCase().includes(searchValue) ||
-                item.location?.toLowerCase().includes(searchValue) ||
-                item.address?.toLowerCase().includes(searchValue)
+
+                item.name
+                    ?.toLowerCase()
+                    .includes(searchValue) ||
+
+                item.location
+                    ?.toLowerCase()
+                    .includes(searchValue) ||
+
+                item.address
+                    ?.toLowerCase()
+                    .includes(searchValue)
+
             );
         }
 
 
-        // RATING FILTER
+        /* RATING FILTER */
+
         if (ratingFilter) {
 
             const minimumRating =
@@ -92,7 +113,8 @@ function Classes() {
         }
 
 
-        // FEES FILTER
+        /* FEES FILTER */
+
         if (feesFilter) {
 
             result = result.filter((item) => {
@@ -100,30 +122,56 @@ function Classes() {
                 const fees =
                     Number(item.fees || 0);
 
-                if (feesFilter === "under-10000") {
+
+                if (
+                    feesFilter ===
+                    "under-10000"
+                ) {
+
                     return fees < 10000;
                 }
 
-                if (feesFilter === "10000-25000") {
-                    return fees >= 10000 &&
-                        fees <= 25000;
+
+                if (
+                    feesFilter ===
+                    "10000-25000"
+                ) {
+
+                    return (
+                        fees >= 10000 &&
+                        fees <= 25000
+                    );
                 }
 
-                if (feesFilter === "25000-50000") {
-                    return fees > 25000 &&
-                        fees <= 50000;
+
+                if (
+                    feesFilter ===
+                    "25000-50000"
+                ) {
+
+                    return (
+                        fees > 25000 &&
+                        fees <= 50000
+                    );
                 }
 
-                if (feesFilter === "above-50000") {
+
+                if (
+                    feesFilter ===
+                    "above-50000"
+                ) {
+
                     return fees > 50000;
                 }
+
 
                 return true;
             });
         }
 
 
-        // SORT
+        /* SORT */
+
         if (sortBy === "rating-high") {
 
             result.sort(
@@ -133,6 +181,7 @@ function Classes() {
             );
         }
 
+
         if (sortBy === "fees-low") {
 
             result.sort(
@@ -141,6 +190,7 @@ function Classes() {
                     Number(b.fees || 0)
             );
         }
+
 
         if (sortBy === "fees-high") {
 
@@ -163,12 +213,17 @@ function Classes() {
     ]);
 
 
+    /* ================================
+       CLEAR FILTERS
+    ================================ */
+
     const clearFilters = () => {
 
         setSearch("");
         setRatingFilter("");
         setFeesFilter("");
         setSortBy("");
+
     };
 
 
@@ -179,66 +234,116 @@ function Classes() {
         sortBy;
 
 
+    /* ================================
+       LOADING
+    ================================ */
+
     if (loading) {
+
         return (
+
             <div className="classes-page">
 
-                <h1>Classes</h1>
+                <div className="message">
 
-                <p className="message">
-                    Loading classes...
-                </p>
+                    <h1>
+                        Loading Classes...
+                    </h1>
+
+                    <p>
+                        Please wait while we load
+                        coaching institutes.
+                    </p>
+
+                </div>
 
             </div>
+
         );
     }
 
+
+    /* ================================
+       ERROR
+    ================================ */
 
     if (error) {
+
         return (
+
             <div className="classes-page">
 
-                <h1>Classes</h1>
+                <div className="error-message">
 
-                <p className="error-message">
-                    {error}
-                </p>
+                    <h2>
+                        Something went wrong
+                    </h2>
+
+                    <p>
+                        {error}
+                    </p>
+
+                    <button
+                        type="button"
+                        className="view-btn"
+                        onClick={fetchClasses}
+                    >
+                        Try Again
+                    </button>
+
+                </div>
 
             </div>
+
         );
     }
 
 
+    /* ================================
+       MAIN PAGE
+    ================================ */
+
     return (
+
         <div className="classes-page">
 
-            {/* HEADER */}
+
+            {/* =================================
+                PAGE HEADER
+            ================================= */}
 
             <div className="page-header">
+
+                <span className="details-label">
+                    COACHING INSTITUTES
+                </span>
 
                 <h1>
                     Find Your Coaching Institute
                 </h1>
 
                 <p>
-                    Compare institutes, courses, fees and
-                    ratings before choosing the right one.
+                    Compare institutes, courses, fees
+                    and ratings before choosing
+                    the right one.
                 </p>
 
             </div>
 
 
-            {/* SEARCH */}
+            {/* =================================
+                SEARCH
+            ================================= */}
 
             <div className="classes-search-box">
 
-                <span>
+                <span className="search-box-icon">
                     🔍
                 </span>
 
                 <input
                     type="text"
-                    placeholder="Search institute..."
+                    placeholder="Search institute, location or address..."
                     value={search}
                     onChange={(e) =>
                         setSearch(e.target.value)
@@ -248,9 +353,59 @@ function Classes() {
             </div>
 
 
-            {/* FILTER BAR */}
+            {/* =================================
+                COMPARE NAVIGATION
+            ================================= */}
+
+            <div className="compare-navigation">
+
+                <div className="compare-navigation-content">
+
+                    <div className="compare-navigation-icon">
+                        ⚖️
+                    </div>
+
+                    <div>
+
+                        <h3>
+                            Want to compare institutes?
+                        </h3>
+
+                        <p>
+                            Compare fees, ratings,
+                            exam preparation, study
+                            material and other details.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <Link
+                    to="/compare"
+                    className="compare-classes-btn"
+                >
+
+                    <span>
+                        Compare Classes
+                    </span>
+
+                    <span>
+                        →
+                    </span>
+
+                </Link>
+
+            </div>
+
+
+            {/* =================================
+                FILTER BAR
+            ================================= */}
 
             <div className="classes-filter-bar">
+
 
                 {/* RATING */}
 
@@ -263,7 +418,9 @@ function Classes() {
                     <select
                         value={ratingFilter}
                         onChange={(e) =>
-                            setRatingFilter(e.target.value)
+                            setRatingFilter(
+                                e.target.value
+                            )
                         }
                     >
 
@@ -303,7 +460,9 @@ function Classes() {
                     <select
                         value={feesFilter}
                         onChange={(e) =>
-                            setFeesFilter(e.target.value)
+                            setFeesFilter(
+                                e.target.value
+                            )
                         }
                     >
 
@@ -343,7 +502,9 @@ function Classes() {
                     <select
                         value={sortBy}
                         onChange={(e) =>
-                            setSortBy(e.target.value)
+                            setSortBy(
+                                e.target.value
+                            )
                         }
                     >
 
@@ -385,24 +546,32 @@ function Classes() {
             </div>
 
 
-            {/* RESULT COUNT */}
+            {/* =================================
+                RESULT COUNT
+            ================================= */}
 
             <div className="classes-result-info">
 
                 Showing{" "}
+
                 <strong>
                     {filteredClasses.length}
-                </strong>{" "}
-                of{" "}
+                </strong>
+
+                {" "}of{" "}
+
                 <strong>
                     {classes.length}
-                </strong>{" "}
-                institutes
+                </strong>
+
+                {" "}institutes
 
             </div>
 
 
-            {/* RESULTS */}
+            {/* =================================
+                NO RESULTS
+            ================================= */}
 
             {filteredClasses.length === 0 ? (
 
@@ -417,7 +586,8 @@ function Classes() {
                     </h3>
 
                     <p>
-                        Try changing your filters or search.
+                        Try changing your filters
+                        or search.
                     </p>
 
                     <button
@@ -432,6 +602,11 @@ function Classes() {
 
             ) : (
 
+
+                /* =================================
+                   INSTITUTE CARDS
+                ================================= */
+
                 <div className="institutes">
 
                     {filteredClasses.map((item) => (
@@ -441,80 +616,146 @@ function Classes() {
                             key={item._id}
                         >
 
+
+                            {/* CARD TOP */}
+
                             <div className="card-top">
 
-                                <div className="institute-icon">
-                                    🏫
+
+                                <div className="institute-card-title">
+
+                                    <div className="institute-icon">
+                                        🏫
+                                    </div>
+
+
+                                    <div>
+
+                                        <h3>
+                                            {item.name}
+                                        </h3>
+
+                                    </div>
+
                                 </div>
 
-                                <div>
 
-                                    <h3>
-                                        {item.name}
-                                    </h3>
+                                {/* COMPACT RATING */}
 
-                                    {item.rating && (
+                                <div className="compact-rating">
+                                    <span>⭐</span>
 
-                                        <div className="institute-rating">
-                                            ⭐ {item.rating}
-                                        </div>
-
-                                    )}
-
+                                    <strong>
+                                        {item.rating !== undefined &&
+                                            item.rating !== null &&
+                                            item.rating !== ""
+                                            ? Number(item.rating).toFixed(1)
+                                            : "N/A"}
+                                    </strong>
                                 </div>
 
                             </div>
 
 
-                            <p className="description">
-                                {item.description}
-                            </p>
+                            {/* DESCRIPTION */}
+
+                            {item.description && (
+
+                                <p className="description">
+                                    {item.description}
+                                </p>
+
+                            )}
 
 
-                            <p className="location">
-                                <strong>
-                                    Location:
-                                </strong>{" "}
-                                {item.location}
-                            </p>
+                            {/* LOCATION */}
 
-
-                            <p className="location">
-                                <strong>
-                                    Address:
-                                </strong>{" "}
-                                {item.address}
-                            </p>
-
-
-                            {item.fees && (
+                            {item.location && (
 
                                 <p className="location">
 
                                     <strong>
-                                        Fees:
-                                    </strong>{" "}
+                                        Location:
+                                    </strong>
 
-                                    ₹{Number(item.fees).toLocaleString("en-IN")}
+                                    {" "}
+
+                                    {item.location}
 
                                 </p>
 
                             )}
 
 
-                            <p className="location">
+                            {/* ADDRESS */}
 
-                                <strong>
-                                    Contact:
-                                </strong>{" "}
+                            {item.address && (
 
-                                {item.contactNumber}
+                                <p className="location">
 
-                            </p>
+                                    <strong>
+                                        Address:
+                                    </strong>
 
+                                    {" "}
+
+                                    {item.address}
+
+                                </p>
+
+                            )}
+
+
+                            {/* FEES */}
+
+                            {item.fees !== undefined &&
+                                item.fees !== null &&
+                                item.fees !== "" && (
+
+                                    <p className="location">
+
+                                        <strong>
+                                            Fees:
+                                        </strong>
+
+                                        {" "}
+
+                                        ₹
+                                        {Number(
+                                            item.fees
+                                        ).toLocaleString(
+                                            "en-IN"
+                                        )}
+
+                                    </p>
+
+                                )}
+
+
+                            {/* CONTACT */}
+
+                            {item.contactNumber && (
+
+                                <p className="location">
+
+                                    <strong>
+                                        Contact:
+                                    </strong>
+
+                                    {" "}
+
+                                    {item.contactNumber}
+
+                                </p>
+
+                            )}
+
+
+                            {/* VIEW DETAILS */}
 
                             <Link
                                 to={`/classes/${item._id}`}
+                                className="class-details-link"
                             >
 
                                 <button
@@ -522,9 +763,11 @@ function Classes() {
                                     type="button"
                                 >
                                     View Details
+                                    <span>→</span>
                                 </button>
 
                             </Link>
+
 
                         </div>
 
@@ -535,6 +778,7 @@ function Classes() {
             )}
 
         </div>
+
     );
 }
 

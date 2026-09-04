@@ -1,8 +1,25 @@
 const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
-const authMiddleware = (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
     try {
-        // Get Authorization header
+        // =========================================
+        // CHECK JWT SECRET
+        // =========================================
+
+        if (!process.env.JWT_SECRET) {
+            console.error("JWT_SECRET is not configured");
+
+            return res.status(500).json({
+                message: "Server authentication configuration error"
+            });
+        }
+
+
+        // =========================================
+        // GET AUTHORIZATION HEADER
+        // =========================================
+
         const authHeader = req.headers.authorization;
 
         if (!authHeader) {
@@ -11,35 +28,71 @@ const authMiddleware = (req, res, next) => {
             });
         }
 
-        // Expected format:
-        // Bearer TOKEN
-        const parts = authHeader.split(" ");
 
-        if (parts.length !== 2 || parts[0] !== "Bearer") {
+        // =========================================
+        // CHECK BEARER FORMAT
+        // =========================================
+
+        const [scheme, token] = authHeader.split(" ");
+
+        if (
+            scheme !== "Bearer" ||
+            !token
+        ) {
             return res.status(401).json({
                 message: "Invalid authorization format"
             });
         }
 
-        const token = parts[1];
 
-        // Verify token
+        // =========================================
+        // VERIFY TOKEN
+        // =========================================
+
         const decoded = jwt.verify(
             token,
             process.env.JWT_SECRET
         );
 
-        // Store user information in request
-        req.user = decoded;
-        console.log("Authenticated user:", req.user);
+
+        // =========================================
+        // STORE USER INFORMATION
+        // =========================================
+
+        const user = await User.findById(decoded.userId).select("name email role");
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Authentication required"
+            });
+        }
+
+        req.user = {
+            userId: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role === "institute" ? "class" : user.role
+        };
+
+
+        // =========================================
+        // CONTINUE REQUEST
+        // =========================================
 
         next();
 
     } catch (error) {
+
+        console.error(
+            "Authentication error:",
+            error.message
+        );
+
         return res.status(401).json({
             message: "Invalid or expired token"
         });
     }
 };
+
 
 module.exports = authMiddleware;

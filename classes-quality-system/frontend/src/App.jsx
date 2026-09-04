@@ -11,22 +11,38 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Classes from "./pages/Classes";
 import ClassDetails from "./pages/ClassDetails";
-import Profile from "./pages/Profile";
 import CourseDetails from "./pages/CourseDetails";
 import SubjectDetails from "./pages/SubjectDetails";
-import ProtectedRoute from "./components/ProtectedRoute";
-import Dashboard from "./pages/Dashboard";
 import DemoLectures from "./pages/DemoLectures";
-import CompareFees from "./pages/CompareFees";
+import Profile from "./pages/Profile";
+import Compare from "./pages/Compare";
+import StudentDashboard from "./pages/StudentDashboard";
+import ClassDashboard from "./pages/ClassDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-
   return (
     <BrowserRouter>
-
       <Navbar />
 
       <Routes>
+
+        <Route
+          path="/student/dashboard"
+          element={<ProtectedRoute allowedRoles={["student"]}><StudentDashboard /></ProtectedRoute>}
+        />
+
+        <Route
+          path="/class/dashboard"
+          element={<ProtectedRoute allowedRoles={["class"]}><ClassDashboard /></ProtectedRoute>}
+        />
+
+        <Route
+          path="/admin/dashboard"
+          element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>}
+        />
 
         <Route
           path="/"
@@ -54,13 +70,23 @@ function App() {
         />
 
         <Route
-          path="/subjects/:id"
-          element={<SubjectDetails />}
+          path="/compare"
+          element={<Compare />}
         />
 
         <Route
           path="/courses/:id"
           element={<CourseDetails />}
+        />
+
+        <Route
+          path="/subjects/:id"
+          element={<SubjectDetails />}
+        />
+
+        <Route
+          path="/classes/:classId/courses/:courseId/subjects/:subjectId/demos"
+          element={<DemoLectures />}
         />
 
         <Route
@@ -72,24 +98,7 @@ function App() {
           }
         />
 
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/demo-lectures"
-          element={<DemoLectures />}
-        />
-
-        <Route path="/compare" element={<CompareFees />} />
       </Routes>
-
-
     </BrowserRouter>
   );
 }

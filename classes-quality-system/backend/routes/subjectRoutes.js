@@ -3,18 +3,24 @@ const express = require("express");
 const {
     createSubject,
     getSubjectsByCourse,
-    getSubjectById
+    getSubjectById,
+    addDemoLecture,
+    updateDemoLecture,
+    deleteDemoLecture,
+    updateSubject,
+    deleteSubject
 } = require("../controllers/subjectController");
+
+const authMiddleware = require("../middleware/authMiddleware");
+const authorize = require("../middleware/authorization");
 
 const router = express.Router();
 
-
-// Get all subjects of a course
+// Get subjects of a course
 router.get(
     "/course/:courseId",
     getSubjectsByCourse
 );
-
 
 // Get one subject
 router.get(
@@ -22,12 +28,18 @@ router.get(
     getSubjectById
 );
 
-
-// Create subject
+// Create subject - class owner or admin
 router.post(
     "/",
+    authMiddleware,
+    authorize("class", "admin"),
     createSubject
 );
 
+router.put("/:id", authMiddleware, authorize("class", "admin"), updateSubject);
+router.delete("/:id", authMiddleware, authorize("class", "admin"), deleteSubject);
+router.post("/:id/demos", authMiddleware, authorize("class", "admin"), addDemoLecture);
+router.put("/:id/demos/:lectureId", authMiddleware, authorize("class", "admin"), updateDemoLecture);
+router.delete("/:id/demos/:lectureId", authMiddleware, authorize("class", "admin"), deleteDemoLecture);
 
 module.exports = router;

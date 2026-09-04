@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import ReviewForm from "../components/ReviewForm";
 
 function SubjectDetails() {
@@ -7,10 +7,16 @@ function SubjectDetails() {
     const { id } = useParams();
 
     const [subject, setSubject] = useState(null);
+    const [course, setCourse] = useState(null);
     const [reviews, setReviews] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+
+    // =========================================
+    // FETCH SUBJECT + REVIEWS
+    // =========================================
 
     const fetchSubjectDetails = async () => {
 
@@ -18,6 +24,10 @@ function SubjectDetails() {
 
             setLoading(true);
             setError("");
+
+            // =========================================
+            // FETCH SUBJECT
+            // =========================================
 
             const subjectResponse = await fetch(
                 `http://localhost:8080/api/subjects/${id}`
@@ -29,14 +39,35 @@ function SubjectDetails() {
             console.log("SUBJECT:", subjectData);
 
             if (!subjectResponse.ok) {
+
                 throw new Error(
                     subjectData.message ||
                     "Failed to fetch subject"
                 );
+
             }
 
             setSubject(subjectData.subject);
 
+            const courseResponse = await fetch(
+                `http://localhost:8080/api/courses/${subjectData.subject.courseId}`
+            );
+
+            const courseData = await courseResponse.json();
+
+            if (!courseResponse.ok) {
+                throw new Error(
+                    courseData.message ||
+                    "Failed to fetch course"
+                );
+            }
+
+            setCourse(courseData.course);
+
+
+            // =========================================
+            // FETCH REVIEWS
+            // =========================================
 
             const reviewResponse = await fetch(
                 `http://localhost:8080/api/reviews/subject/${id}`
@@ -48,10 +79,12 @@ function SubjectDetails() {
             console.log("REVIEWS:", reviewData);
 
             if (!reviewResponse.ok) {
+
                 throw new Error(
                     reviewData.message ||
                     "Failed to fetch reviews"
                 );
+
             }
 
             setReviews(
@@ -70,9 +103,15 @@ function SubjectDetails() {
         } finally {
 
             setLoading(false);
+
         }
+
     };
 
+
+    // =========================================
+    // LOAD DATA
+    // =========================================
 
     useEffect(() => {
 
@@ -80,6 +119,10 @@ function SubjectDetails() {
 
     }, [id]);
 
+
+    // =========================================
+    // CALCULATE AVERAGE RATING
+    // =========================================
 
     const calculateAverage = (field) => {
 
@@ -89,7 +132,10 @@ function SubjectDetails() {
 
         const total = reviews.reduce(
             (sum, review) => {
-                return sum + Number(review[field] || 0);
+
+                return sum +
+                    Number(review[field] || 0);
+
             },
             0
         );
@@ -97,38 +143,64 @@ function SubjectDetails() {
         return (
             total / reviews.length
         ).toFixed(1);
+
     };
 
+
+    // =========================================
+    // LOADING
+    // =========================================
 
     if (loading) {
 
         return (
+
             <div className="message">
-                <h1>Loading subject...</h1>
+
+                <h1>
+                    Loading subject...
+                </h1>
+
             </div>
+
         );
+
     }
 
+
+    // =========================================
+    // ERROR
+    // =========================================
 
     if (error) {
 
         return (
+
             <div className="details-page">
 
-                <h1>Error</h1>
+                <h1>
+                    Error
+                </h1>
 
                 <p className="error-message">
                     {error}
                 </p>
 
             </div>
+
         );
+
     }
 
+
+    // =========================================
+    // SUBJECT NOT FOUND
+    // =========================================
 
     if (!subject) {
 
         return (
+
             <div className="message">
 
                 <h1>
@@ -136,98 +208,238 @@ function SubjectDetails() {
                 </h1>
 
             </div>
+
         );
+
     }
 
 
     return (
+
         <div className="details-page">
+
+
+            {/* =========================================
+                SUBJECT HEADER
+            ========================================= */}
 
             <div className="details-header">
 
                 <div>
+
+                    <span className="details-label">
+                        SUBJECT
+                    </span>
+
                     <h1>
                         {subject.name}
                     </h1>
 
                     <p>
-                        {subject.description}
+                        {subject.description ||
+                            "Explore this subject and its learning resources."}
                     </p>
+
                 </div>
 
             </div>
 
 
-            <div className="details-card">
+            {/* =========================================
+                DEMO LECTURE CTA
+            ========================================= */}
 
-                <h2>
-                    Ratings
-                </h2>
+            {course && (
+
+                <div className="demo-lectures-cta">
+
+                    {/* LEFT SIDE */}
+
+                    <div className="demo-cta-left">
+
+                        <div className="demo-cta-icon">
+                            ▶
+                        </div>
+
+
+                        <div className="demo-cta-content">
+
+                            <span className="demo-cta-label">
+                                FREE DEMO
+                            </span>
+
+                            <h3>
+                                Try {subject.name} Demo Lectures
+                            </h3>
+
+                            <p>
+                                Explore sample lectures for this subject.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    {/* BUTTON */}
+
+                    <Link
+                        to={`/classes/${course.classId}/courses/${subject.courseId}/subjects/${id}/demos`}
+                        className="demo-cta-btn"
+                    >
+                        Watch Demo
+                        <span>→</span>
+                    </Link>
+
+                </div>
+
+            )}
+
+
+            {/* =========================================
+                COMPACT RATINGS
+            ========================================= */}
+
+            <div className="details-card compact-ratings-card">
+
+                <div className="ratings-header">
+
+                    <div>
+
+                        <h2>
+                            Ratings
+                        </h2>
+
+                        <p>
+                            Student feedback
+                        </p>
+
+                    </div>
+
+
+                    {/* OVERALL RATING */}
+
+                    {reviews.length > 0 && (
+
+                        <div className="overall-rating-mini">
+
+                            <span>
+                                ⭐
+                            </span>
+
+                            <strong>
+                                {calculateAverage(
+                                    "overallRating"
+                                )}
+                            </strong>
+
+                            <small>
+                                / 5
+                            </small>
+
+                        </div>
+
+                    )}
+
+                </div>
+
+
+                {/* =========================================
+                    NO REVIEWS
+                ========================================= */}
 
                 {reviews.length === 0 ? (
 
-                    <p className="empty-state">
+                    <p className="no-rating-text">
                         No reviews yet.
                     </p>
 
                 ) : (
 
-                    <div>
+                    <div className="rating-mini-grid">
 
-                        <div className="rating-box">
-                            <h3>Overall Rating</h3>
 
-                            <p className="big-rating">
-                                ⭐ {calculateAverage("overallRating")} / 5
-                            </p>
+                        {/* TEACHING QUALITY */}
 
-                            <p className="rating-count">
-                                Based on {reviews.length} review
-                                {reviews.length !== 1 ? "s" : ""}
-                            </p>
+                        <div className="rating-mini-item">
+
+                            <span>
+                                Teaching
+                            </span>
+
+                            <strong>
+                                ⭐{" "}
+                                {calculateAverage(
+                                    "teachingQuality"
+                                )}
+                            </strong>
+
                         </div>
 
 
-                        <div className="rating-box">
-                            <h3>Teaching Quality</h3>
+                        {/* CONCEPT CLARITY */}
 
-                            <p>
-                                ⭐ {calculateAverage("teachingQuality")} / 5
-                            </p>
+                        <div className="rating-mini-item">
+
+                            <span>
+                                Concept Clarity
+                            </span>
+
+                            <strong>
+                                ⭐{" "}
+                                {calculateAverage(
+                                    "conceptClarity"
+                                )}
+                            </strong>
+
                         </div>
 
 
-                        <div className="rating-box">
-                            <h3>Concept Clarity</h3>
+                        {/* DOUBT SOLVING */}
 
-                            <p>
-                                ⭐ {calculateAverage("conceptClarity")} / 5
-                            </p>
+                        <div className="rating-mini-item">
+
+                            <span>
+                                Doubt Solving
+                            </span>
+
+                            <strong>
+                                ⭐{" "}
+                                {calculateAverage(
+                                    "doubtSolving"
+                                )}
+                            </strong>
+
                         </div>
 
 
-                        <div className="rating-box">
-                            <h3>Doubt Solving</h3>
+                        {/* STUDY MATERIAL */}
 
-                            <p>
-                                ⭐ {calculateAverage("doubtSolving")} / 5
-                            </p>
-                        </div>
+                        <div className="rating-mini-item">
 
+                            <span>
+                                Study Material
+                            </span>
 
-                        <div className="rating-box">
-                            <h3>Study Material</h3>
+                            <strong>
+                                ⭐{" "}
+                                {calculateAverage(
+                                    "studyMaterial"
+                                )}
+                            </strong>
 
-                            <p>
-                                ⭐ {calculateAverage("studyMaterial")} / 5
-                            </p>
                         </div>
 
                     </div>
+
                 )}
 
             </div>
 
+
+            {/* =========================================
+                STUDENT REVIEWS
+            ========================================= */}
 
             <div className="details-card">
 
@@ -258,66 +470,105 @@ function SubjectDetails() {
                                 className="review-card"
                             >
 
+                                {/* STUDENT NAME */}
+
                                 <h3>
                                     {review.studentId?.name ||
                                         "Student"}
                                 </h3>
 
 
+                                {/* OVERALL RATING */}
+
                                 <p className="review-rating">
 
-                                    ⭐ {review.overallRating}/5
+                                    ⭐{" "}
+                                    {review.overallRating}
+                                    /5
 
                                 </p>
 
 
-                                <p className="review-comment">
+                                {/* COMMENT */}
 
-                                    {review.comment}
+                                {review.comment && (
 
-                                </p>
+                                    <p className="review-comment">
+
+                                        {review.comment}
+
+                                    </p>
+
+                                )}
 
 
                                 <hr />
 
 
+                                {/* TEACHING QUALITY */}
+
                                 <p>
+
                                     <strong>
                                         Teaching Quality:
                                     </strong>{" "}
-                                    {review.teachingQuality}/5
+
+                                    {review.teachingQuality}
+                                    /5
+
                                 </p>
 
 
+                                {/* CONCEPT CLARITY */}
+
                                 <p>
+
                                     <strong>
                                         Concept Clarity:
                                     </strong>{" "}
-                                    {review.conceptClarity}/5
+
+                                    {review.conceptClarity}
+                                    /5
+
                                 </p>
 
 
+                                {/* DOUBT SOLVING */}
+
                                 <p>
+
                                     <strong>
                                         Doubt Solving:
                                     </strong>{" "}
-                                    {review.doubtSolving}/5
+
+                                    {review.doubtSolving}
+                                    /5
+
                                 </p>
 
 
+                                {/* STUDY MATERIAL */}
+
                                 <p>
+
                                     <strong>
                                         Study Material:
                                     </strong>{" "}
-                                    {review.studyMaterial}/5
+
+                                    {review.studyMaterial}
+                                    /5
+
                                 </p>
 
+
+                                {/* DATE */}
 
                                 {review.createdAt && (
 
                                     <small className="review-date">
 
                                         Submitted on{" "}
+
                                         {new Date(
                                             review.createdAt
                                         ).toLocaleDateString()}
@@ -337,24 +588,36 @@ function SubjectDetails() {
             </div>
 
 
+            {/* =========================================
+                REVIEW FORM
+            ========================================= */}
+
             <div className="details-card">
 
                 {localStorage.getItem("token") ? (
+
                     <ReviewForm
                         subjectId={id}
-                        onReviewSubmitted={fetchSubjectDetails}
+                        onReviewSubmitted={
+                            fetchSubjectDetails
+                        }
                     />
+
                 ) : (
+
                     <p>
                         Please login to submit a review.
                     </p>
+
                 )}
 
             </div>
 
-        </div>
-    );
-}
 
+        </div>
+
+    );
+
+}
 
 export default SubjectDetails;

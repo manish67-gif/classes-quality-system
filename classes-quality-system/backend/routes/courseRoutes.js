@@ -3,31 +3,34 @@ const express = require("express");
 const {
     createCourse,
     getCoursesByClass,
-    getCourseById
+    getCourseById,
+    updateCourse,
+    deleteCourse
 } = require("../controllers/courseController");
+
+const authMiddleware = require("../middleware/authMiddleware");
+const authorize = require("../middleware/authorization");
 
 const router = express.Router();
 
-
-// Get all courses belonging to a class
 router.get(
     "/class/:classId",
     getCoursesByClass
 );
 
-
-// Get one course
 router.get(
     "/:id",
     getCourseById
 );
 
-
-// Create course
 router.post(
     "/",
+    authMiddleware,
+    authorize("class", "admin"),
     createCourse
 );
 
+router.put("/:id", authMiddleware, authorize("class", "admin"), updateCourse);
+router.delete("/:id", authMiddleware, authorize("class", "admin"), deleteCourse);
 
 module.exports = router;
