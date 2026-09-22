@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const API = "http://localhost:8080/api";
 
@@ -34,7 +34,7 @@ function ManagementDashboard({ role }) {
 
     const currentUser = JSON.parse(localStorage.getItem("user") || "null");
 
-    const loadClasses = async () => {
+    const loadClasses = useCallback(async () => {
         const data = await request("/classes", { headers: {} });
         const owned = role === "class"
             ? (data.classes || []).filter((item) => item.ownerId === currentUser?.id || item.ownerId?._id === currentUser?.id)
@@ -43,15 +43,16 @@ function ManagementDashboard({ role }) {
         if (selectedClass && !owned.some((item) => item._id === selectedClass._id)) {
             setSelectedClass(null);
         }
-    };
+    }, [currentUser?.id, role, selectedClass]);
 
-    const loadUsers = async () => {
+    const loadUsers = useCallback(async () => {
         if (role === "admin") setUsers((await request("/users")).users || []);
-    };
+    }, [role]);
 
     useEffect(() => {
+        // oxlint-disable-next-line react/set-state-in-effect
         Promise.all([loadClasses(), loadUsers()]).catch((loadError) => setError(loadError.message));
-    }, [role]);
+    }, [loadClasses, loadUsers]);
 
     const selectClass = async (classItem) => {
         setSelectedClass(classItem);

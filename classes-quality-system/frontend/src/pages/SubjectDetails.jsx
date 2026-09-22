@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReviewForm from "../components/ReviewForm";
 
@@ -18,11 +18,10 @@ function SubjectDetails() {
     // FETCH SUBJECT + REVIEWS
     // =========================================
 
-    const fetchSubjectDetails = async () => {
+    const fetchSubjectDetails = useCallback(async () => {
 
         try {
 
-            setLoading(true);
             setError("");
 
             // =========================================
@@ -106,7 +105,7 @@ function SubjectDetails() {
 
         }
 
-    };
+    }, [id]);
 
 
     // =========================================
@@ -114,10 +113,10 @@ function SubjectDetails() {
     // =========================================
 
     useEffect(() => {
-
+        // oxlint-disable-next-line react/set-state-in-effect
         fetchSubjectDetails();
 
-    }, [id]);
+    }, [fetchSubjectDetails]);
 
 
     // =========================================

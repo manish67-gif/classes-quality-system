@@ -65,9 +65,9 @@ function Navbar() {
                             Profile
                         </Link>
 
-                        <Link to={`/${role || "student"}/dashboard`}>
+                        {/* <Link to={`/${role || "student"}/dashboard`}>
                             Dashboard
-                        </Link>
+                        </Link> */}
 
                         {role === "class" && (
                             <Link to="/classes">My Institute</Link>

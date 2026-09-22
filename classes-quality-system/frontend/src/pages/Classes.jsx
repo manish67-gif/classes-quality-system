@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 
 function Classes() {
@@ -22,16 +22,10 @@ function Classes() {
        FETCH CLASSES
     ================================ */
 
-    useEffect(() => {
-        fetchClasses();
-    }, []);
-
-
-    const fetchClasses = async () => {
+    const fetchClasses = useCallback(async () => {
 
         try {
 
-            setLoading(true);
             setError("");
 
             const response = await fetch(
@@ -61,7 +55,12 @@ function Classes() {
 
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        // oxlint-disable-next-line react/set-state-in-effect
+        fetchClasses();
+    }, [fetchClasses]);
 
 
     /* ================================

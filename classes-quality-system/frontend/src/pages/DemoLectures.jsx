@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 function DemoLectures() {
@@ -19,16 +19,10 @@ function DemoLectures() {
     // FETCH DATA
     // =========================================
 
-    useEffect(() => {
-        fetchDemoLectures();
-    }, [classId, courseId, subjectId]);
-
-
-    const fetchDemoLectures = async () => {
+    const fetchDemoLectures = useCallback(async () => {
 
         try {
 
-            setLoading(true);
             setError("");
 
 
@@ -121,7 +115,12 @@ function DemoLectures() {
 
         }
 
-    };
+    }, [classId, courseId, subjectId]);
+
+    useEffect(() => {
+        // oxlint-disable-next-line react/set-state-in-effect
+        fetchDemoLectures();
+    }, [fetchDemoLectures]);
 
 
     // =========================================

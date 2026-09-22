@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 function Compare() {
@@ -9,11 +9,7 @@ function Compare() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-        fetchClasses();
-    }, []);
-
-    const fetchClasses = async () => {
+    const fetchClasses = useCallback(async () => {
 
         try {
 
@@ -41,7 +37,12 @@ function Compare() {
 
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        // oxlint-disable-next-line react/set-state-in-effect
+        fetchClasses();
+    }, [fetchClasses]);
 
 
     /* =========================================
@@ -355,8 +356,8 @@ function Compare() {
 
                                 <div
                                     className={`compare-class-card ${isSelected
-                                            ? "selected"
-                                            : ""
+                                        ? "selected"
+                                        : ""
                                         }`}
                                     key={item._id}
                                 >

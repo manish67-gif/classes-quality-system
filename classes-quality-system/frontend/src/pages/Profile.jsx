@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 function Profile() {
 
@@ -9,16 +9,10 @@ function Profile() {
     const [error, setError] = useState("");
 
 
-    useEffect(() => {
-        fetchProfile();
-    }, []);
-
-
-    const fetchProfile = async () => {
+    const fetchProfile = useCallback(async () => {
 
         try {
 
-            setLoading(true);
             setError("");
 
             const token = localStorage.getItem("token");
@@ -202,7 +196,12 @@ function Profile() {
 
             setLoading(false);
         }
-    };
+    }, []);
+
+    useEffect(() => {
+        // oxlint-disable-next-line react/set-state-in-effect
+        fetchProfile();
+    }, [fetchProfile]);
 
 
     // =========================

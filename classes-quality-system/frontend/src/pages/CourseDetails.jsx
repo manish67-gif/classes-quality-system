@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 
 function CourseDetails() {
@@ -10,13 +10,8 @@ function CourseDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-        fetchCourseDetails();
-    }, [id]);
-
-    const fetchCourseDetails = async () => {
+    const fetchCourseDetails = useCallback(async () => {
         try {
-            setLoading(true);
             setError("");
 
             // GET COURSE
@@ -54,7 +49,12 @@ function CourseDetails() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [id]);
+
+    useEffect(() => {
+        // oxlint-disable-next-line react/set-state-in-effect
+        fetchCourseDetails();
+    }, [fetchCourseDetails]);
 
     // LOADING
     if (loading) {
