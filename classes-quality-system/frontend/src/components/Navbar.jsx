@@ -66,11 +66,14 @@ function Navbar() {
                         </Link>
 
                         {role === "class" && (
-                            <Link to="/classes">My Institute</Link>
+                            <Link to="/class/dashboard">
+                                My Institute
+                            </Link>
                         )}
 
                         {role === "admin" && (
                             <Link to="/classes">Institutes</Link>
+
                         )}
 
                         <button

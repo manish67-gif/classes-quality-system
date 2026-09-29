@@ -76,7 +76,13 @@ function Signup() {
                 name: "",
                 email: "",
                 password: "",
-                role: "student"
+                role: "student",
+                className: "",
+                description: "",
+                location: "",
+                address: "",
+                contactNumber: "",
+                website: ""
             });
 
 

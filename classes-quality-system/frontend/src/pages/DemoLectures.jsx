@@ -19,6 +19,31 @@ function DemoLectures() {
     // FETCH DATA
     // =========================================
 
+    const getYouTubeEmbedUrl = (url) => {
+        if (!url) return null;
+
+        try {
+            const parsed = new URL(url);
+
+            if (parsed.hostname.includes("youtube.com")) {
+                const videoId = parsed.searchParams.get("v");
+
+                if (videoId) {
+                    return `https://www.youtube.com/embed/${videoId}`;
+                }
+            }
+
+            if (parsed.hostname === "youtu.be") {
+                return `https://www.youtube.com/embed${parsed.pathname}`;
+            }
+
+            return null;
+
+        } catch {
+            return null;
+        }
+    };
+
     const fetchDemoLectures = useCallback(async () => {
 
         try {
@@ -661,5 +686,7 @@ function DemoLectures() {
     );
 
 }
+
+
 
 export default DemoLectures;

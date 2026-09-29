@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const Course = require("../models/Course");
 const Class = require("../models/Class");
+const Subject = require("../models/Subject");
+const Review = require("../models/Review");
 
 const createCourse = async (req, res) => {
     try {
@@ -153,64 +155,31 @@ const getCourseById = async (req, res) => {
     }
 };
 
+const getAllCourses = async (req, res) => {
+    try {
+        const courses = await Course.find()
+            .populate("classId", "name location address")
+            .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            message: "Courses fetched successfully",
+            courses
+        });
+
+    } catch (error) {
+        console.error("Get all courses error:", error);
+
+        return res.status(500).json({
+            message: "Server error"
+        });
+    }
+};
+
 module.exports = {
     createCourse,
     getCoursesByClass,
     getCourseById,
-    updateCourse: async (req, res) => {
-        try {
-            const course = await Course.findById(req.params.id);
-
-            if (!course) {
-                return res.status(404).json({ message: "Course not found" });
-            }
-
-            const classItem = await Class.findById(course.classId);
-
-            if (!classItem) {
-                return res.status(404).json({ message: "Class not found" });
-            }
-
-            if (req.user.role !== "admin" && classItem.ownerId.toString() !== req.user.userId) {
-                return res.status(403).json({ message: "You do not have permission to modify this resource" });
-            }
-
-            ["name", "description", "fees", "duration"].forEach((field) => {
-                if (req.body[field] !== undefined) {
-                    course[field] = field === "fees" ? Number(req.body[field]) : req.body[field];
-                }
-            });
-
-            await course.save();
-            return res.status(200).json({ message: "Course updated successfully", course });
-        } catch (error) {
-            console.error("Update course error:", error);
-            return res.status(500).json({ message: "Server error" });
-        }
-    },
-    deleteCourse: async (req, res) => {
-        try {
-            const course = await Course.findById(req.params.id);
-
-            if (!course) {
-                return res.status(404).json({ message: "Course not found" });
-            }
-
-            const classItem = await Class.findById(course.classId);
-
-            if (!classItem) {
-                return res.status(404).json({ message: "Class not found" });
-            }
-
-            if (req.user.role !== "admin" && classItem.ownerId.toString() !== req.user.userId) {
-                return res.status(403).json({ message: "You do not have permission to modify this resource" });
-            }
-
-            await Course.findByIdAndDelete(req.params.id);
-            return res.status(200).json({ message: "Course deleted successfully" });
-        } catch (error) {
-            console.error("Delete course error:", error);
-            return res.status(500).json({ message: "Server error" });
-        }
-    }
+    getAllCourses,
+    updateCourse,
+    deleteCourse
 };

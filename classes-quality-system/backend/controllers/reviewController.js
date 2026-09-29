@@ -161,6 +161,22 @@ const createReview = async (req, res) => {
             comment: comment.trim()
         });
 
+        const subjectReviews = await Review.find({
+            subjectId
+        });
+
+        const totalRating = subjectReviews.reduce(
+            (sum, item) => sum + item.overallRating,
+            0
+        );
+
+        const averageRating =
+            totalRating / subjectReviews.length;
+
+        subjectExists.rating =
+            Number(averageRating.toFixed(1));
+
+        await subjectExists.save();
 
         // =========================================
         // RESPONSE

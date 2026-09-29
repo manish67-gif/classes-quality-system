@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const Subject = require("../models/Subject");
 const Course = require("../models/Course");
 const Class = require("../models/Class");
+const Review = require("../models/Review");
 
 const canManageClass = (classItem, user) =>
     user.role === "admin" ||
@@ -378,6 +379,10 @@ module.exports = {
             if (!canManageClass(classItem, req.user)) {
                 return res.status(403).json({ message: "You do not have permission to modify this resource" });
             }
+
+            await Review.deleteMany({
+                subjectId: req.params.id
+            });
 
             await Subject.findByIdAndDelete(req.params.id);
             return res.status(200).json({ message: "Subject deleted successfully" });

@@ -5,7 +5,9 @@ const classSchema = new mongoose.Schema(
         ownerId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true
+            required: true,
+            unique: true,
+            index: true
         },
 
         name: {

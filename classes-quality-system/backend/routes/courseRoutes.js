@@ -4,6 +4,7 @@ const {
     createCourse,
     getCoursesByClass,
     getCourseById,
+    getAllCourses,
     updateCourse,
     deleteCourse
 } = require("../controllers/courseController");
@@ -17,6 +18,8 @@ router.get(
     "/class/:classId",
     getCoursesByClass
 );
+
+router.get("/", getAllCourses);
 
 router.get(
     "/:id",

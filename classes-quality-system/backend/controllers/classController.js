@@ -1,4 +1,7 @@
 const Class = require("../models/Class");
+const Course = require("../models/Course");
+const Subject = require("../models/Subject");
+const Review = require("../models/Review");
 
 const createClass = async (req, res) => {
     try {
@@ -131,6 +134,34 @@ module.exports = {
             if (req.user.role !== "admin" && classItem.ownerId.toString() !== req.user.userId) {
                 return res.status(403).json({ message: "You do not have permission to modify this resource" });
             }
+
+            const courses = await Course.find({
+                classId: req.params.id
+            }).select("_id");
+
+            const courseIds = courses.map(
+                (course) => course._id
+            );
+
+            const subjects = await Subject.find({
+                courseId: { $in: courseIds }
+            }).select("_id");
+
+            const subjectIds = subjects.map(
+                (subject) => subject._id
+            );
+
+            await Review.deleteMany({
+                subjectId: { $in: subjectIds }
+            });
+
+            await Subject.deleteMany({
+                courseId: { $in: courseIds }
+            });
+
+            await Course.deleteMany({
+                classId: req.params.id
+            });
 
             await Class.findByIdAndDelete(req.params.id);
             return res.status(200).json({ message: "Class deleted successfully" });
