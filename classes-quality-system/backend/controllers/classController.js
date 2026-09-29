@@ -17,6 +17,16 @@ const createClass = async (req, res) => {
             });
         }
 
+        const existingClass = await Class.findOne({
+            ownerId: req.user.userId
+        });
+
+        if (existingClass) {
+            return res.status(409).json({
+                message: "Your institute profile already exists"
+            });
+        }
+
         const newClass = await Class.create({
             ownerId: req.user.userId,
             name,
@@ -26,7 +36,6 @@ const createClass = async (req, res) => {
             contactNumber,
             website
         });
-
         res.status(201).json({
             message: "Class created successfully",
             class: newClass

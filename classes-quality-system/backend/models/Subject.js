@@ -60,6 +60,6 @@ const subjectSchema = new mongoose.Schema(
 
 // Helps when fetching subjects for a course:
 // /api/subjects/course/:id
-subjectSchema.index({ courseId: 1 });
+// subjectSchema.index({ courseId: 1 });
 
 module.exports = mongoose.model("Subject", subjectSchema);

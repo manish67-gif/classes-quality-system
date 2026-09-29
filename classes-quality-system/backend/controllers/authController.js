@@ -1,11 +1,33 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const Class = require("../models/Class");
 
 const registerUser = async (req, res) => {
     try {
-        const { name, email, password, role: requestedRole } = req.body;
+        const {
+            name,
+            email,
+            password,
+            role: requestedRole,
+            className,
+            description,
+            location,
+            address,
+            contactNumber,
+            website
+        } = req.body;
+
         const role = requestedRole === "class" ? "class" : "student";
+
+        if (
+            role === "class" &&
+            (!className || !description || !location)
+        ) {
+            return res.status(400).json({
+                message: "Institute name, description and location are required"
+            });
+        }
 
         if (!name || !email || !password) {
             return res.status(400).json({
@@ -54,6 +76,19 @@ const registerUser = async (req, res) => {
             password: hashedPassword,
             role
         });
+
+        // Create Class document only for institute/class accounts
+        if (role === "class") {
+            await Class.create({
+                ownerId: user._id,
+                name: className.trim(),
+                description: description.trim(),
+                location: location.trim(),
+                address: address?.trim() || "",
+                contactNumber: contactNumber?.trim() || "",
+                website: website?.trim() || ""
+            });
+        }
 
         return res.status(201).json({
             message: `${role === "class" ? "Institute" : "Student"} account created successfully`,

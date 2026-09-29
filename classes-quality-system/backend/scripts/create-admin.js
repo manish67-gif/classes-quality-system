@@ -28,7 +28,11 @@ const createAdmin = async () => {
             password,
             role: "admin"
         },
-        { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
+        {
+            upsert: true,
+            new: true,
+            setDefaultsOnInsert: true
+        }
     );
 
     console.log(`Admin account ready: ${user.email}`);

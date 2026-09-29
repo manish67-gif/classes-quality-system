@@ -74,7 +74,16 @@ function Login() {
 
 
             const role = data.user?.role === "institute" ? "class" : data.user?.role;
-            setTimeout(() => navigate(role ? `/${role}/dashboard` : "/"), 500);
+
+            setTimeout(() => {
+                if (role === "class") {
+                    navigate("/class/dashboard");
+                } else if (role === "admin") {
+                    navigate("/admin/dashboard");
+                } else {
+                    navigate("/");
+                }
+            }, 500);
 
 
         } catch (error) {

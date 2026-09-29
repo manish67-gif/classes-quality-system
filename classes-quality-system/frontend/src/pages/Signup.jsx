@@ -9,7 +9,13 @@ function Signup() {
         name: "",
         email: "",
         password: "",
-        role: "student"
+        role: "student",
+        className: "",
+        description: "",
+        location: "",
+        address: "",
+        contactNumber: "",
+        website: ""
     });
 
     const [message, setMessage] = useState("");
@@ -176,6 +182,60 @@ function Signup() {
                             <option value="student">Student</option>
                             <option value="class">Institute / Class</option>
                         </select>
+
+                        {formData.role === "class" && (
+                            <>
+                                <input
+                                    type="text"
+                                    name="className"
+                                    placeholder="Institute Name"
+                                    value={formData.className}
+                                    onChange={handleChange}
+                                    required
+                                />
+
+                                <textarea
+                                    name="description"
+                                    placeholder="Description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    required
+                                />
+
+                                <input
+                                    type="text"
+                                    name="location"
+                                    placeholder="Location"
+                                    value={formData.location}
+                                    onChange={handleChange}
+                                    required
+                                />
+
+                                <input
+                                    type="text"
+                                    name="address"
+                                    placeholder="Full Address"
+                                    value={formData.address}
+                                    onChange={handleChange}
+                                />
+
+                                <input
+                                    type="tel"
+                                    name="contactNumber"
+                                    placeholder="Contact Number"
+                                    value={formData.contactNumber}
+                                    onChange={handleChange}
+                                />
+
+                                <input
+                                    type="url"
+                                    name="website"
+                                    placeholder="Website"
+                                    value={formData.website}
+                                    onChange={handleChange}
+                                />
+                            </>
+                        )}
                     </div>
 
 

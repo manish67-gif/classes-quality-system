@@ -16,7 +16,6 @@ import SubjectDetails from "./pages/SubjectDetails";
 import DemoLectures from "./pages/DemoLectures";
 import Profile from "./pages/Profile";
 import Compare from "./pages/Compare";
-import StudentDashboard from "./pages/StudentDashboard";
 import ClassDashboard from "./pages/ClassDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 
@@ -29,10 +28,6 @@ function App() {
 
       <Routes>
 
-        <Route
-          path="/student/dashboard"
-          element={<ProtectedRoute allowedRoles={["student"]}><StudentDashboard /></ProtectedRoute>}
-        />
 
         <Route
           path="/class/dashboard"

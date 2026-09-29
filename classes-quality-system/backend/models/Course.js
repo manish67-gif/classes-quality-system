@@ -48,6 +48,6 @@ const courseSchema = new mongoose.Schema(
 );
 
 // Helps when fetching all courses belonging to a class
-courseSchema.index({ classId: 1 });
+// courseSchema.index({ classId: 1 });
 
 module.exports = mongoose.model("Course", courseSchema);

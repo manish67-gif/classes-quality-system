@@ -27,7 +27,6 @@ function ManagementDashboard({ role }) {
     const [selectedSubject, setSelectedSubject] = useState(null);
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
-    const [classForm, setClassForm] = useState({ name: "", description: "", location: "" });
     const [courseForm, setCourseForm] = useState({ name: "", fees: "", description: "", duration: "" });
     const [subjectForm, setSubjectForm] = useState({ name: "", description: "" });
     const [demoForm, setDemoForm] = useState({ title: "", duration: "", videoUrl: "" });
@@ -136,21 +135,51 @@ function ManagementDashboard({ role }) {
 
             <section className="management-grid">
                 <div className="management-panel">
-                    <h2>{role === "admin" ? "Institutes" : "My Institutes"}</h2>
+                    <h2>{role === "admin" ? "Institutes" : "My Institute"}</h2>
+
                     {classes.map((item) => (
-                        <div className={`management-row ${selectedClass?._id === item._id ? "is-selected" : ""}`} key={item._id}>
-                            <button type="button" onClick={() => selectClass(item)}>{item.name}</button>
-                            <button type="button" onClick={() => editName(`/classes/${item._id}`, item.name, loadClasses)}>Edit</button>
-                            <button type="button" className="danger-button" onClick={() => remove(`/classes/${item._id}`, loadClasses)}>Delete</button>
+                        <div
+                            className={`management-row ${selectedClass?._id === item._id ? "is-selected" : ""
+                                }`}
+                            key={item._id}
+                        >
+                            <button
+                                type="button"
+                                onClick={() => selectClass(item)}
+                            >
+                                {item.name}
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    editName(
+                                        `/classes/${item._id}`,
+                                        item.name,
+                                        loadClasses
+                                    )
+                                }
+                            >
+                                Edit
+                            </button>
+
+                            {role === "admin" && (
+                                <button
+                                    type="button"
+                                    className="danger-button"
+                                    onClick={() =>
+                                        remove(`/classes/${item._id}`, loadClasses)
+                                    }
+                                >
+                                    Delete
+                                </button>
+                            )}
                         </div>
                     ))}
-                    <form onSubmit={(event) => { event.preventDefault(); submit("/classes", classForm, () => setClassForm({ name: "", description: "", location: "" }), loadClasses); }}>
-                        <h3>Add Institute</h3>
-                        <input placeholder="Name" value={classForm.name} onChange={(event) => setClassForm({ ...classForm, name: event.target.value })} required />
-                        <input placeholder="Location" value={classForm.location} onChange={(event) => setClassForm({ ...classForm, location: event.target.value })} required />
-                        <textarea placeholder="Description" value={classForm.description} onChange={(event) => setClassForm({ ...classForm, description: event.target.value })} required />
-                        <button className="primary-btn" type="submit">Add Institute</button>
-                    </form>
+
+                    {classes.length === 0 && (
+                        <p>No institute profile found.</p>
+                    )}
                 </div>
 
                 <div className="management-panel">
