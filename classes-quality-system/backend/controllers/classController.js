@@ -164,6 +164,7 @@ module.exports = {
             });
 
             await Class.findByIdAndDelete(req.params.id);
+
             return res.status(200).json({ message: "Class deleted successfully" });
         } catch (error) {
             console.error("Delete class error:", error);
