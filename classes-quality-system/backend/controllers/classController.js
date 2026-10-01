@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Class = require("../models/Class");
 const Course = require("../models/Course");
 const Subject = require("../models/Subject");
@@ -53,7 +54,7 @@ const createClass = async (req, res) => {
         });
 
 
-        res.status(201).json({
+        return res.status(201).json({
             message:
                 "Class created successfully",
 
@@ -68,7 +69,7 @@ const createClass = async (req, res) => {
         );
 
 
-        res.status(500).json({
+        return res.status(500).json({
             message: "Server error"
         });
     }
@@ -89,7 +90,7 @@ const getClasses = async (req, res) => {
 
 
         // =========================================
-        // CALCULATE CLASS RATINGS
+        // CALCULATE INSTITUTE RATINGS
         // =========================================
 
         for (const classItem of classes) {
@@ -130,10 +131,6 @@ const getClasses = async (req, res) => {
         }
 
 
-        // =========================================
-        // RESPONSE
-        // =========================================
-
         return res.status(200).json({
             message:
                 "Classes fetched successfully",
@@ -163,10 +160,19 @@ const getClasses = async (req, res) => {
 const getClassById = async (req, res) => {
     try {
 
+        const { id } = req.params;
+
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message:
+                    "Invalid class ID"
+            });
+        }
+
+
         const classItem =
-            await Class.findById(
-                req.params.id
-            );
+            await Class.findById(id);
 
 
         if (!classItem) {
@@ -178,7 +184,7 @@ const getClassById = async (req, res) => {
 
 
         // =========================================
-        // CALCULATE CLASS RATING
+        // CALCULATE INSTITUTE RATING
         // =========================================
 
         const courses = await Course.find({
@@ -216,9 +222,19 @@ const getClassById = async (req, res) => {
         }
 
 
-        // IMPORTANT:
-        // Do NOT use classItem.save() here.
-        // We only calculate the rating for the response.
+        /*
+            IMPORTANT:
+
+            Do NOT use:
+
+            await classItem.save();
+
+            here.
+
+            The rating is calculated only for
+            this response. It is not saved to
+            the database from a GET request.
+        */
 
 
         return res.status(200).json({
@@ -250,10 +266,19 @@ const getClassById = async (req, res) => {
 const updateClass = async (req, res) => {
     try {
 
+        const { id } = req.params;
+
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message:
+                    "Invalid class ID"
+            });
+        }
+
+
         const classItem =
-            await Class.findById(
-                req.params.id
-            );
+            await Class.findById(id);
 
 
         if (!classItem) {
@@ -313,6 +338,14 @@ const updateClass = async (req, res) => {
         );
 
 
+        if (error.name === "ValidationError") {
+            return res.status(400).json({
+                message:
+                    error.message
+            });
+        }
+
+
         return res.status(500).json({
             message: "Server error"
         });
@@ -327,10 +360,19 @@ const updateClass = async (req, res) => {
 const deleteClass = async (req, res) => {
     try {
 
+        const { id } = req.params;
+
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message:
+                    "Invalid class ID"
+            });
+        }
+
+
         const classItem =
-            await Class.findById(
-                req.params.id
-            );
+            await Class.findById(id);
 
 
         if (!classItem) {
@@ -353,8 +395,12 @@ const deleteClass = async (req, res) => {
         }
 
 
+        // =========================================
+        // FIND COURSES
+        // =========================================
+
         const courses = await Course.find({
-            classId: req.params.id
+            classId: id
         }).select("_id");
 
 
@@ -364,6 +410,10 @@ const deleteClass = async (req, res) => {
                     course._id
             );
 
+
+        // =========================================
+        // FIND SUBJECTS
+        // =========================================
 
         const subjects = await Subject.find({
             courseId: {
@@ -379,12 +429,20 @@ const deleteClass = async (req, res) => {
             );
 
 
+        // =========================================
+        // DELETE REVIEWS
+        // =========================================
+
         await Review.deleteMany({
             subjectId: {
                 $in: subjectIds
             }
         });
 
+
+        // =========================================
+        // DELETE SUBJECTS
+        // =========================================
 
         await Subject.deleteMany({
             courseId: {
@@ -393,14 +451,20 @@ const deleteClass = async (req, res) => {
         });
 
 
+        // =========================================
+        // DELETE COURSES
+        // =========================================
+
         await Course.deleteMany({
-            classId: req.params.id
+            classId: id
         });
 
 
-        await Class.findByIdAndDelete(
-            req.params.id
-        );
+        // =========================================
+        // DELETE CLASS
+        // =========================================
+
+        await Class.findByIdAndDelete(id);
 
 
         return res.status(200).json({

@@ -22,28 +22,56 @@ import Reviews from "./pages/Reviews";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
+
 function App() {
   return (
     <BrowserRouter>
+
       <Navbar />
 
       <Routes>
 
+        {/* =========================================
+            CLASS / INSTITUTE DASHBOARD
+        ========================================= */}
 
         <Route
           path="/class/dashboard"
-          element={<ProtectedRoute allowedRoles={["class"]}><ClassDashboard /></ProtectedRoute>}
+          element={
+            <ProtectedRoute allowedRoles={["class"]}>
+              <ClassDashboard />
+            </ProtectedRoute>
+          }
         />
+
+
+        {/* =========================================
+            ADMIN DASHBOARD
+        ========================================= */}
 
         <Route
           path="/admin/dashboard"
-          element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>}
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
         />
+
+
+        {/* =========================================
+            HOME
+        ========================================= */}
 
         <Route
           path="/"
           element={<Home />}
         />
+
+
+        {/* =========================================
+            AUTHENTICATION
+        ========================================= */}
 
         <Route
           path="/login"
@@ -55,6 +83,11 @@ function App() {
           element={<Signup />}
         />
 
+
+        {/* =========================================
+            CLASSES / INSTITUTES
+        ========================================= */}
+
         <Route
           path="/classes"
           element={<Classes />}
@@ -65,30 +98,50 @@ function App() {
           element={<ClassDetails />}
         />
 
+
+        {/* =========================================
+            COMPARE
+        ========================================= */}
+
         <Route
           path="/compare"
           element={<Compare />}
         />
+
+
+        {/* =========================================
+            COURSES
+        ========================================= */}
 
         <Route
           path="/courses/:id"
           element={<CourseDetails />}
         />
 
+
+        {/* =========================================
+            SUBJECTS
+        ========================================= */}
+
         <Route
           path="/subjects/:id"
           element={<SubjectDetails />}
         />
 
-        <Route
-          path="/reviews/subject/:subjectId"
-          element={<Reviews />}
-        />
+
+        {/* =========================================
+            ALL REVIEWS FOR A SUBJECT
+        ========================================= */}
 
         <Route
           path="/reviews/subject/:subjectId"
           element={<Reviews />}
         />
+
+
+        {/* =========================================
+            ALL REVIEWS OF LOGGED-IN STUDENT
+        ========================================= */}
 
         <Route
           path="/reviews/my-reviews"
@@ -98,10 +151,21 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+
+        {/* =========================================
+            DEMO LECTURES
+        ========================================= */}
+
         <Route
           path="/classes/:classId/courses/:courseId/subjects/:subjectId/demos"
           element={<DemoLectures />}
         />
+
+
+        {/* =========================================
+            PROFILE
+        ========================================= */}
 
         <Route
           path="/profile"
@@ -113,6 +177,7 @@ function App() {
         />
 
       </Routes>
+
     </BrowserRouter>
   );
 }

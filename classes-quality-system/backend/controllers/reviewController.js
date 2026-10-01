@@ -29,11 +29,14 @@ const createReview = async (req, res) => {
 
         if (!req.user || !req.user.userId) {
             return res.status(401).json({
-                message: "Authentication required"
+                message:
+                    "Authentication required"
             });
         }
 
-        const studentId = req.user.userId;
+
+        const studentId =
+            req.user.userId;
 
 
         // =========================================
@@ -42,10 +45,13 @@ const createReview = async (req, res) => {
 
         if (
             !subjectId ||
-            !mongoose.Types.ObjectId.isValid(subjectId)
+            !mongoose.Types.ObjectId.isValid(
+                subjectId
+            )
         ) {
             return res.status(400).json({
-                message: "Invalid subject ID"
+                message:
+                    "Invalid subject ID"
             });
         }
 
@@ -61,7 +67,8 @@ const createReview = async (req, res) => {
             studyMaterial === undefined
         ) {
             return res.status(400).json({
-                message: "All ratings are required"
+                message:
+                    "All ratings are required"
             });
         }
 
@@ -75,7 +82,8 @@ const createReview = async (req, res) => {
             !comment.trim()
         ) {
             return res.status(400).json({
-                message: "Comment is required"
+                message:
+                    "Comment is required"
             });
         }
 
@@ -102,10 +110,17 @@ const createReview = async (req, res) => {
         // =========================================
 
         const categoryRatings = {
-            teachingQuality: teachingQualityValue,
-            conceptClarity: conceptClarityValue,
-            doubtSolving: doubtSolvingValue,
-            studyMaterial: studyMaterialValue
+            teachingQuality:
+                teachingQualityValue,
+
+            conceptClarity:
+                conceptClarityValue,
+
+            doubtSolving:
+                doubtSolvingValue,
+
+            studyMaterial:
+                studyMaterialValue
         };
 
 
@@ -131,30 +146,33 @@ const createReview = async (req, res) => {
         // CALCULATE OVERALL RATING
         // =========================================
 
-        const overallRating = Number(
-            (
+        const overallRating =
+            Number(
                 (
-                    teachingQualityValue +
-                    conceptClarityValue +
-                    doubtSolvingValue +
-                    studyMaterialValue
-                ) / 4
-            ).toFixed(1)
-        );
+                    (
+                        teachingQualityValue +
+                        conceptClarityValue +
+                        doubtSolvingValue +
+                        studyMaterialValue
+                    ) / 4
+                ).toFixed(1)
+            );
 
 
         // =========================================
         // CHECK SUBJECT EXISTS
         // =========================================
 
-        const subjectExists = await Subject.findById(
-            subjectId
-        );
+        const subjectExists =
+            await Subject.findById(
+                subjectId
+            );
 
 
         if (!subjectExists) {
             return res.status(404).json({
-                message: "Subject not found"
+                message:
+                    "Subject not found"
             });
         }
 
@@ -163,10 +181,11 @@ const createReview = async (req, res) => {
         // CHECK EXISTING REVIEW
         // =========================================
 
-        const existingReview = await Review.findOne({
-            studentId,
-            subjectId
-        });
+        const existingReview =
+            await Review.findOne({
+                studentId,
+                subjectId
+            });
 
 
         if (existingReview) {
@@ -181,41 +200,47 @@ const createReview = async (req, res) => {
         // CREATE REVIEW
         // =========================================
 
-        const review = await Review.create({
-            studentId,
-            subjectId,
+        const review =
+            await Review.create({
+                studentId,
+                subjectId,
 
-            teachingQuality:
-                teachingQualityValue,
+                teachingQuality:
+                    teachingQualityValue,
 
-            conceptClarity:
-                conceptClarityValue,
+                conceptClarity:
+                    conceptClarityValue,
 
-            doubtSolving:
-                doubtSolvingValue,
+                doubtSolving:
+                    doubtSolvingValue,
 
-            studyMaterial:
-                studyMaterialValue,
+                studyMaterial:
+                    studyMaterialValue,
 
-            overallRating,
+                overallRating,
 
-            comment: comment.trim()
-        });
+                comment:
+                    comment.trim()
+            });
 
 
         // =========================================
         // UPDATE SUBJECT RATING
         // =========================================
 
-        const subjectReviews = await Review.find({
-            subjectId
-        });
+        const subjectReviews =
+            await Review.find({
+                subjectId
+            });
 
 
         const totalSubjectRating =
             subjectReviews.reduce(
                 (sum, item) =>
-                    sum + Number(item.overallRating),
+                    sum +
+                    Number(
+                        item.overallRating
+                    ),
                 0
             );
 
@@ -225,25 +250,36 @@ const createReview = async (req, res) => {
             subjectReviews.length;
 
 
-        subjectExists.rating =
-            Number(subjectAverage.toFixed(1));
+        const subjectRating =
+            Number(
+                subjectAverage.toFixed(1)
+            );
 
 
-        await subjectExists.save();
+        await Subject.findByIdAndUpdate(
+            subjectId,
+            {
+                $set: {
+                    rating: subjectRating
+                }
+            }
+        );
 
 
         // =========================================
         // FIND COURSE
         // =========================================
 
-        const course = await Course.findById(
-            subjectExists.courseId
-        );
+        const course =
+            await Course.findById(
+                subjectExists.courseId
+            );
 
 
         if (!course) {
             return res.status(404).json({
-                message: "Course not found"
+                message:
+                    "Course not found"
             });
         }
 
@@ -271,7 +307,10 @@ const createReview = async (req, res) => {
             const totalCourseRating =
                 ratedSubjects.reduce(
                     (sum, subject) =>
-                        sum + Number(subject.rating),
+                        sum +
+                        Number(
+                            subject.rating
+                        ),
                     0
                 );
 
@@ -281,11 +320,21 @@ const createReview = async (req, res) => {
                 ratedSubjects.length;
 
 
-            course.rating =
-                Number(courseAverage.toFixed(1));
+            const courseRating =
+                Number(
+                    courseAverage.toFixed(1)
+                );
 
 
-            await course.save();
+            await Course.findByIdAndUpdate(
+                course._id,
+                {
+                    $set: {
+                        rating:
+                            courseRating
+                    }
+                }
+            );
         }
 
 
@@ -293,18 +342,21 @@ const createReview = async (req, res) => {
         // UPDATE CLASS / INSTITUTE RATING
         // =========================================
 
-        const classId = course.classId;
+        const classId =
+            course.classId;
 
 
         const classExists =
-            await Class.findById(classId);
+            await Class.findById(
+                classId
+            );
 
 
         if (classExists) {
 
             const classCourses =
                 await Course.find({
-                    classId: classId
+                    classId
                 });
 
 
@@ -321,7 +373,10 @@ const createReview = async (req, res) => {
                 const totalClassRating =
                     ratedCourses.reduce(
                         (sum, item) =>
-                            sum + Number(item.rating),
+                            sum +
+                            Number(
+                                item.rating
+                            ),
                         0
                     );
 
@@ -331,11 +386,32 @@ const createReview = async (req, res) => {
                     ratedCourses.length;
 
 
-                classExists.rating =
-                    Number(classAverage.toFixed(1));
+                const classRating =
+                    Number(
+                        classAverage.toFixed(1)
+                    );
 
 
-                await classExists.save();
+                /*
+                    IMPORTANT:
+
+                    Use findByIdAndUpdate()
+                    instead of classExists.save().
+
+                    This updates only the rating
+                    and avoids triggering validation
+                    on old Class documents.
+                */
+
+                await Class.findByIdAndUpdate(
+                    classId,
+                    {
+                        $set: {
+                            rating:
+                                classRating
+                        }
+                    }
+                );
             }
         }
 
@@ -360,7 +436,10 @@ const createReview = async (req, res) => {
         );
 
 
-        // Duplicate review protection
+        // =========================================
+        // DUPLICATE REVIEW
+        // =========================================
+
         if (error.code === 11000) {
             return res.status(409).json({
                 message:
@@ -369,16 +448,24 @@ const createReview = async (req, res) => {
         }
 
 
-        // Mongoose validation error
-        if (error.name === "ValidationError") {
+        // =========================================
+        // MONGOOSE VALIDATION ERROR
+        // =========================================
+
+        if (
+            error.name ===
+            "ValidationError"
+        ) {
             return res.status(400).json({
-                message: error.message
+                message:
+                    error.message
             });
         }
 
 
         return res.status(500).json({
-            message: "Server error"
+            message:
+                "Server error"
         });
     }
 };
@@ -388,14 +475,11 @@ const createReview = async (req, res) => {
 // GET REVIEWS FOR A SUBJECT
 // =========================================
 
-// =========================================
-// GET REVIEWS FOR A SUBJECT
-// =========================================
-
 const getReviewsBySubject = async (req, res) => {
     try {
 
-        const { subjectId } = req.params;
+        const { subjectId } =
+            req.params;
 
 
         // =========================================
@@ -404,10 +488,13 @@ const getReviewsBySubject = async (req, res) => {
 
         if (
             !subjectId ||
-            !mongoose.Types.ObjectId.isValid(subjectId)
+            !mongoose.Types.ObjectId.isValid(
+                subjectId
+            )
         ) {
             return res.status(400).json({
-                message: "Invalid subject ID"
+                message:
+                    "Invalid subject ID"
             });
         }
 
@@ -416,14 +503,16 @@ const getReviewsBySubject = async (req, res) => {
         // CHECK SUBJECT EXISTS
         // =========================================
 
-        const subjectExists = await Subject.findById(
-            subjectId
-        );
+        const subjectExists =
+            await Subject.findById(
+                subjectId
+            );
 
 
         if (!subjectExists) {
             return res.status(404).json({
-                message: "Subject not found"
+                message:
+                    "Subject not found"
             });
         }
 
@@ -432,32 +521,37 @@ const getReviewsBySubject = async (req, res) => {
         // GET REVIEWS
         // =========================================
 
-        const reviews = await Review.find({
-            subjectId
-        })
-            .populate(
-                "studentId",
-                "name"
-            )
-            .populate({
-                path: "subjectId",
-                select: "name description courseId",
+        const reviews =
+            await Review.find({
+                subjectId
+            })
+                .populate(
+                    "studentId",
+                    "name"
+                )
+                .populate({
+                    path: "subjectId",
 
-                populate: {
-                    path: "courseId",
                     select:
-                        "name description fees duration classId",
+                        "name description courseId",
 
                     populate: {
-                        path: "classId",
+                        path: "courseId",
+
                         select:
-                            "name location address"
+                            "name description fees duration classId",
+
+                        populate: {
+                            path: "classId",
+
+                            select:
+                                "name location address"
+                        }
                     }
-                }
-            })
-            .sort({
-                createdAt: -1
-            });
+                })
+                .sort({
+                    createdAt: -1
+                });
 
 
         return res.status(200).json({
@@ -477,14 +571,12 @@ const getReviewsBySubject = async (req, res) => {
 
 
         return res.status(500).json({
-            message: "Server error"
+            message:
+                "Server error"
         });
     }
 };
 
-// =========================================
-// GET REVIEWS OF LOGGED-IN STUDENT
-// =========================================
 
 // =========================================
 // GET REVIEWS OF LOGGED-IN STUDENT
@@ -497,43 +589,53 @@ const getMyReviews = async (req, res) => {
         // CHECK AUTHENTICATION
         // =========================================
 
-        if (!req.user || !req.user.userId) {
+        if (
+            !req.user ||
+            !req.user.userId
+        ) {
             return res.status(401).json({
-                message: "Authentication required"
+                message:
+                    "Authentication required"
             });
         }
 
 
         // =========================================
-        // GET REVIEWS
+        // GET ALL REVIEWS
         // =========================================
 
-        const reviews = await Review.find({
-            studentId: req.user.userId
-        })
-            .populate(
-                "studentId",
-                "name"
-            )
-            .populate({
-                path: "subjectId",
-                select: "name description courseId",
+        const reviews =
+            await Review.find({
+                studentId:
+                    req.user.userId
+            })
+                .populate(
+                    "studentId",
+                    "name"
+                )
+                .populate({
+                    path: "subjectId",
 
-                populate: {
-                    path: "courseId",
                     select:
-                        "name description fees duration classId",
+                        "name description courseId",
 
                     populate: {
-                        path: "classId",
+                        path: "courseId",
+
                         select:
-                            "name location address"
+                            "name description fees duration classId",
+
+                        populate: {
+                            path: "classId",
+
+                            select:
+                                "name location address"
+                        }
                     }
-                }
-            })
-            .sort({
-                createdAt: -1
-            });
+                })
+                .sort({
+                    createdAt: -1
+                });
 
 
         return res.status(200).json({
@@ -553,10 +655,12 @@ const getMyReviews = async (req, res) => {
 
 
         return res.status(500).json({
-            message: "Server error"
+            message:
+                "Server error"
         });
     }
 };
+
 
 // =========================================
 // EXPORTS

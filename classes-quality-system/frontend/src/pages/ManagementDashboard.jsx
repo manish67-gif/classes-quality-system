@@ -2,13 +2,8 @@ import { useEffect, useState } from "react";
 
 const API = "http://localhost:8080/api";
 
-function ManagementDashboard({ role = "class" }) {
+function ManagementDashboard() {
     const token = localStorage.getItem("token");
-    const currentUser = JSON.parse(
-        localStorage.getItem("user") || "{}"
-    );
-
-    const isAdmin = role === "admin";
 
     const [classes, setClasses] = useState([]);
     const [courses, setCourses] = useState([]);
@@ -42,17 +37,13 @@ function ManagementDashboard({ role = "class" }) {
         videoUrl: ""
     });
 
-    // --------------------------------------------------
-    // COMMON HEADERS
-    // --------------------------------------------------
-
     const headers = {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`
     };
 
     // --------------------------------------------------
-    // LOAD CLASSES
+    // LOAD INSTITUTE
     // --------------------------------------------------
 
     const loadClasses = async () => {
@@ -64,23 +55,28 @@ function ManagementDashboard({ role = "class" }) {
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Failed to load classes");
-            }
-
-            let loadedClasses = data.classes || [];
-
-            // Class account should see only its own institute
-            if (!isAdmin && currentUser?.id) {
-                loadedClasses = loadedClasses.filter(
-                    (item) =>
-                        String(item.ownerId?._id || item.ownerId) ===
-                        String(currentUser.id)
+                throw new Error(
+                    data.message || "Failed to load institute"
                 );
             }
+
+            const currentUser = JSON.parse(
+                localStorage.getItem("user") || "{}"
+            );
+
+            const loadedClasses = (data.classes || []).filter(
+                (item) =>
+                    String(item.ownerId?._id || item.ownerId) ===
+                    String(currentUser.id)
+            );
+
             setClasses(loadedClasses);
+
+            return loadedClasses;
         } catch (error) {
-            console.error("Load classes error:", error);
+            console.error("Load institute error:", error);
             setMessage(error.message);
+            return [];
         }
     };
 
@@ -88,21 +84,32 @@ function ManagementDashboard({ role = "class" }) {
     // LOAD COURSES
     // --------------------------------------------------
 
-    const loadCourses = async () => {
+    const loadCourses = async (classId) => {
+        if (!classId) {
+            setCourses([]);
+            return;
+        }
+
         try {
-            const response = await fetch(`${API}/courses`, {
-                headers
-            });
+            const response = await fetch(
+                `${API}/courses/class/${classId}`,
+                {
+                    headers
+                }
+            );
 
             const data = await response.json();
 
             if (!response.ok) {
-                throw new Error(data.message || "Failed to load courses");
+                throw new Error(
+                    data.message || "Failed to load courses"
+                );
             }
 
             setCourses(data.courses || []);
         } catch (error) {
             console.error("Load courses error:", error);
+            setCourses([]);
             setMessage(error.message);
         }
     };
@@ -137,6 +144,7 @@ function ManagementDashboard({ role = "class" }) {
         } catch (error) {
             console.error("Load subjects error:", error);
             setSubjects([]);
+            setMessage(error.message);
         }
     };
 
@@ -148,8 +156,11 @@ function ManagementDashboard({ role = "class" }) {
         const loadData = async () => {
             setLoading(true);
 
-            await loadClasses();
-            await loadCourses();
+            const loadedClasses = await loadClasses();
+
+            if (loadedClasses.length > 0) {
+                await loadCourses(loadedClasses[0]._id);
+            }
 
             setLoading(false);
         };
@@ -164,6 +175,7 @@ function ManagementDashboard({ role = "class" }) {
     const handleSelectCourse = async (course) => {
         setSelectedCourse(course);
         setSelectedSubject(null);
+
         setShowSubjectForm(false);
         setShowLectureForm(false);
 
@@ -188,19 +200,17 @@ function ManagementDashboard({ role = "class" }) {
 
         if (!classes.length) {
             setMessage(
-                "Your institute profile is not available. Please complete institute signup first."
+                "Your institute profile is not available."
             );
             return;
         }
-
-        const classId = classes[0]._id;
 
         try {
             const response = await fetch(`${API}/courses`, {
                 method: "POST",
                 headers,
                 body: JSON.stringify({
-                    classId,
+                    classId: classes[0]._id,
                     name: courseForm.name,
                     description: courseForm.description,
                     fees: Number(courseForm.fees),
@@ -227,7 +237,7 @@ function ManagementDashboard({ role = "class" }) {
 
             setShowCourseForm(false);
 
-            await loadCourses();
+            await loadCourses(classes[0]._id);
         } catch (error) {
             console.error("Create course error:", error);
             setMessage(error.message);
@@ -266,10 +276,11 @@ function ManagementDashboard({ role = "class" }) {
 
             if (selectedCourse?._id === courseId) {
                 setSelectedCourse(null);
+                setSelectedSubject(null);
                 setSubjects([]);
             }
 
-            await loadCourses();
+            await loadCourses(classes[0]._id);
         } catch (error) {
             console.error("Delete course error:", error);
             setMessage(error.message);
@@ -424,7 +435,6 @@ function ManagementDashboard({ role = "class" }) {
 
             setShowLectureForm(false);
 
-            // Refresh selected subject
             const subjectResponse = await fetch(
                 `${API}/subjects/${selectedSubject._id}`,
                 {
@@ -440,7 +450,10 @@ function ManagementDashboard({ role = "class" }) {
 
             await loadSubjects(selectedCourse._id);
         } catch (error) {
-            console.error("Create demo lecture error:", error);
+            console.error(
+                "Create demo lecture error:",
+                error
+            );
             setMessage(error.message);
         }
     };
@@ -471,11 +484,14 @@ function ManagementDashboard({ role = "class" }) {
 
             if (!response.ok) {
                 throw new Error(
-                    data.message || "Failed to delete demo lecture"
+                    data.message ||
+                    "Failed to delete demo lecture"
                 );
             }
 
-            setMessage("Demo lecture deleted successfully.");
+            setMessage(
+                "Demo lecture deleted successfully."
+            );
 
             const subjectResponse = await fetch(
                 `${API}/subjects/${selectedSubject._id}`,
@@ -492,7 +508,10 @@ function ManagementDashboard({ role = "class" }) {
 
             await loadSubjects(selectedCourse._id);
         } catch (error) {
-            console.error("Delete demo lecture error:", error);
+            console.error(
+                "Delete demo lecture error:",
+                error
+            );
             setMessage(error.message);
         }
     };
@@ -509,21 +528,20 @@ function ManagementDashboard({ role = "class" }) {
         );
     }
 
+    // --------------------------------------------------
+    // UI
+    // --------------------------------------------------
+
     return (
         <div className="management-dashboard">
 
             <div className="dashboard-header">
                 <div>
-                    <h1>
-                        {isAdmin
-                            ? "Admin Dashboard"
-                            : "My Institute"}
-                    </h1>
+                    <h1>My Institute</h1>
 
                     <p>
-                        {isAdmin
-                            ? "Manage institutes, courses and academic content."
-                            : "Manage your institute, courses, subjects and demo lectures."}
+                        Manage your institute, courses,
+                        subjects and demo lectures.
                     </p>
                 </div>
             </div>
@@ -535,7 +553,7 @@ function ManagementDashboard({ role = "class" }) {
             )}
 
             {/* =================================================
-                INSTITUTE SECTION
+                INSTITUTE
             ================================================= */}
 
             <section className="management-section">
@@ -549,12 +567,15 @@ function ManagementDashboard({ role = "class" }) {
 
                 {classes.length === 0 ? (
                     <div className="empty-state">
+
                         <h3>No Institute Found</h3>
 
                         <p>
-                            Please create your institute account
-                            through the institute signup option.
+                            Please create your institute
+                            account through the institute
+                            signup option.
                         </p>
+
                     </div>
                 ) : (
                     <div className="institute-card">
@@ -566,6 +587,7 @@ function ManagementDashboard({ role = "class" }) {
                         </p>
 
                         <div className="institute-details">
+
                             <span>
                                 📍 {classes[0].location}
                             </span>
@@ -587,6 +609,14 @@ function ManagementDashboard({ role = "class" }) {
                                     🌐 {classes[0].website}
                                 </span>
                             )}
+
+                            {classes[0].rating !== null &&
+                                classes[0].rating !== undefined && (
+                                    <span>
+                                        ⭐ {classes[0].rating}
+                                    </span>
+                                )}
+
                         </div>
 
                     </div>
@@ -595,7 +625,7 @@ function ManagementDashboard({ role = "class" }) {
             </section>
 
             {/* =================================================
-                COURSES SECTION
+                COURSES
             ================================================= */}
 
             <section className="management-section">
@@ -606,26 +636,27 @@ function ManagementDashboard({ role = "class" }) {
                         <h2>Courses</h2>
 
                         <p>
-                            Add and manage courses offered by your institute.
+                            Add and manage courses offered
+                            by your institute.
                         </p>
                     </div>
 
-                    {!isAdmin && (
-                        <button
-                            className="primary-button"
-                            onClick={() =>
-                                setShowCourseForm(!showCourseForm)
-                            }
-                        >
-                            {showCourseForm
-                                ? "Cancel"
-                                : "+ Add Course"}
-                        </button>
-                    )}
+                    <button
+                        className="primary-button"
+                        onClick={() =>
+                            setShowCourseForm(
+                                !showCourseForm
+                            )
+                        }
+                    >
+                        {showCourseForm
+                            ? "Cancel"
+                            : "+ Add Course"}
+                    </button>
 
                 </div>
 
-                {showCourseForm && !isAdmin && (
+                {showCourseForm && (
                     <form
                         className="management-form"
                         onSubmit={createCourse}
@@ -682,84 +713,80 @@ function ManagementDashboard({ role = "class" }) {
 
                     {courses.length === 0 ? (
                         <div className="empty-state">
-                            <p>No courses added yet.</p>
+                            <p>
+                                No courses added yet.
+                            </p>
                         </div>
                     ) : (
-                        courses.map((course) => {
+                        courses.map((course) => (
 
-                            const courseClassId =
-                                course.classId?._id ||
-                                course.classId;
-
-                            const ownClassId =
-                                classes[0]?._id;
-
-                            if (
-                                !isAdmin &&
-                                courseClassId !== ownClassId
-                            ) {
-                                return null;
-                            }
-
-                            return (
-                                <div
-                                    className={`course-card ${selectedCourse?._id === course._id
+                            <div
+                                className={`course-card ${selectedCourse?._id ===
+                                        course._id
                                         ? "selected"
                                         : ""
-                                        }`}
-                                    key={course._id}
+                                    }`}
+                                key={course._id}
+                            >
+
+                                <div
+                                    onClick={() =>
+                                        handleSelectCourse(
+                                            course
+                                        )
+                                    }
+                                    className="course-content"
                                 >
 
-                                    <div
-                                        onClick={() =>
-                                            handleSelectCourse(course)
-                                        }
-                                        className="course-content"
-                                    >
+                                    <h3>
+                                        {course.name}
+                                    </h3>
 
-                                        <h3>{course.name}</h3>
+                                    <p>
+                                        {course.description ||
+                                            "No description"}
+                                    </p>
 
-                                        <p>
-                                            {course.description ||
-                                                "No description"}
-                                        </p>
+                                    <div className="course-info">
 
-                                        <div className="course-info">
+                                        <span>
+                                            💰 ₹{course.fees}
+                                        </span>
 
-                                            <span>
-                                                💰 ₹{course.fees}
-                                            </span>
+                                        <span>
+                                            ⏱ {course.duration}
+                                        </span>
 
-                                            <span>
-                                                ⏱ {course.duration}
-                                            </span>
-
-                                            {course.rating !== undefined && (
+                                        {course.rating !==
+                                            undefined &&
+                                            course.rating !==
+                                            null && (
                                                 <span>
-                                                    ⭐ {course.rating}
+                                                    ⭐{" "}
+                                                    {
+                                                        course.rating
+                                                    }
                                                 </span>
                                             )}
 
-                                        </div>
-
                                     </div>
 
-                                    {!isAdmin && (
-                                        <button
-                                            className="danger-button"
-                                            onClick={() =>
-                                                deleteCourse(
-                                                    course._id
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </button>
-                                    )}
-
                                 </div>
-                            );
-                        })
+
+                                <button
+                                    className="danger-button"
+                                    onClick={() =>
+                                        deleteCourse(
+                                            course._id
+                                        )
+                                    }
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        ))
                     )}
 
                 </div>
@@ -767,7 +794,7 @@ function ManagementDashboard({ role = "class" }) {
             </section>
 
             {/* =================================================
-                SUBJECT SECTION
+                SUBJECTS
             ================================================= */}
 
             {selectedCourse && (
@@ -777,32 +804,32 @@ function ManagementDashboard({ role = "class" }) {
 
                         <div>
                             <h2>
-                                Subjects — {selectedCourse.name}
+                                Subjects —{" "}
+                                {selectedCourse.name}
                             </h2>
 
                             <p>
-                                Add subjects under this course.
+                                Add subjects under this
+                                course.
                             </p>
                         </div>
 
-                        {!isAdmin && (
-                            <button
-                                className="primary-button"
-                                onClick={() =>
-                                    setShowSubjectForm(
-                                        !showSubjectForm
-                                    )
-                                }
-                            >
-                                {showSubjectForm
-                                    ? "Cancel"
-                                    : "+ Add Subject"}
-                            </button>
-                        )}
+                        <button
+                            className="primary-button"
+                            onClick={() =>
+                                setShowSubjectForm(
+                                    !showSubjectForm
+                                )
+                            }
+                        >
+                            {showSubjectForm
+                                ? "Cancel"
+                                : "+ Add Subject"}
+                        </button>
 
                     </div>
 
-                    {showSubjectForm && !isAdmin && (
+                    {showSubjectForm && (
                         <form
                             className="management-form"
                             onSubmit={createSubject}
@@ -822,8 +849,12 @@ function ManagementDashboard({ role = "class" }) {
                             <textarea
                                 name="description"
                                 placeholder="Subject Description"
-                                value={subjectForm.description}
-                                onChange={handleSubjectChange}
+                                value={
+                                    subjectForm.description
+                                }
+                                onChange={
+                                    handleSubjectChange
+                                }
                             />
 
                             <button
@@ -841,16 +872,18 @@ function ManagementDashboard({ role = "class" }) {
                         {subjects.length === 0 ? (
                             <div className="empty-state">
                                 <p>
-                                    No subjects added to this course.
+                                    No subjects added to this
+                                    course.
                                 </p>
                             </div>
                         ) : (
                             subjects.map((subject) => (
+
                                 <div
                                     className={`subject-card ${selectedSubject?._id ===
-                                        subject._id
-                                        ? "selected"
-                                        : ""
+                                            subject._id
+                                            ? "selected"
+                                            : ""
                                         }`}
                                     key={subject._id}
                                 >
@@ -861,7 +894,9 @@ function ManagementDashboard({ role = "class" }) {
                                             setSelectedSubject(
                                                 subject
                                             );
-                                            setShowLectureForm(false);
+                                            setShowLectureForm(
+                                                false
+                                            );
                                         }}
                                     >
 
@@ -878,13 +913,16 @@ function ManagementDashboard({ role = "class" }) {
 
                                             <span>
                                                 ⭐{" "}
-                                                {subject.rating || 0}
+                                                {subject.rating ||
+                                                    0}
                                             </span>
 
                                             <span>
                                                 🎥{" "}
-                                                {subject.demoLectures
-                                                    ?.length || 0}{" "}
+                                                {subject
+                                                    .demoLectures
+                                                    ?.length ||
+                                                    0}{" "}
                                                 Demo Lectures
                                             </span>
 
@@ -892,20 +930,19 @@ function ManagementDashboard({ role = "class" }) {
 
                                     </div>
 
-                                    {!isAdmin && (
-                                        <button
-                                            className="danger-button"
-                                            onClick={() =>
-                                                deleteSubject(
-                                                    subject._id
-                                                )
-                                            }
-                                        >
-                                            Delete
-                                        </button>
-                                    )}
+                                    <button
+                                        className="danger-button"
+                                        onClick={() =>
+                                            deleteSubject(
+                                                subject._id
+                                            )
+                                        }
+                                    >
+                                        Delete
+                                    </button>
 
                                 </div>
+
                             ))
                         )}
 
@@ -915,7 +952,7 @@ function ManagementDashboard({ role = "class" }) {
             )}
 
             {/* =================================================
-                DEMO LECTURES SECTION
+                DEMO LECTURES
             ================================================= */}
 
             {selectedSubject && (
@@ -930,35 +967,35 @@ function ManagementDashboard({ role = "class" }) {
                             </h2>
 
                             <p>
-                                Add YouTube or direct video lectures
-                                for this subject.
+                                Add YouTube or direct video
+                                lectures for this subject.
                             </p>
                         </div>
 
-                        {!isAdmin && (
-                            <button
-                                className="primary-button"
-                                onClick={() =>
-                                    setShowLectureForm(
-                                        !showLectureForm
-                                    )
-                                }
-                            >
-                                {showLectureForm
-                                    ? "Cancel"
-                                    : "+ Add Demo Lecture"}
-                            </button>
-                        )}
+                        <button
+                            className="primary-button"
+                            onClick={() =>
+                                setShowLectureForm(
+                                    !showLectureForm
+                                )
+                            }
+                        >
+                            {showLectureForm
+                                ? "Cancel"
+                                : "+ Add Demo Lecture"}
+                        </button>
 
                     </div>
 
-                    {showLectureForm && !isAdmin && (
+                    {showLectureForm && (
                         <form
                             className="management-form"
                             onSubmit={createDemoLecture}
                         >
 
-                            <h3>Add Demo Lecture</h3>
+                            <h3>
+                                Add Demo Lecture
+                            </h3>
 
                             <input
                                 type="text"
@@ -998,21 +1035,25 @@ function ManagementDashboard({ role = "class" }) {
 
                     <div className="lecture-list">
 
-                        {selectedSubject.demoLectures?.length === 0 ? (
+                        {!selectedSubject.demoLectures ||
+                            selectedSubject.demoLectures.length === 0 ? (
                             <div className="empty-state">
                                 <p>
-                                    No demo lectures added yet.
+                                    No demo lectures added
+                                    yet.
                                 </p>
                             </div>
                         ) : (
-                            selectedSubject.demoLectures?.map(
+                            selectedSubject.demoLectures.map(
                                 (lecture) => (
+
                                     <div
                                         className="lecture-card"
                                         key={lecture._id}
                                     >
 
                                         <div>
+
                                             <h3>
                                                 {lecture.title}
                                             </h3>
@@ -1035,22 +1076,22 @@ function ManagementDashboard({ role = "class" }) {
                                             >
                                                 Watch Lecture
                                             </a>
+
                                         </div>
 
-                                        {!isAdmin && (
-                                            <button
-                                                className="danger-button"
-                                                onClick={() =>
-                                                    deleteDemoLecture(
-                                                        lecture._id
-                                                    )
-                                                }
-                                            >
-                                                Delete
-                                            </button>
-                                        )}
+                                        <button
+                                            className="danger-button"
+                                            onClick={() =>
+                                                deleteDemoLecture(
+                                                    lecture._id
+                                                )
+                                            }
+                                        >
+                                            Delete
+                                        </button>
 
                                     </div>
+
                                 )
                             )
                         )}

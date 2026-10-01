@@ -12,11 +12,9 @@ function Classes() {
 
     // Filters
     const [ratingFilter, setRatingFilter] = useState("");
-    const [feesFilter, setFeesFilter] = useState("");
 
     // Sort
     const [sortBy, setSortBy] = useState("");
-
 
     /* ================================
        FETCH CLASSES
@@ -26,6 +24,7 @@ function Classes() {
 
         try {
 
+            setLoading(true);
             setError("");
 
             const response = await fetch(
@@ -58,13 +57,12 @@ function Classes() {
 
             setLoading(false);
         }
+
     }, []);
 
     useEffect(() => {
-        // oxlint-disable-next-line react/set-state-in-effect
         fetchClasses();
     }, [fetchClasses]);
-
 
     /* ================================
        SEARCH + FILTER + SORT
@@ -76,7 +74,6 @@ function Classes() {
 
         const searchValue =
             search.trim().toLowerCase();
-
 
         /* SEARCH */
 
@@ -99,7 +96,6 @@ function Classes() {
             );
         }
 
-
         /* RATING FILTER */
 
         if (ratingFilter) {
@@ -114,64 +110,6 @@ function Classes() {
             );
         }
 
-
-        /* FEES FILTER */
-
-        if (feesFilter) {
-
-            result = result.filter((item) => {
-
-                const fees =
-                    Number(item.fees || 0);
-
-
-                if (
-                    feesFilter ===
-                    "under-10000"
-                ) {
-
-                    return fees < 10000;
-                }
-
-
-                if (
-                    feesFilter ===
-                    "10000-25000"
-                ) {
-
-                    return (
-                        fees >= 10000 &&
-                        fees <= 25000
-                    );
-                }
-
-
-                if (
-                    feesFilter ===
-                    "25000-50000"
-                ) {
-
-                    return (
-                        fees > 25000 &&
-                        fees <= 50000
-                    );
-                }
-
-
-                if (
-                    feesFilter ===
-                    "above-50000"
-                ) {
-
-                    return fees > 50000;
-                }
-
-
-                return true;
-            });
-        }
-
-
         /* SORT */
 
         if (sortBy === "rating-high") {
@@ -183,37 +121,14 @@ function Classes() {
             );
         }
 
-
-        if (sortBy === "fees-low") {
-
-            result.sort(
-                (a, b) =>
-                    Number(a.fees || 0) -
-                    Number(b.fees || 0)
-            );
-        }
-
-
-        if (sortBy === "fees-high") {
-
-            result.sort(
-                (a, b) =>
-                    Number(b.fees || 0) -
-                    Number(a.fees || 0)
-            );
-        }
-
-
         return result;
 
     }, [
         classes,
         search,
         ratingFilter,
-        feesFilter,
         sortBy
     ]);
-
 
     /* ================================
        CLEAR FILTERS
@@ -223,18 +138,14 @@ function Classes() {
 
         setSearch("");
         setRatingFilter("");
-        setFeesFilter("");
         setSortBy("");
 
     };
 
-
     const hasFilters =
         search ||
         ratingFilter ||
-        feesFilter ||
         sortBy;
-
 
     /* ================================
        LOADING
@@ -263,7 +174,6 @@ function Classes() {
 
         );
     }
-
 
     /* ================================
        ERROR
@@ -300,7 +210,6 @@ function Classes() {
         );
     }
 
-
     /* ================================
        MAIN PAGE
     ================================ */
@@ -308,7 +217,6 @@ function Classes() {
     return (
 
         <div className="classes-page">
-
 
             {/* =================================
                 PAGE HEADER
@@ -332,7 +240,6 @@ function Classes() {
 
             </div>
 
-
             {/* =================================
                 SEARCH
             ================================= */}
@@ -353,7 +260,6 @@ function Classes() {
                 />
 
             </div>
-
 
             {/* =================================
                 COMPARE NAVIGATION
@@ -383,7 +289,6 @@ function Classes() {
 
                 </div>
 
-
                 <Link
                     to="/compare"
                     className="compare-classes-btn"
@@ -401,13 +306,11 @@ function Classes() {
 
             </div>
 
-
             {/* =================================
                 FILTER BAR
             ================================= */}
 
             <div className="classes-filter-bar">
-
 
                 {/* RATING */}
 
@@ -450,49 +353,6 @@ function Classes() {
 
                 </div>
 
-
-                {/* FEES */}
-
-                <div className="filter-item">
-
-                    <label>
-                        Fees
-                    </label>
-
-                    <select
-                        value={feesFilter}
-                        onChange={(e) =>
-                            setFeesFilter(
-                                e.target.value
-                            )
-                        }
-                    >
-
-                        <option value="">
-                            All Fees
-                        </option>
-
-                        <option value="under-10000">
-                            Under ₹10,000
-                        </option>
-
-                        <option value="10000-25000">
-                            ₹10,000 – ₹25,000
-                        </option>
-
-                        <option value="25000-50000">
-                            ₹25,000 – ₹50,000
-                        </option>
-
-                        <option value="above-50000">
-                            Above ₹50,000
-                        </option>
-
-                    </select>
-
-                </div>
-
-
                 {/* SORT */}
 
                 <div className="filter-item">
@@ -518,18 +378,9 @@ function Classes() {
                             Highest Rated
                         </option>
 
-                        <option value="fees-low">
-                            Fees: Low to High
-                        </option>
-
-                        <option value="fees-high">
-                            Fees: High to Low
-                        </option>
-
                     </select>
 
                 </div>
-
 
                 {/* CLEAR */}
 
@@ -546,7 +397,6 @@ function Classes() {
                 )}
 
             </div>
-
 
             {/* =================================
                 RESULT COUNT
@@ -569,7 +419,6 @@ function Classes() {
                 {" "}institutes
 
             </div>
-
 
             {/* =================================
                 NO RESULTS
@@ -604,7 +453,6 @@ function Classes() {
 
             ) : (
 
-
                 /* =================================
                    INSTITUTE CARDS
                 ================================= */
@@ -618,18 +466,15 @@ function Classes() {
                             key={item._id}
                         >
 
-
                             {/* CARD TOP */}
 
                             <div className="card-top">
-
 
                                 <div className="institute-card-title">
 
                                     <div className="institute-icon">
                                         🏫
                                     </div>
-
 
                                     <div>
 
@@ -641,23 +486,29 @@ function Classes() {
 
                                 </div>
 
-
                                 {/* COMPACT RATING */}
 
                                 <div className="compact-rating">
-                                    <span>⭐</span>
+
+                                    <span>
+                                        ⭐
+                                    </span>
 
                                     <strong>
-                                        {item.rating !== undefined &&
-                                            item.rating !== null &&
+                                        {item.rating !==
+                                            undefined &&
+                                            item.rating !==
+                                            null &&
                                             item.rating !== ""
-                                            ? Number(item.rating).toFixed(1)
+                                            ? Number(
+                                                item.rating
+                                            ).toFixed(1)
                                             : "N/A"}
                                     </strong>
+
                                 </div>
 
                             </div>
-
 
                             {/* DESCRIPTION */}
 
@@ -668,7 +519,6 @@ function Classes() {
                                 </p>
 
                             )}
-
 
                             {/* LOCATION */}
 
@@ -688,7 +538,6 @@ function Classes() {
 
                             )}
 
-
                             {/* ADDRESS */}
 
                             {item.address && (
@@ -706,33 +555,6 @@ function Classes() {
                                 </p>
 
                             )}
-
-
-                            {/* FEES */}
-
-                            {item.fees !== undefined &&
-                                item.fees !== null &&
-                                item.fees !== "" && (
-
-                                    <p className="location">
-
-                                        <strong>
-                                            Fees:
-                                        </strong>
-
-                                        {" "}
-
-                                        ₹
-                                        {Number(
-                                            item.fees
-                                        ).toLocaleString(
-                                            "en-IN"
-                                        )}
-
-                                    </p>
-
-                                )}
-
 
                             {/* CONTACT */}
 
@@ -752,7 +574,6 @@ function Classes() {
 
                             )}
 
-
                             {/* VIEW DETAILS */}
 
                             <Link
@@ -765,11 +586,14 @@ function Classes() {
                                     type="button"
                                 >
                                     View Details
-                                    <span>→</span>
+
+                                    <span>
+                                        →
+                                    </span>
+
                                 </button>
 
                             </Link>
-
 
                         </div>
 

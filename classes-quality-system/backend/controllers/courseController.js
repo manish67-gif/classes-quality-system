@@ -38,7 +38,8 @@ const createCourse = async (req, res) => {
             !mongoose.Types.ObjectId.isValid(classId)
         ) {
             return res.status(400).json({
-                message: "Invalid class ID"
+                message:
+                    "Invalid class ID"
             });
         }
 
@@ -48,7 +49,8 @@ const createCourse = async (req, res) => {
             !name.trim()
         ) {
             return res.status(400).json({
-                message: "Course name is required"
+                message:
+                    "Course name is required"
             });
         }
 
@@ -73,10 +75,15 @@ const createCourse = async (req, res) => {
 
         if (!classExists) {
             return res.status(404).json({
-                message: "Class not found"
+                message:
+                    "Class not found"
             });
         }
 
+
+        // =========================================
+        // AUTHORIZATION
+        // =========================================
 
         if (
             req.user.role !== "admin" &&
@@ -90,15 +97,20 @@ const createCourse = async (req, res) => {
         }
 
 
-        const course = await Course.create({
-            classId,
-            name: name.trim(),
-            description:
-                description?.trim() || "",
-            fees: numericFees,
-            duration:
-                duration?.trim() || ""
-        });
+        const course =
+            await Course.create({
+                classId,
+                name: name.trim(),
+                description:
+                    typeof description === "string"
+                        ? description.trim()
+                        : "",
+                fees: numericFees,
+                duration:
+                    typeof duration === "string"
+                        ? duration.trim()
+                        : ""
+            });
 
 
         return res.status(201).json({
@@ -120,13 +132,15 @@ const createCourse = async (req, res) => {
             "ValidationError"
         ) {
             return res.status(400).json({
-                message: error.message
+                message:
+                    error.message
             });
         }
 
 
         return res.status(500).json({
-            message: "Server error"
+            message:
+                "Server error"
         });
     }
 };
@@ -148,7 +162,8 @@ const getCoursesByClass = async (req, res) => {
             )
         ) {
             return res.status(400).json({
-                message: "Invalid class ID"
+                message:
+                    "Invalid class ID"
             });
         }
 
@@ -159,7 +174,8 @@ const getCoursesByClass = async (req, res) => {
 
         if (!classExists) {
             return res.status(404).json({
-                message: "Class not found"
+                message:
+                    "Class not found"
             });
         }
 
@@ -198,9 +214,7 @@ const getCoursesByClass = async (req, res) => {
                     ratedSubjects.reduce(
                         (sum, subject) =>
                             sum +
-                            Number(
-                                subject.rating
-                            ),
+                            Number(subject.rating),
                         0
                     );
 
@@ -216,7 +230,6 @@ const getCoursesByClass = async (req, res) => {
             } else {
 
                 course.rating = null;
-
             }
         }
 
@@ -236,7 +249,8 @@ const getCoursesByClass = async (req, res) => {
 
 
         return res.status(500).json({
-            message: "Server error"
+            message:
+                "Server error"
         });
     }
 };
@@ -256,7 +270,8 @@ const getCourseById = async (req, res) => {
             !mongoose.Types.ObjectId.isValid(id)
         ) {
             return res.status(400).json({
-                message: "Invalid course ID"
+                message:
+                    "Invalid course ID"
             });
         }
 
@@ -267,7 +282,8 @@ const getCourseById = async (req, res) => {
 
         if (!course) {
             return res.status(404).json({
-                message: "Course not found"
+                message:
+                    "Course not found"
             });
         }
 
@@ -281,10 +297,6 @@ const getCourseById = async (req, res) => {
                 courseId: course._id
             });
 
-
-        // =========================================
-        // GET RATED SUBJECTS
-        // =========================================
 
         const ratedSubjects =
             subjects.filter(
@@ -304,9 +316,7 @@ const getCourseById = async (req, res) => {
                 ratedSubjects.reduce(
                     (sum, subject) =>
                         sum +
-                        Number(
-                            subject.rating
-                        ),
+                        Number(subject.rating),
                     0
                 );
 
@@ -322,7 +332,6 @@ const getCourseById = async (req, res) => {
         } else {
 
             course.rating = null;
-
         }
 
 
@@ -341,7 +350,8 @@ const getCourseById = async (req, res) => {
 
 
         return res.status(500).json({
-            message: "Server error"
+            message:
+                "Server error"
         });
     }
 };
@@ -391,9 +401,7 @@ const getAllCourses = async (req, res) => {
                     ratedSubjects.reduce(
                         (sum, subject) =>
                             sum +
-                            Number(
-                                subject.rating
-                            ),
+                            Number(subject.rating),
                         0
                     );
 
@@ -409,7 +417,6 @@ const getAllCourses = async (req, res) => {
             } else {
 
                 course.rating = null;
-
             }
         }
 
@@ -429,7 +436,8 @@ const getAllCourses = async (req, res) => {
 
 
         return res.status(500).json({
-            message: "Server error"
+            message:
+                "Server error"
         });
     }
 };
@@ -452,13 +460,24 @@ const updateCourse = async (req, res) => {
         } = req.body;
 
 
+        if (
+            !mongoose.Types.ObjectId.isValid(id)
+        ) {
+            return res.status(400).json({
+                message:
+                    "Invalid course ID"
+            });
+        }
+
+
         const course =
             await Course.findById(id);
 
 
         if (!course) {
             return res.status(404).json({
-                message: "Course not found"
+                message:
+                    "Course not found"
             });
         }
 
@@ -471,7 +490,8 @@ const updateCourse = async (req, res) => {
 
         if (!classExists) {
             return res.status(404).json({
-                message: "Class not found"
+                message:
+                    "Class not found"
             });
         }
 
@@ -486,24 +506,83 @@ const updateCourse = async (req, res) => {
             req.user.userId.toString()
         ) {
             return res.status(403).json({
-                message: "Not authorized"
+                message:
+                    "Not authorized"
             });
         }
 
 
-        course.name =
-            name ?? course.name;
+        // =========================================
+        // UPDATE NAME
+        // =========================================
 
-        course.description =
-            description ??
-            course.description;
+        if (name !== undefined) {
 
-        course.fees =
-            fees ?? course.fees;
+            if (
+                typeof name !== "string" ||
+                !name.trim()
+            ) {
+                return res.status(400).json({
+                    message:
+                        "Course name cannot be empty"
+                });
+            }
 
-        course.duration =
-            duration ??
-            course.duration;
+            course.name =
+                name.trim();
+        }
+
+
+        // =========================================
+        // UPDATE DESCRIPTION
+        // =========================================
+
+        if (description !== undefined) {
+
+            course.description =
+                typeof description === "string"
+                    ? description.trim()
+                    : course.description;
+        }
+
+
+        // =========================================
+        // UPDATE FEES
+        // =========================================
+
+        if (fees !== undefined) {
+
+            const numericFees =
+                Number(fees);
+
+
+            if (
+                Number.isNaN(numericFees) ||
+                numericFees < 0
+            ) {
+                return res.status(400).json({
+                    message:
+                        "Fees must be a valid non-negative number"
+                });
+            }
+
+
+            course.fees =
+                numericFees;
+        }
+
+
+        // =========================================
+        // UPDATE DURATION
+        // =========================================
+
+        if (duration !== undefined) {
+
+            course.duration =
+                typeof duration === "string"
+                    ? duration.trim()
+                    : course.duration;
+        }
 
 
         await course.save();
@@ -523,8 +602,20 @@ const updateCourse = async (req, res) => {
         );
 
 
+        if (
+            error.name ===
+            "ValidationError"
+        ) {
+            return res.status(400).json({
+                message:
+                    error.message
+            });
+        }
+
+
         return res.status(500).json({
-            message: "Server error"
+            message:
+                "Server error"
         });
     }
 };
@@ -540,13 +631,24 @@ const deleteCourse = async (req, res) => {
         const { id } = req.params;
 
 
+        if (
+            !mongoose.Types.ObjectId.isValid(id)
+        ) {
+            return res.status(400).json({
+                message:
+                    "Invalid course ID"
+            });
+        }
+
+
         const course =
             await Course.findById(id);
 
 
         if (!course) {
             return res.status(404).json({
-                message: "Course not found"
+                message:
+                    "Course not found"
             });
         }
 
@@ -559,7 +661,8 @@ const deleteCourse = async (req, res) => {
 
         if (!classExists) {
             return res.status(404).json({
-                message: "Class not found"
+                message:
+                    "Class not found"
             });
         }
 
@@ -574,7 +677,8 @@ const deleteCourse = async (req, res) => {
             req.user.userId.toString()
         ) {
             return res.status(403).json({
-                message: "Not authorized"
+                message:
+                    "Not authorized"
             });
         }
 
@@ -586,18 +690,26 @@ const deleteCourse = async (req, res) => {
         const subjects =
             await Subject.find({
                 courseId: id
-            });
+            }).select("_id");
+
+
+        const subjectIds =
+            subjects.map(
+                (subject) =>
+                    subject._id
+            );
 
 
         // =========================================
         // DELETE REVIEWS
         // =========================================
 
-        for (const subject of subjects) {
+        if (subjectIds.length > 0) {
 
             await Review.deleteMany({
-                subjectId:
-                    subject._id
+                subjectId: {
+                    $in: subjectIds
+                }
             });
         }
 
@@ -632,11 +744,16 @@ const deleteCourse = async (req, res) => {
 
 
         return res.status(500).json({
-            message: "Server error"
+            message:
+                "Server error"
         });
     }
 };
 
+
+// =========================================
+// EXPORTS
+// =========================================
 
 module.exports = {
     createCourse,

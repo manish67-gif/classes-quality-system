@@ -11,11 +11,11 @@ function ClassDetails() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
-
     const fetchClassDetails = useCallback(async () => {
 
         try {
 
+            setLoading(true);
             setError("");
 
             // =========================================
@@ -40,13 +40,15 @@ function ClassDetails() {
 
             setClassData(classResult.class);
 
-
             // =========================================
             // FETCH COURSES
             // =========================================
 
             const courseResponse = await fetch(
-                `http://localhost:8080/api/courses/class/${id}`
+                `http://localhost:8080/api/courses/class/${id}`,
+                {
+                    cache: "no-store"
+                }
             );
 
             const courseResult = await courseResponse.json();
@@ -73,19 +75,19 @@ function ClassDetails() {
 
             setLoading(false);
         }
+
     }, [id]);
 
     useEffect(() => {
-        // oxlint-disable-next-line react/set-state-in-effect
         fetchClassDetails();
     }, [fetchClassDetails]);
-
 
     // =========================================
     // LOADING
     // =========================================
 
     if (loading) {
+
         return (
             <div className="message">
 
@@ -94,19 +96,20 @@ function ClassDetails() {
                 </h1>
 
                 <p>
-                    Please wait while we load the institute details.
+                    Please wait while we load
+                    the institute details.
                 </p>
 
             </div>
         );
     }
 
-
     // =========================================
     // ERROR
     // =========================================
 
     if (error) {
+
         return (
             <div className="details-page">
 
@@ -120,18 +123,26 @@ function ClassDetails() {
                         {error}
                     </p>
 
+                    <button
+                        type="button"
+                        className="view-btn"
+                        onClick={fetchClassDetails}
+                    >
+                        Try Again
+                    </button>
+
                 </div>
 
             </div>
         );
     }
 
-
     // =========================================
     // NOT FOUND
     // =========================================
 
     if (!classData) {
+
         return (
             <div className="message">
 
@@ -148,10 +159,9 @@ function ClassDetails() {
         );
     }
 
-
     return (
-        <div className="details-page">
 
+        <div className="details-page">
 
             {/* =========================================
                 INSTITUTE HEADER
@@ -174,11 +184,11 @@ function ClassDetails() {
                             "Explore courses and subjects offered by this institute."}
                     </p>
 
-
                     {/* INSTITUTE RATING */}
 
                     {classData.rating !== undefined &&
                         classData.rating !== null && (
+
                             <div className="details-rating">
 
                                 <span className="rating-star">
@@ -186,7 +196,9 @@ function ClassDetails() {
                                 </span>
 
                                 <strong>
-                                    {Number(classData.rating).toFixed(1)}
+                                    {Number(
+                                        classData.rating
+                                    ).toFixed(1)}
                                 </strong>
 
                                 <span>
@@ -198,19 +210,18 @@ function ClassDetails() {
                                 </span>
 
                             </div>
+
                         )}
 
                 </div>
 
             </div>
 
-
             {/* =========================================
                 INSTITUTE INFORMATION
             ========================================= */}
 
             <div className="class-info-grid">
-
 
                 <div className="class-info-card">
 
@@ -225,13 +236,13 @@ function ClassDetails() {
                         </h3>
 
                         <p>
-                            {classData.location || "Not available"}
+                            {classData.location ||
+                                "Not available"}
                         </p>
 
                     </div>
 
                 </div>
-
 
                 <div className="class-info-card">
 
@@ -246,13 +257,13 @@ function ClassDetails() {
                         </h3>
 
                         <p>
-                            {classData.address || "Not available"}
+                            {classData.address ||
+                                "Not available"}
                         </p>
 
                     </div>
 
                 </div>
-
 
                 <div className="class-info-card">
 
@@ -267,7 +278,8 @@ function ClassDetails() {
                         </h3>
 
                         <p>
-                            {classData.contactNumber || "Not available"}
+                            {classData.contactNumber ||
+                                "Not available"}
                         </p>
 
                     </div>
@@ -276,13 +288,11 @@ function ClassDetails() {
 
             </div>
 
-
             {/* =========================================
                 COURSES
             ========================================= */}
 
             <div className="courses-section">
-
 
                 <div className="section-heading">
 
@@ -303,7 +313,6 @@ function ClassDetails() {
 
                     </div>
 
-
                     <span className="course-count">
 
                         {courses.length}
@@ -317,7 +326,6 @@ function ClassDetails() {
                     </span>
 
                 </div>
-
 
                 {/* =========================================
                     NO COURSES
@@ -340,7 +348,6 @@ function ClassDetails() {
 
                 ) : (
 
-
                     /* =====================================
                        COURSE GRID
                     ===================================== */
@@ -353,7 +360,6 @@ function ClassDetails() {
                                 key={course._id}
                                 className="course-card"
                             >
-
 
                                 {/* COURSE TOP */}
 
@@ -369,29 +375,36 @@ function ClassDetails() {
 
                                 </div>
 
-
                                 {/* COURSE NAME */}
 
                                 <h3>
                                     {course.name}
                                 </h3>
 
+                                {/* COURSE RATING */}
+
                                 <div className="course-rating">
+
                                     <span className="course-rating-star">
                                         ★
                                     </span>
 
                                     <strong>
-                                        {course.rating !== undefined && course.rating !== null
-                                            ? Number(course.rating).toFixed(1)
+                                        {course.rating !==
+                                            undefined &&
+                                            course.rating !==
+                                            null
+                                            ? Number(
+                                                course.rating
+                                            ).toFixed(1)
                                             : "N/A"}
                                     </strong>
 
                                     <span className="course-rating-max">
                                         / 5
                                     </span>
-                                </div>
 
+                                </div>
 
                                 {/* DESCRIPTION */}
 
@@ -402,11 +415,11 @@ function ClassDetails() {
 
                                 </p>
 
-
                                 {/* COURSE META */}
 
                                 <div className="course-meta">
 
+                                    {/* DURATION */}
 
                                     <div>
 
@@ -415,11 +428,14 @@ function ClassDetails() {
                                         </span>
 
                                         <strong>
-                                            ⏱ {course.duration || "N/A"}
+                                            ⏱{" "}
+                                            {course.duration ||
+                                                "N/A"}
                                         </strong>
 
                                     </div>
 
+                                    {/* FEES */}
 
                                     <div>
 
@@ -429,9 +445,15 @@ function ClassDetails() {
 
                                         <strong>
 
-                                            {course.fees !== undefined &&
-                                                course.fees !== null
-                                                ? `₹${Number(course.fees).toLocaleString("en-IN")}`
+                                            {course.fees !==
+                                                undefined &&
+                                                course.fees !==
+                                                null
+                                                ? `₹${Number(
+                                                    course.fees
+                                                ).toLocaleString(
+                                                    "en-IN"
+                                                )}`
                                                 : "N/A"}
 
                                         </strong>
@@ -439,7 +461,6 @@ function ClassDetails() {
                                     </div>
 
                                 </div>
-
 
                                 {/* VIEW COURSE */}
 
@@ -457,7 +478,6 @@ function ClassDetails() {
                                     </span>
 
                                 </Link>
-
 
                             </div>
 

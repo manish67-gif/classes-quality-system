@@ -42,6 +42,7 @@ const classSchema = new mongoose.Schema(
             type: String,
             trim: true
         },
+
         rating: {
             type: Number,
             min: 0,
