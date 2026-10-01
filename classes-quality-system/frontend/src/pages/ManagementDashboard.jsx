@@ -1,47 +1,33 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 const API = "http://localhost:8080/api";
 
-async function request(path, options = {}) {
+function ManagementDashboard({ role = "class" }) {
     const token = localStorage.getItem("token");
+    const currentUser = JSON.parse(
+        localStorage.getItem("user") || "{}"
+    );
 
-    const response = await fetch(`${API}${path}`, {
-        ...options,
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            ...(options.headers || {})
-        }
-    });
+    const isAdmin = role === "admin";
 
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.message || "Request failed");
-    }
-
-    return data;
-}
-
-function ManagementDashboard({ role }) {
     const [classes, setClasses] = useState([]);
-    const [users, setUsers] = useState([]);
-
-    const [selectedClass, setSelectedClass] = useState(null);
     const [courses, setCourses] = useState([]);
-
-    const [selectedCourse, setSelectedCourse] = useState(null);
     const [subjects, setSubjects] = useState([]);
 
+    const [selectedCourse, setSelectedCourse] = useState(null);
     const [selectedSubject, setSelectedSubject] = useState(null);
 
+    const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
+
+    const [showCourseForm, setShowCourseForm] = useState(false);
+    const [showSubjectForm, setShowSubjectForm] = useState(false);
+    const [showLectureForm, setShowLectureForm] = useState(false);
 
     const [courseForm, setCourseForm] = useState({
         name: "",
-        fees: "",
         description: "",
+        fees: "",
         duration: ""
     });
 
@@ -50,664 +36,800 @@ function ManagementDashboard({ role }) {
         description: ""
     });
 
-    const [demoForm, setDemoForm] = useState({
+    const [lectureForm, setLectureForm] = useState({
         title: "",
         duration: "",
         videoUrl: ""
     });
 
-    const currentUser = JSON.parse(
-        localStorage.getItem("user") || "null"
-    );
+    // --------------------------------------------------
+    // COMMON HEADERS
+    // --------------------------------------------------
 
-    // =========================
+    const headers = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+    };
+
+    // --------------------------------------------------
     // LOAD CLASSES
-    // =========================
+    // --------------------------------------------------
 
-    const loadClasses = useCallback(async () => {
-        const data = await request("/classes", {
-            headers: {}
-        });
-
-        const owned =
-            role === "class"
-                ? (data.classes || []).filter(
-                    (item) =>
-                        item.ownerId === currentUser?.id ||
-                        item.ownerId?._id === currentUser?.id
-                )
-                : data.classes || [];
-
-        setClasses(owned);
-
-        if (
-            selectedClass &&
-            !owned.some(
-                (item) => item._id === selectedClass._id
-            )
-        ) {
-            setSelectedClass(null);
-        }
-    }, [currentUser?.id, role, selectedClass]);
-
-    // =========================
-    // LOAD USERS
-    // =========================
-
-    const loadUsers = useCallback(async () => {
-        if (role === "admin") {
-            const data = await request("/users");
-            setUsers(data.users || []);
-        }
-    }, [role]);
-
-    // =========================
-    // INITIAL LOAD
-    // =========================
-
-    useEffect(() => {
-        Promise.all([
-            loadClasses(),
-            loadUsers()
-        ]).catch((loadError) => {
-            setError(loadError.message);
-        });
-    }, [loadClasses, loadUsers]);
-
-    // =========================
-    // SELECT CLASS
-    // =========================
-
-    const selectClass = async (classItem) => {
-        setSelectedClass(classItem);
-        setSelectedCourse(null);
-        setSelectedSubject(null);
-        setCourses([]);
-        setSubjects([]);
-
+    const loadClasses = async () => {
         try {
-            const data = await request(
-                `/courses/class/${classItem._id}`,
-                {
-                    headers: {}
-                }
-            );
+            const response = await fetch(`${API}/classes`, {
+                headers
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to load classes");
+            }
+
+            let loadedClasses = data.classes || [];
+
+            // Class account should see only its own institute
+            if (!isAdmin && currentUser?.id) {
+                loadedClasses = loadedClasses.filter(
+                    (item) =>
+                        item.ownerId === currentUser.id ||
+                        item.ownerId?._id === currentUser.id
+                );
+            }
+
+            setClasses(loadedClasses);
+        } catch (error) {
+            console.error("Load classes error:", error);
+            setMessage(error.message);
+        }
+    };
+
+    // --------------------------------------------------
+    // LOAD COURSES
+    // --------------------------------------------------
+
+    const loadCourses = async () => {
+        try {
+            const response = await fetch(`${API}/courses`, {
+                headers
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to load courses");
+            }
 
             setCourses(data.courses || []);
-        } catch (loadError) {
-            setError(loadError.message);
+        } catch (error) {
+            console.error("Load courses error:", error);
+            setMessage(error.message);
         }
     };
 
-    // =========================
-    // SELECT COURSE
-    // =========================
+    // --------------------------------------------------
+    // LOAD SUBJECTS
+    // --------------------------------------------------
 
-    const selectCourse = async (course) => {
-        setSelectedCourse(course);
-        setSelectedSubject(null);
-        setSubjects([]);
+    const loadSubjects = async (courseId) => {
+        if (!courseId) {
+            setSubjects([]);
+            return;
+        }
 
         try {
-            const data = await request(
-                `/subjects/course/${course._id}`,
+            const response = await fetch(
+                `${API}/subjects/course/${courseId}`,
                 {
-                    headers: {}
+                    headers
                 }
             );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to load subjects"
+                );
+            }
 
             setSubjects(data.subjects || []);
-        } catch (loadError) {
-            setError(loadError.message);
+        } catch (error) {
+            console.error("Load subjects error:", error);
+            setSubjects([]);
         }
     };
 
-    // =========================
-    // SELECT SUBJECT
-    // =========================
+    // --------------------------------------------------
+    // INITIAL LOAD
+    // --------------------------------------------------
 
-    const selectSubject = async (subject) => {
-        try {
-            const data = await request(
-                `/subjects/${subject._id}`,
-                {
-                    headers: {}
-                }
+    useEffect(() => {
+        const loadData = async () => {
+            setLoading(true);
+
+            await loadClasses();
+            await loadCourses();
+
+            setLoading(false);
+        };
+
+        loadData();
+    }, []);
+
+    // --------------------------------------------------
+    // SELECT COURSE
+    // --------------------------------------------------
+
+    const handleSelectCourse = async (course) => {
+        setSelectedCourse(course);
+        setSelectedSubject(null);
+        setShowSubjectForm(false);
+        setShowLectureForm(false);
+
+        await loadSubjects(course._id);
+    };
+
+    // --------------------------------------------------
+    // COURSE FORM
+    // --------------------------------------------------
+
+    const handleCourseChange = (event) => {
+        const { name, value } = event.target;
+
+        setCourseForm((previous) => ({
+            ...previous,
+            [name]: value
+        }));
+    };
+
+    const createCourse = async (event) => {
+        event.preventDefault();
+
+        if (!classes.length) {
+            setMessage(
+                "Your institute profile is not available. Please complete institute signup first."
             );
-
-            setSelectedSubject(data.subject);
-        } catch (loadError) {
-            setError(loadError.message);
+            return;
         }
-    };
 
-    // =========================
-    // GENERIC ADD FUNCTION
-    // =========================
-
-    const submit = async (
-        path,
-        body,
-        reset,
-        refresh
-    ) => {
-        setError("");
-        setMessage("");
+        const classId = classes[0]._id;
 
         try {
-            await request(path, {
+            const response = await fetch(`${API}/courses`, {
                 method: "POST",
-                body: JSON.stringify(body)
-            });
-
-            reset();
-
-            await refresh();
-
-            setMessage("Saved successfully.");
-        } catch (submitError) {
-            setError(submitError.message);
-        }
-    };
-
-    // =========================
-    // DELETE FUNCTION
-    // =========================
-
-    const remove = async (path, refresh) => {
-        if (!window.confirm("Delete this item?")) {
-            return;
-        }
-
-        try {
-            await request(path, {
-                method: "DELETE"
-            });
-
-            await refresh();
-
-            setMessage("Deleted successfully.");
-        } catch (removeError) {
-            setError(removeError.message);
-        }
-    };
-
-    // =========================
-    // EDIT NAME
-    // Used for Class, Course, Subject
-    // =========================
-
-    const editName = async (
-        path,
-        currentName,
-        refresh
-    ) => {
-        const name = window.prompt(
-            "Name",
-            currentName
-        );
-
-        if (!name || name === currentName) {
-            return;
-        }
-
-        try {
-            await request(path, {
-                method: "PUT",
+                headers,
                 body: JSON.stringify({
-                    name
+                    classId,
+                    name: courseForm.name,
+                    description: courseForm.description,
+                    fees: Number(courseForm.fees),
+                    duration: courseForm.duration
                 })
             });
 
-            await refresh();
+            const data = await response.json();
 
-            setMessage("Updated successfully.");
-        } catch (editError) {
-            setError(editError.message);
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to create course"
+                );
+            }
+
+            setMessage("Course added successfully.");
+
+            setCourseForm({
+                name: "",
+                description: "",
+                fees: "",
+                duration: ""
+            });
+
+            setShowCourseForm(false);
+
+            await loadCourses();
+        } catch (error) {
+            console.error("Create course error:", error);
+            setMessage(error.message);
         }
     };
 
-    // =========================
-    // EDIT DEMO LECTURE
-    // =========================
+    // --------------------------------------------------
+    // DELETE COURSE
+    // --------------------------------------------------
 
-    const editDemoLecture = async (
-        subjectId,
-        lecture,
-        refresh
-    ) => {
-        const title = window.prompt(
-            "Lecture title",
-            lecture.title
+    const deleteCourse = async (courseId) => {
+        const confirmDelete = window.confirm(
+            "Delete this course? Its subjects and reviews will also be deleted."
         );
 
-        if (!title || title === lecture.title) {
+        if (!confirmDelete) return;
+
+        try {
+            const response = await fetch(
+                `${API}/courses/${courseId}`,
+                {
+                    method: "DELETE",
+                    headers
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to delete course"
+                );
+            }
+
+            setMessage("Course deleted successfully.");
+
+            if (selectedCourse?._id === courseId) {
+                setSelectedCourse(null);
+                setSubjects([]);
+            }
+
+            await loadCourses();
+        } catch (error) {
+            console.error("Delete course error:", error);
+            setMessage(error.message);
+        }
+    };
+
+    // --------------------------------------------------
+    // SUBJECT FORM
+    // --------------------------------------------------
+
+    const handleSubjectChange = (event) => {
+        const { name, value } = event.target;
+
+        setSubjectForm((previous) => ({
+            ...previous,
+            [name]: value
+        }));
+    };
+
+    const createSubject = async (event) => {
+        event.preventDefault();
+
+        if (!selectedCourse) {
+            setMessage("Please select a course first.");
             return;
         }
 
         try {
-            await request(
-                `/subjects/${subjectId}/demos/${lecture._id}`,
+            const response = await fetch(`${API}/subjects`, {
+                method: "POST",
+                headers,
+                body: JSON.stringify({
+                    courseId: selectedCourse._id,
+                    name: subjectForm.name,
+                    description: subjectForm.description
+                })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to create subject"
+                );
+            }
+
+            setMessage("Subject added successfully.");
+
+            setSubjectForm({
+                name: "",
+                description: ""
+            });
+
+            setShowSubjectForm(false);
+
+            await loadSubjects(selectedCourse._id);
+        } catch (error) {
+            console.error("Create subject error:", error);
+            setMessage(error.message);
+        }
+    };
+
+    // --------------------------------------------------
+    // DELETE SUBJECT
+    // --------------------------------------------------
+
+    const deleteSubject = async (subjectId) => {
+        const confirmDelete = window.confirm(
+            "Delete this subject and its reviews/demo lectures?"
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+            const response = await fetch(
+                `${API}/subjects/${subjectId}`,
                 {
-                    method: "PUT",
+                    method: "DELETE",
+                    headers
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to delete subject"
+                );
+            }
+
+            setMessage("Subject deleted successfully.");
+
+            setSelectedSubject(null);
+
+            await loadSubjects(selectedCourse._id);
+        } catch (error) {
+            console.error("Delete subject error:", error);
+            setMessage(error.message);
+        }
+    };
+
+    // --------------------------------------------------
+    // DEMO LECTURE FORM
+    // --------------------------------------------------
+
+    const handleLectureChange = (event) => {
+        const { name, value } = event.target;
+
+        setLectureForm((previous) => ({
+            ...previous,
+            [name]: value
+        }));
+    };
+
+    const createDemoLecture = async (event) => {
+        event.preventDefault();
+
+        if (!selectedSubject) {
+            setMessage("Please select a subject first.");
+            return;
+        }
+
+        try {
+            const response = await fetch(
+                `${API}/subjects/${selectedSubject._id}/demos`,
+                {
+                    method: "POST",
+                    headers,
                     body: JSON.stringify({
-                        title
+                        title: lectureForm.title,
+                        duration: lectureForm.duration,
+                        videoUrl: lectureForm.videoUrl
                     })
                 }
             );
 
-            await refresh();
+            const data = await response.json();
 
-            setMessage("Updated successfully.");
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to add demo lecture"
+                );
+            }
+
+            setMessage("Demo lecture added successfully.");
+
+            setLectureForm({
+                title: "",
+                duration: "",
+                videoUrl: ""
+            });
+
+            setShowLectureForm(false);
+
+            // Refresh selected subject
+            const subjectResponse = await fetch(
+                `${API}/subjects/${selectedSubject._id}`,
+                {
+                    headers
+                }
+            );
+
+            const subjectData = await subjectResponse.json();
+
+            if (subjectResponse.ok) {
+                setSelectedSubject(subjectData.subject);
+            }
+
+            await loadSubjects(selectedCourse._id);
         } catch (error) {
-            setError(error.message);
+            console.error("Create demo lecture error:", error);
+            setMessage(error.message);
         }
     };
 
-    // =========================
-    // REFRESH FUNCTIONS
-    // =========================
+    // --------------------------------------------------
+    // DELETE DEMO LECTURE
+    // --------------------------------------------------
 
-    const refreshCourses = () => {
-        if (selectedClass) {
-            return selectClass(selectedClass);
+    const deleteDemoLecture = async (lectureId) => {
+        if (!selectedSubject) return;
+
+        const confirmDelete = window.confirm(
+            "Delete this demo lecture?"
+        );
+
+        if (!confirmDelete) return;
+
+        try {
+            const response = await fetch(
+                `${API}/subjects/${selectedSubject._id}/demos/${lectureId}`,
+                {
+                    method: "DELETE",
+                    headers
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to delete demo lecture"
+                );
+            }
+
+            setMessage("Demo lecture deleted successfully.");
+
+            const subjectResponse = await fetch(
+                `${API}/subjects/${selectedSubject._id}`,
+                {
+                    headers
+                }
+            );
+
+            const subjectData = await subjectResponse.json();
+
+            if (subjectResponse.ok) {
+                setSelectedSubject(subjectData.subject);
+            }
+
+            await loadSubjects(selectedCourse._id);
+        } catch (error) {
+            console.error("Delete demo lecture error:", error);
+            setMessage(error.message);
         }
     };
 
-    const refreshSubjects = () => {
-        if (selectedCourse) {
-            return selectCourse(selectedCourse);
-        }
-    };
+    // --------------------------------------------------
+    // LOADING
+    // --------------------------------------------------
 
-    const refreshSubject = () => {
-        if (selectedSubject) {
-            return selectSubject(selectedSubject);
-        }
-    };
-
-    // =========================
-    // UI
-    // =========================
+    if (loading) {
+        return (
+            <div className="management-dashboard">
+                <h2>Loading Dashboard...</h2>
+            </div>
+        );
+    }
 
     return (
-        <main className="management-page">
+        <div className="management-dashboard">
 
-            {/* HEADER */}
+            <div className="dashboard-header">
+                <div>
+                    <h1>
+                        {isAdmin
+                            ? "Admin Dashboard"
+                            : "My Institute"}
+                    </h1>
 
-            <header className="management-header">
-
-                <span className="management-kicker">
-                    {role === "admin"
-                        ? "PLATFORM CONTROL"
-                        : "INSTITUTE CONTROL"}
-                </span>
-
-                <h1>
-                    {role === "admin"
-                        ? "Admin Dashboard"
-                        : "Class Dashboard"}
-                </h1>
-
-                <p>
-                    {role === "admin"
-                        ? "Manage users and every published learning resource."
-                        : "Manage resources owned by your institute."}
-                </p>
-
-            </header>
-
-            {/* MESSAGES */}
+                    <p>
+                        {isAdmin
+                            ? "Manage institutes, courses and academic content."
+                            : "Manage your institute, courses, subjects and demo lectures."}
+                    </p>
+                </div>
+            </div>
 
             {message && (
-                <p className="management-success">
+                <div className="dashboard-message">
                     {message}
-                </p>
+                </div>
             )}
 
-            {error && (
-                <p className="management-error">
-                    {error}
-                </p>
-            )}
+            {/* =================================================
+                INSTITUTE SECTION
+            ================================================= */}
 
-            <section className="management-grid">
+            <section className="management-section">
 
-                {/* =====================================
-                    INSTITUTES
-                ===================================== */}
+                <div className="section-header">
+                    <div>
+                        <h2>Institute</h2>
+                        <p>Your institute profile</p>
+                    </div>
+                </div>
 
-                <div className="management-panel">
+                {classes.length === 0 ? (
+                    <div className="empty-state">
+                        <h3>No Institute Found</h3>
 
-                    <h2>
-                        {role === "admin"
-                            ? "Institutes"
-                            : "My Institute"}
-                    </h2>
+                        <p>
+                            Please create your institute account
+                            through the institute signup option.
+                        </p>
+                    </div>
+                ) : (
+                    <div className="institute-card">
 
-                    {classes.map((item) => (
-                        <div
-                            className={`management-row ${selectedClass?._id === item._id
-                                    ? "is-selected"
-                                    : ""
-                                }`}
-                            key={item._id}
-                        >
+                        <h3>{classes[0].name}</h3>
 
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    selectClass(item)
-                                }
-                            >
-                                {item.name}
-                            </button>
+                        <p>
+                            {classes[0].description}
+                        </p>
 
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    editName(
-                                        `/classes/${item._id}`,
-                                        item.name,
-                                        loadClasses
-                                    )
-                                }
-                            >
-                                Edit
-                            </button>
+                        <div className="institute-details">
+                            <span>
+                                📍 {classes[0].location}
+                            </span>
 
-                            {role === "admin" && (
-                                <button
-                                    type="button"
-                                    className="danger-button"
-                                    onClick={() =>
-                                        remove(
-                                            `/classes/${item._id}`,
-                                            loadClasses
-                                        )
-                                    }
-                                >
-                                    Delete
-                                </button>
+                            {classes[0].address && (
+                                <span>
+                                    🏠 {classes[0].address}
+                                </span>
                             )}
 
-                        </div>
-                    ))}
+                            {classes[0].contactNumber && (
+                                <span>
+                                    📞 {classes[0].contactNumber}
+                                </span>
+                            )}
 
-                    {classes.length === 0 && (
+                            {classes[0].website && (
+                                <span>
+                                    🌐 {classes[0].website}
+                                </span>
+                            )}
+                        </div>
+
+                    </div>
+                )}
+
+            </section>
+
+            {/* =================================================
+                COURSES SECTION
+            ================================================= */}
+
+            <section className="management-section">
+
+                <div className="section-header">
+
+                    <div>
+                        <h2>Courses</h2>
+
                         <p>
-                            No institute profile found.
+                            Add and manage courses offered by your institute.
                         </p>
+                    </div>
+
+                    {!isAdmin && (
+                        <button
+                            className="primary-button"
+                            onClick={() =>
+                                setShowCourseForm(!showCourseForm)
+                            }
+                        >
+                            {showCourseForm
+                                ? "Cancel"
+                                : "+ Add Course"}
+                        </button>
                     )}
 
                 </div>
 
-                {/* =====================================
-                    COURSES
-                ===================================== */}
+                {showCourseForm && !isAdmin && (
+                    <form
+                        className="management-form"
+                        onSubmit={createCourse}
+                    >
 
-                <div className="management-panel">
+                        <h3>Add Course</h3>
 
-                    <h2>Courses</h2>
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Course Name"
+                            value={courseForm.name}
+                            onChange={handleCourseChange}
+                            required
+                        />
 
-                    {!selectedClass && (
-                        <p>
-                            Select an institute first.
-                        </p>
-                    )}
+                        <textarea
+                            name="description"
+                            placeholder="Course Description"
+                            value={courseForm.description}
+                            onChange={handleCourseChange}
+                        />
 
-                    {courses.map((course) => (
-                        <div
-                            className={`management-row ${selectedCourse?._id === course._id
-                                    ? "is-selected"
-                                    : ""
-                                }`}
-                            key={course._id}
+                        <input
+                            type="number"
+                            name="fees"
+                            placeholder="Fees"
+                            value={courseForm.fees}
+                            onChange={handleCourseChange}
+                            min="0"
+                            required
+                        />
+
+                        <input
+                            type="text"
+                            name="duration"
+                            placeholder="Duration (e.g. 1 Year)"
+                            value={courseForm.duration}
+                            onChange={handleCourseChange}
+                            required
+                        />
+
+                        <button
+                            type="submit"
+                            className="primary-button"
                         >
+                            Add Course
+                        </button>
 
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    selectCourse(course)
-                                }
-                            >
-                                {course.name}
-                            </button>
+                    </form>
+                )}
 
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    editName(
-                                        `/courses/${course._id}`,
-                                        course.name,
-                                        refreshCourses
-                                    )
-                                }
-                            >
-                                Edit
-                            </button>
+                <div className="course-list">
 
-                            <button
-                                type="button"
-                                className="danger-button"
-                                onClick={() =>
-                                    remove(
-                                        `/courses/${course._id}`,
-                                        refreshCourses
-                                    )
-                                }
-                            >
-                                Delete
-                            </button>
-
+                    {courses.length === 0 ? (
+                        <div className="empty-state">
+                            <p>No courses added yet.</p>
                         </div>
-                    ))}
+                    ) : (
+                        courses.map((course) => {
 
-                    {selectedClass && (
-                        <form
-                            onSubmit={(event) => {
-                                event.preventDefault();
+                            const courseClassId =
+                                course.classId?._id ||
+                                course.classId;
 
-                                submit(
-                                    "/courses",
-                                    {
-                                        ...courseForm,
-                                        classId:
-                                            selectedClass._id
-                                    },
-                                    () =>
-                                        setCourseForm({
-                                            name: "",
-                                            fees: "",
-                                            description: "",
-                                            duration: ""
-                                        }),
-                                    refreshCourses
-                                );
-                            }}
-                        >
+                            const ownClassId =
+                                classes[0]?._id;
 
-                            <h3>Add Course</h3>
+                            if (
+                                !isAdmin &&
+                                courseClassId !== ownClassId
+                            ) {
+                                return null;
+                            }
 
-                            <input
-                                placeholder="Name"
-                                value={courseForm.name}
-                                onChange={(event) =>
-                                    setCourseForm({
-                                        ...courseForm,
-                                        name: event.target.value
-                                    })
-                                }
-                                required
-                            />
+                            return (
+                                <div
+                                    className={`course-card ${selectedCourse?._id === course._id
+                                            ? "selected"
+                                            : ""
+                                        }`}
+                                    key={course._id}
+                                >
 
-                            <input
-                                type="number"
-                                min="0"
-                                placeholder="Fees"
-                                value={courseForm.fees}
-                                onChange={(event) =>
-                                    setCourseForm({
-                                        ...courseForm,
-                                        fees: event.target.value
-                                    })
-                                }
-                                required
-                            />
+                                    <div
+                                        onClick={() =>
+                                            handleSelectCourse(course)
+                                        }
+                                        className="course-content"
+                                    >
 
-                            <input
-                                placeholder="Duration"
-                                value={courseForm.duration}
-                                onChange={(event) =>
-                                    setCourseForm({
-                                        ...courseForm,
-                                        duration:
-                                            event.target.value
-                                    })
-                                }
-                            />
+                                        <h3>{course.name}</h3>
 
-                            <textarea
-                                placeholder="Description"
-                                value={
-                                    courseForm.description
-                                }
-                                onChange={(event) =>
-                                    setCourseForm({
-                                        ...courseForm,
-                                        description:
-                                            event.target.value
-                                    })
-                                }
-                            />
+                                        <p>
+                                            {course.description ||
+                                                "No description"}
+                                        </p>
 
-                            <button
-                                className="primary-btn"
-                                type="submit"
-                            >
-                                Add Course
-                            </button>
+                                        <div className="course-info">
 
-                        </form>
+                                            <span>
+                                                💰 ₹{course.fees}
+                                            </span>
+
+                                            <span>
+                                                ⏱ {course.duration}
+                                            </span>
+
+                                            {course.rating !== undefined && (
+                                                <span>
+                                                    ⭐ {course.rating}
+                                                </span>
+                                            )}
+
+                                        </div>
+
+                                    </div>
+
+                                    {!isAdmin && (
+                                        <button
+                                            className="danger-button"
+                                            onClick={() =>
+                                                deleteCourse(
+                                                    course._id
+                                                )
+                                            }
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
+
+                                </div>
+                            );
+                        })
                     )}
 
                 </div>
 
-                {/* =====================================
-                    SUBJECTS
-                ===================================== */}
+            </section>
 
-                <div className="management-panel">
+            {/* =================================================
+                SUBJECT SECTION
+            ================================================= */}
 
-                    <h2>Subjects</h2>
+            {selectedCourse && (
+                <section className="management-section">
 
-                    {!selectedCourse && (
-                        <p>
-                            Select a course first.
-                        </p>
-                    )}
+                    <div className="section-header">
 
-                    {subjects.map((subject) => (
-                        <div
-                            className={`management-row ${selectedSubject?._id ===
-                                    subject._id
-                                    ? "is-selected"
-                                    : ""
-                                }`}
-                            key={subject._id}
-                        >
+                        <div>
+                            <h2>
+                                Subjects — {selectedCourse.name}
+                            </h2>
 
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    selectSubject(subject)
-                                }
-                            >
-                                {subject.name}
-                            </button>
-
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    editName(
-                                        `/subjects/${subject._id}`,
-                                        subject.name,
-                                        refreshSubjects
-                                    )
-                                }
-                            >
-                                Edit
-                            </button>
-
-                            <button
-                                type="button"
-                                className="danger-button"
-                                onClick={() =>
-                                    remove(
-                                        `/subjects/${subject._id}`,
-                                        refreshSubjects
-                                    )
-                                }
-                            >
-                                Delete
-                            </button>
-
+                            <p>
+                                Add subjects under this course.
+                            </p>
                         </div>
-                    ))}
 
-                    {selectedCourse && (
+                        {!isAdmin && (
+                            <button
+                                className="primary-button"
+                                onClick={() =>
+                                    setShowSubjectForm(
+                                        !showSubjectForm
+                                    )
+                                }
+                            >
+                                {showSubjectForm
+                                    ? "Cancel"
+                                    : "+ Add Subject"}
+                            </button>
+                        )}
+
+                    </div>
+
+                    {showSubjectForm && !isAdmin && (
                         <form
-                            onSubmit={(event) => {
-                                event.preventDefault();
-
-                                submit(
-                                    "/subjects",
-                                    {
-                                        ...subjectForm,
-                                        courseId:
-                                            selectedCourse._id
-                                    },
-                                    () =>
-                                        setSubjectForm({
-                                            name: "",
-                                            description: ""
-                                        }),
-                                    refreshSubjects
-                                );
-                            }}
+                            className="management-form"
+                            onSubmit={createSubject}
                         >
 
                             <h3>Add Subject</h3>
 
                             <input
-                                placeholder="Name"
+                                type="text"
+                                name="name"
+                                placeholder="Subject Name"
                                 value={subjectForm.name}
-                                onChange={(event) =>
-                                    setSubjectForm({
-                                        ...subjectForm,
-                                        name: event.target.value
-                                    })
-                                }
+                                onChange={handleSubjectChange}
                                 required
                             />
 
                             <textarea
-                                placeholder="Description"
-                                value={
-                                    subjectForm.description
-                                }
-                                onChange={(event) =>
-                                    setSubjectForm({
-                                        ...subjectForm,
-                                        description:
-                                            event.target.value
-                                    })
-                                }
+                                name="description"
+                                placeholder="Subject Description"
+                                value={subjectForm.description}
+                                onChange={handleSubjectChange}
                             />
 
                             <button
-                                className="primary-btn"
                                 type="submit"
+                                className="primary-button"
                             >
                                 Add Subject
                             </button>
@@ -715,181 +837,231 @@ function ManagementDashboard({ role }) {
                         </form>
                     )}
 
-                </div>
+                    <div className="subject-list">
 
-                {/* =====================================
-                    DEMO LECTURES
-                ===================================== */}
-
-                <div className="management-panel">
-
-                    <h2>Demo Lectures</h2>
-
-                    {!selectedSubject && (
-                        <p>
-                            Select a subject first.
-                        </p>
-                    )}
-
-                    {selectedSubject?.demoLectures?.map(
-                        (lecture) => (
-                            <div
-                                className="management-row"
-                                key={lecture._id}
-                            >
-
-                                <span>
-                                    {lecture.title}
-                                </span>
-
-                                <button
-                                    type="button"
-                                    onClick={() =>
-                                        editDemoLecture(
-                                            selectedSubject._id,
-                                            lecture,
-                                            refreshSubject
-                                        )
-                                    }
-                                >
-                                    Edit
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className="danger-button"
-                                    onClick={() =>
-                                        remove(
-                                            `/subjects/${selectedSubject._id}/demos/${lecture._id}`,
-                                            refreshSubject
-                                        )
-                                    }
-                                >
-                                    Delete
-                                </button>
-
+                        {subjects.length === 0 ? (
+                            <div className="empty-state">
+                                <p>
+                                    No subjects added to this course.
+                                </p>
                             </div>
-                        )
-                    )}
+                        ) : (
+                            subjects.map((subject) => (
+                                <div
+                                    className={`subject-card ${selectedSubject?._id ===
+                                            subject._id
+                                            ? "selected"
+                                            : ""
+                                        }`}
+                                    key={subject._id}
+                                >
 
-                    {selectedSubject && (
+                                    <div
+                                        className="subject-content"
+                                        onClick={() => {
+                                            setSelectedSubject(
+                                                subject
+                                            );
+                                            setShowLectureForm(false);
+                                        }}
+                                    >
+
+                                        <h3>
+                                            {subject.name}
+                                        </h3>
+
+                                        <p>
+                                            {subject.description ||
+                                                "No description"}
+                                        </p>
+
+                                        <div className="subject-info">
+
+                                            <span>
+                                                ⭐{" "}
+                                                {subject.rating || 0}
+                                            </span>
+
+                                            <span>
+                                                🎥{" "}
+                                                {subject.demoLectures
+                                                    ?.length || 0}{" "}
+                                                Demo Lectures
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                    {!isAdmin && (
+                                        <button
+                                            className="danger-button"
+                                            onClick={() =>
+                                                deleteSubject(
+                                                    subject._id
+                                                )
+                                            }
+                                        >
+                                            Delete
+                                        </button>
+                                    )}
+
+                                </div>
+                            ))
+                        )}
+
+                    </div>
+
+                </section>
+            )}
+
+            {/* =================================================
+                DEMO LECTURES SECTION
+            ================================================= */}
+
+            {selectedSubject && (
+                <section className="management-section">
+
+                    <div className="section-header">
+
+                        <div>
+                            <h2>
+                                Demo Lectures —{" "}
+                                {selectedSubject.name}
+                            </h2>
+
+                            <p>
+                                Add YouTube or direct video lectures
+                                for this subject.
+                            </p>
+                        </div>
+
+                        {!isAdmin && (
+                            <button
+                                className="primary-button"
+                                onClick={() =>
+                                    setShowLectureForm(
+                                        !showLectureForm
+                                    )
+                                }
+                            >
+                                {showLectureForm
+                                    ? "Cancel"
+                                    : "+ Add Demo Lecture"}
+                            </button>
+                        )}
+
+                    </div>
+
+                    {showLectureForm && !isAdmin && (
                         <form
-                            onSubmit={(event) => {
-                                event.preventDefault();
-
-                                submit(
-                                    `/subjects/${selectedSubject._id}/demos`,
-                                    demoForm,
-                                    () =>
-                                        setDemoForm({
-                                            title: "",
-                                            duration: "",
-                                            videoUrl: ""
-                                        }),
-                                    refreshSubject
-                                );
-                            }}
+                            className="management-form"
+                            onSubmit={createDemoLecture}
                         >
 
                             <h3>Add Demo Lecture</h3>
 
                             <input
-                                placeholder="Title"
-                                value={demoForm.title}
-                                onChange={(event) =>
-                                    setDemoForm({
-                                        ...demoForm,
-                                        title: event.target.value
-                                    })
-                                }
+                                type="text"
+                                name="title"
+                                placeholder="Lecture Title"
+                                value={lectureForm.title}
+                                onChange={handleLectureChange}
                                 required
                             />
 
                             <input
-                                placeholder="Duration"
-                                value={demoForm.duration}
-                                onChange={(event) =>
-                                    setDemoForm({
-                                        ...demoForm,
-                                        duration:
-                                            event.target.value
-                                    })
-                                }
+                                type="text"
+                                name="duration"
+                                placeholder="Duration (e.g. 20 min)"
+                                value={lectureForm.duration}
+                                onChange={handleLectureChange}
                             />
 
                             <input
                                 type="url"
-                                placeholder="Video URL"
-                                value={
-                                    demoForm.videoUrl
-                                }
-                                onChange={(event) =>
-                                    setDemoForm({
-                                        ...demoForm,
-                                        videoUrl:
-                                            event.target.value
-                                    })
-                                }
+                                name="videoUrl"
+                                placeholder="YouTube Video URL"
+                                value={lectureForm.videoUrl}
+                                onChange={handleLectureChange}
+                                required
                             />
 
                             <button
-                                className="primary-btn"
                                 type="submit"
+                                className="primary-button"
                             >
-                                Add Lecture
+                                Add Demo Lecture
                             </button>
 
                         </form>
                     )}
 
-                </div>
+                    <div className="lecture-list">
 
-            </section>
+                        {selectedSubject.demoLectures?.length === 0 ? (
+                            <div className="empty-state">
+                                <p>
+                                    No demo lectures added yet.
+                                </p>
+                            </div>
+                        ) : (
+                            selectedSubject.demoLectures?.map(
+                                (lecture) => (
+                                    <div
+                                        className="lecture-card"
+                                        key={lecture._id}
+                                    >
 
-            {/* =====================================
-                USERS — ADMIN ONLY
-            ===================================== */}
+                                        <div>
+                                            <h3>
+                                                {lecture.title}
+                                            </h3>
 
-            {role === "admin" && (
-                <section className="management-panel users-panel">
+                                            {lecture.duration && (
+                                                <p>
+                                                    ⏱{" "}
+                                                    {
+                                                        lecture.duration
+                                                    }
+                                                </p>
+                                            )}
 
-                    <h2>Users</h2>
+                                            <a
+                                                href={
+                                                    lecture.videoUrl
+                                                }
+                                                target="_blank"
+                                                rel="noreferrer"
+                                            >
+                                                Watch Lecture
+                                            </a>
+                                        </div>
 
-                    {users.map((user) => (
-                        <div
-                            className="management-row"
-                            key={user.id}
-                        >
+                                        {!isAdmin && (
+                                            <button
+                                                className="danger-button"
+                                                onClick={() =>
+                                                    deleteDemoLecture(
+                                                        lecture._id
+                                                    )
+                                                }
+                                            >
+                                                Delete
+                                            </button>
+                                        )}
 
-                            <span>
-                                {user.name}{" "}
-                                <small>
-                                    {user.email} · {user.role}
-                                </small>
-                            </span>
+                                    </div>
+                                )
+                            )
+                        )}
 
-                            {user.id !== currentUser?.id && (
-                                <button
-                                    type="button"
-                                    className="danger-button"
-                                    onClick={() =>
-                                        remove(
-                                            `/users/${user.id}`,
-                                            loadUsers
-                                        )
-                                    }
-                                >
-                                    Delete
-                                </button>
-                            )}
-
-                        </div>
-                    ))}
+                    </div>
 
                 </section>
             )}
 
-        </main>
+        </div>
     );
 }
 

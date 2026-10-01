@@ -208,7 +208,6 @@ function DemoLectures() {
 
         <div className="demo-page">
 
-
             {/* =========================================
                 BREADCRUMB
             ========================================= */}
@@ -660,19 +659,23 @@ function DemoLectures() {
 
                         {/* VIDEO */}
 
-                        <video
-                            className="demo-video"
-                            controls
-                            autoPlay
-                            src={
-                                selectedLecture.videoUrl
-                            }
-                        >
-
-                            Your browser does not support
-                            video playback.
-
-                        </video>
+                        {getYouTubeEmbedUrl(selectedLecture.videoUrl) ? (
+                            <iframe
+                                className="demo-video"
+                                src={getYouTubeEmbedUrl(selectedLecture.videoUrl)}
+                                title={selectedLecture.title}
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                            ></iframe>
+                        ) : (
+                            <video
+                                className="demo-video"
+                                controls
+                                src={selectedLecture.videoUrl}
+                            >
+                                Your browser does not support video playback.
+                            </video>
+                        )}
 
 
                     </div>

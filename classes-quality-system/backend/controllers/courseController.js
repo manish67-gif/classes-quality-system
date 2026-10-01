@@ -175,6 +175,121 @@ const getAllCourses = async (req, res) => {
     }
 };
 
+const updateCourse = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name, description, fees, duration } = req.body;
+
+        const course = await Course.findById(id);
+
+        if (!course) {
+            return res.status(404).json({
+                message: "Course not found"
+            });
+        }
+
+        const classExists = await Class.findById(course.classId);
+
+        if (!classExists) {
+            return res.status(404).json({
+                message: "Class not found"
+            });
+        }
+
+        // Allow admin or the owner of the class
+        if (
+            req.user.role !== "admin" &&
+            classExists.ownerId.toString() !== req.user.id
+        ) {
+            return res.status(403).json({
+                message: "Not authorized"
+            });
+        }
+
+        course.name = name ?? course.name;
+        course.description = description ?? course.description;
+        course.fees = fees ?? course.fees;
+        course.duration = duration ?? course.duration;
+
+        await course.save();
+
+        return res.status(200).json({
+            message: "Course updated successfully",
+            course
+        });
+
+    } catch (error) {
+        console.error("Update course error:", error);
+
+        return res.status(500).json({
+            message: "Server error"
+        });
+    }
+};
+
+const deleteCourse = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const course = await Course.findById(id);
+
+        if (!course) {
+            return res.status(404).json({
+                message: "Course not found"
+            });
+        }
+
+        const classExists = await Class.findById(course.classId);
+
+        if (!classExists) {
+            return res.status(404).json({
+                message: "Class not found"
+            });
+        }
+
+        // Allow admin or the owner of the class
+        if (
+            req.user.role !== "admin" &&
+            classExists.ownerId.toString() !== req.user.id
+        ) {
+            return res.status(403).json({
+                message: "Not authorized"
+            });
+        }
+
+        // Find subjects belonging to this course
+        const subjects = await Subject.find({
+            courseId: id
+        });
+
+        // Delete reviews belonging to those subjects
+        for (const subject of subjects) {
+            await Review.deleteMany({
+                subjectId: subject._id
+            });
+        }
+
+        // Delete subjects
+        await Subject.deleteMany({
+            courseId: id
+        });
+
+        // Delete course
+        await Course.findByIdAndDelete(id);
+
+        return res.status(200).json({
+            message: "Course deleted successfully"
+        });
+
+    } catch (error) {
+        console.error("Delete course error:", error);
+
+        return res.status(500).json({
+            message: "Server error"
+        });
+    }
+};
+
 module.exports = {
     createCourse,
     getCoursesByClass,

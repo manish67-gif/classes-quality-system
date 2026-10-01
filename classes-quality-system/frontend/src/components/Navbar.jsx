@@ -51,9 +51,9 @@ function Navbar() {
 
             <div className="nav-links">
 
-                <Link to="/">
-                    Home
-                </Link>
+                {role !== "admin" && (
+                    <Link to="/">Home</Link>
+                )}
 
                 <Link to="/classes">
                     Classes
@@ -72,8 +72,15 @@ function Navbar() {
                         )}
 
                         {role === "admin" && (
-                            <Link to="/classes">Institutes</Link>
+                            <>
+                                <Link to="/admin/dashboard">
+                                    Admin Dashboard
+                                </Link>
 
+                                <Link to="/classes">
+                                    Institutes
+                                </Link>
+                            </>
                         )}
 
                         <button
