@@ -6,7 +6,6 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
         conceptClarity: 5,
         doubtSolving: 5,
         studyMaterial: 5,
-        overallRating: 5,
         comment: ""
     });
 
@@ -19,7 +18,10 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
 
         setFormData((previous) => ({
             ...previous,
-            [name]: name === "comment" ? value : Number(value)
+            [name]:
+                name === "comment"
+                    ? value
+                    : Number(value)
         }));
     };
 
@@ -63,8 +65,7 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                         conceptClarity: formData.conceptClarity,
                         doubtSolving: formData.doubtSolving,
                         studyMaterial: formData.studyMaterial,
-                        overallRating: formData.overallRating,
-                        comment: formData.comment.trim()
+                        comment: formData.comment
                     })
                 }
             );
@@ -75,7 +76,10 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                 if (response.status === 401) {
                     localStorage.removeItem("token");
                     localStorage.removeItem("user");
-                    window.dispatchEvent(new Event("authChanged"));
+
+                    window.dispatchEvent(
+                        new Event("authChanged")
+                    );
 
                     throw new Error(
                         "Your session has expired. Please login again."
@@ -94,16 +98,24 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                 conceptClarity: 5,
                 doubtSolving: 5,
                 studyMaterial: 5,
-                overallRating: 5,
                 comment: ""
             });
 
             if (onReviewSubmitted) {
                 onReviewSubmitted(data.review);
             }
+
         } catch (error) {
-            console.error("Review submission error:", error);
-            setError(error.message || "Failed to submit review");
+            console.error(
+                "Review submission error:",
+                error
+            );
+
+            setError(
+                error.message ||
+                "Failed to submit review"
+            );
+
         } finally {
             setLoading(false);
         }
@@ -113,6 +125,7 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
         <div className="review-form-card">
 
             <div className="review-form-header">
+
                 <span className="details-label">
                     SHARE YOUR EXPERIENCE
                 </span>
@@ -125,6 +138,7 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                     Help other students choose the right
                     coaching class by sharing your experience.
                 </p>
+
             </div>
 
             {message && (
@@ -143,9 +157,13 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                 onSubmit={handleSubmit}
                 className="review-form"
             >
+
                 <div className="rating-fields">
 
+                    {/* Teaching Quality */}
+
                     <div className="rating-field">
+
                         <label>
                             Teaching Quality
                         </label>
@@ -156,15 +174,34 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                             onChange={handleChange}
                             disabled={loading}
                         >
-                            <option value="1">1 - Poor</option>
-                            <option value="2">2</option>
-                            <option value="3">3 - Average</option>
-                            <option value="4">4</option>
-                            <option value="5">5 - Excellent</option>
+                            <option value="1">
+                                1 - Poor
+                            </option>
+
+                            <option value="2">
+                                2
+                            </option>
+
+                            <option value="3">
+                                3 - Average
+                            </option>
+
+                            <option value="4">
+                                4
+                            </option>
+
+                            <option value="5">
+                                5 - Excellent
+                            </option>
                         </select>
+
                     </div>
 
+
+                    {/* Concept Clarity */}
+
                     <div className="rating-field">
+
                         <label>
                             Concept Clarity
                         </label>
@@ -175,15 +212,34 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                             onChange={handleChange}
                             disabled={loading}
                         >
-                            <option value="1">1 - Poor</option>
-                            <option value="2">2</option>
-                            <option value="3">3 - Average</option>
-                            <option value="4">4</option>
-                            <option value="5">5 - Excellent</option>
+                            <option value="1">
+                                1 - Poor
+                            </option>
+
+                            <option value="2">
+                                2
+                            </option>
+
+                            <option value="3">
+                                3 - Average
+                            </option>
+
+                            <option value="4">
+                                4
+                            </option>
+
+                            <option value="5">
+                                5 - Excellent
+                            </option>
                         </select>
+
                     </div>
 
+
+                    {/* Doubt Solving */}
+
                     <div className="rating-field">
+
                         <label>
                             Doubt Solving
                         </label>
@@ -194,15 +250,34 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                             onChange={handleChange}
                             disabled={loading}
                         >
-                            <option value="1">1 - Poor</option>
-                            <option value="2">2</option>
-                            <option value="3">3 - Average</option>
-                            <option value="4">4</option>
-                            <option value="5">5 - Excellent</option>
+                            <option value="1">
+                                1 - Poor
+                            </option>
+
+                            <option value="2">
+                                2
+                            </option>
+
+                            <option value="3">
+                                3 - Average
+                            </option>
+
+                            <option value="4">
+                                4
+                            </option>
+
+                            <option value="5">
+                                5 - Excellent
+                            </option>
                         </select>
+
                     </div>
 
+
+                    {/* Study Material */}
+
                     <div className="rating-field">
+
                         <label>
                             Study Material
                         </label>
@@ -213,36 +288,36 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                             onChange={handleChange}
                             disabled={loading}
                         >
-                            <option value="1">1 - Poor</option>
-                            <option value="2">2</option>
-                            <option value="3">3 - Average</option>
-                            <option value="4">4</option>
-                            <option value="5">5 - Excellent</option>
-                        </select>
-                    </div>
+                            <option value="1">
+                                1 - Poor
+                            </option>
 
-                    <div className="rating-field overall-rating-field">
-                        <label>
-                            Overall Rating
-                        </label>
+                            <option value="2">
+                                2
+                            </option>
 
-                        <select
-                            name="overallRating"
-                            value={formData.overallRating}
-                            onChange={handleChange}
-                            disabled={loading}
-                        >
-                            <option value="1">1 - Poor</option>
-                            <option value="2">2</option>
-                            <option value="3">3 - Average</option>
-                            <option value="4">4</option>
-                            <option value="5">5 - Excellent</option>
+                            <option value="3">
+                                3 - Average
+                            </option>
+
+                            <option value="4">
+                                4
+                            </option>
+
+                            <option value="5">
+                                5 - Excellent
+                            </option>
                         </select>
+
                     </div>
 
                 </div>
 
+
+                {/* Experience */}
+
                 <div className="comment-field">
+
                     <label>
                         Your Experience
                     </label>
@@ -257,7 +332,11 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                         required
                         disabled={loading}
                     />
+
                 </div>
+
+
+                {/* Submit */}
 
                 <button
                     type="submit"
@@ -270,6 +349,7 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                 </button>
 
             </form>
+
         </div>
     );
 }

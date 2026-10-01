@@ -73,11 +73,10 @@ function ManagementDashboard({ role = "class" }) {
             if (!isAdmin && currentUser?.id) {
                 loadedClasses = loadedClasses.filter(
                     (item) =>
-                        item.ownerId === currentUser.id ||
-                        item.ownerId?._id === currentUser.id
+                        String(item.ownerId?._id || item.ownerId) ===
+                        String(currentUser.id)
                 );
             }
-
             setClasses(loadedClasses);
         } catch (error) {
             console.error("Load classes error:", error);
@@ -705,8 +704,8 @@ function ManagementDashboard({ role = "class" }) {
                             return (
                                 <div
                                     className={`course-card ${selectedCourse?._id === course._id
-                                            ? "selected"
-                                            : ""
+                                        ? "selected"
+                                        : ""
                                         }`}
                                     key={course._id}
                                 >
@@ -849,9 +848,9 @@ function ManagementDashboard({ role = "class" }) {
                             subjects.map((subject) => (
                                 <div
                                     className={`subject-card ${selectedSubject?._id ===
-                                            subject._id
-                                            ? "selected"
-                                            : ""
+                                        subject._id
+                                        ? "selected"
+                                        : ""
                                         }`}
                                     key={subject._id}
                                 >

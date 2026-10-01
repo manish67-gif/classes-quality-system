@@ -29,7 +29,10 @@ function Classes() {
             setError("");
 
             const response = await fetch(
-                "http://localhost:8080/api/classes"
+                "http://localhost:8080/api/classes",
+                {
+                    cache: "no-store"
+                }
             );
 
             const data = await response.json();

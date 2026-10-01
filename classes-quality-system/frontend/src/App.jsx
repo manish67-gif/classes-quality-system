@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import Compare from "./pages/Compare";
 import ClassDashboard from "./pages/ClassDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import Reviews from "./pages/Reviews";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -79,6 +80,24 @@ function App() {
           element={<SubjectDetails />}
         />
 
+        <Route
+          path="/reviews/subject/:subjectId"
+          element={<Reviews />}
+        />
+
+        <Route
+          path="/reviews/subject/:subjectId"
+          element={<Reviews />}
+        />
+
+        <Route
+          path="/reviews/my-reviews"
+          element={
+            <ProtectedRoute>
+              <Reviews />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/classes/:classId/courses/:courseId/subjects/:subjectId/demos"
           element={<DemoLectures />}

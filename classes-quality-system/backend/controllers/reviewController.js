@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 
 const Review = require("../models/Review");
 const Subject = require("../models/Subject");
+const Course = require("../models/Course");
+const Class = require("../models/Class");
 
 
 // =========================================
@@ -17,7 +19,6 @@ const createReview = async (req, res) => {
             conceptClarity,
             doubtSolving,
             studyMaterial,
-            overallRating,
             comment
         } = req.body;
 
@@ -31,7 +32,6 @@ const createReview = async (req, res) => {
                 message: "Authentication required"
             });
         }
-
 
         const studentId = req.user.userId;
 
@@ -51,18 +51,17 @@ const createReview = async (req, res) => {
 
 
         // =========================================
-        // VALIDATE REQUIRED FIELDS
+        // VALIDATE REQUIRED RATINGS
         // =========================================
 
         if (
             teachingQuality === undefined ||
             conceptClarity === undefined ||
             doubtSolving === undefined ||
-            studyMaterial === undefined ||
-            overallRating === undefined
+            studyMaterial === undefined
         ) {
             return res.status(400).json({
-                message: "All rating fields are required"
+                message: "All ratings are required"
             });
         }
 
@@ -82,33 +81,66 @@ const createReview = async (req, res) => {
 
 
         // =========================================
+        // CONVERT RATINGS TO NUMBERS
+        // =========================================
+
+        const teachingQualityValue =
+            Number(teachingQuality);
+
+        const conceptClarityValue =
+            Number(conceptClarity);
+
+        const doubtSolvingValue =
+            Number(doubtSolving);
+
+        const studyMaterialValue =
+            Number(studyMaterial);
+
+
+        // =========================================
         // VALIDATE RATINGS
         // =========================================
 
-        const ratings = {
-            teachingQuality,
-            conceptClarity,
-            doubtSolving,
-            studyMaterial,
-            overallRating
+        const categoryRatings = {
+            teachingQuality: teachingQualityValue,
+            conceptClarity: conceptClarityValue,
+            doubtSolving: doubtSolvingValue,
+            studyMaterial: studyMaterialValue
         };
 
 
-        for (const [field, value] of Object.entries(ratings)) {
-
-            const numericValue = Number(value);
-
+        for (
+            const [field, value]
+            of Object.entries(categoryRatings)
+        ) {
 
             if (
-                !Number.isInteger(numericValue) ||
-                numericValue < 1 ||
-                numericValue > 5
+                !Number.isInteger(value) ||
+                value < 1 ||
+                value > 5
             ) {
                 return res.status(400).json({
-                    message: `${field} must be a whole number between 1 and 5`
+                    message:
+                        `${field} must be a whole number between 1 and 5`
                 });
             }
         }
+
+
+        // =========================================
+        // CALCULATE OVERALL RATING
+        // =========================================
+
+        const overallRating = Number(
+            (
+                (
+                    teachingQualityValue +
+                    conceptClarityValue +
+                    doubtSolvingValue +
+                    studyMaterialValue
+                ) / 4
+            ).toFixed(1)
+        );
 
 
         // =========================================
@@ -139,7 +171,8 @@ const createReview = async (req, res) => {
 
         if (existingReview) {
             return res.status(409).json({
-                message: "You have already reviewed this subject"
+                message:
+                    "You have already reviewed this subject"
             });
         }
 
@@ -152,40 +185,172 @@ const createReview = async (req, res) => {
             studentId,
             subjectId,
 
-            teachingQuality: Number(teachingQuality),
-            conceptClarity: Number(conceptClarity),
-            doubtSolving: Number(doubtSolving),
-            studyMaterial: Number(studyMaterial),
-            overallRating: Number(overallRating),
+            teachingQuality:
+                teachingQualityValue,
+
+            conceptClarity:
+                conceptClarityValue,
+
+            doubtSolving:
+                doubtSolvingValue,
+
+            studyMaterial:
+                studyMaterialValue,
+
+            overallRating,
 
             comment: comment.trim()
         });
+
+
+        // =========================================
+        // UPDATE SUBJECT RATING
+        // =========================================
 
         const subjectReviews = await Review.find({
             subjectId
         });
 
-        const totalRating = subjectReviews.reduce(
-            (sum, item) => sum + item.overallRating,
-            0
-        );
 
-        const averageRating =
-            totalRating / subjectReviews.length;
+        const totalSubjectRating =
+            subjectReviews.reduce(
+                (sum, item) =>
+                    sum + Number(item.overallRating),
+                0
+            );
+
+
+        const subjectAverage =
+            totalSubjectRating /
+            subjectReviews.length;
+
 
         subjectExists.rating =
-            Number(averageRating.toFixed(1));
+            Number(subjectAverage.toFixed(1));
+
 
         await subjectExists.save();
+
+
+        // =========================================
+        // FIND COURSE
+        // =========================================
+
+        const course = await Course.findById(
+            subjectExists.courseId
+        );
+
+
+        if (!course) {
+            return res.status(404).json({
+                message: "Course not found"
+            });
+        }
+
+
+        // =========================================
+        // UPDATE COURSE RATING
+        // =========================================
+
+        const courseSubjects =
+            await Subject.find({
+                courseId: course._id
+            });
+
+
+        const ratedSubjects =
+            courseSubjects.filter(
+                (subject) =>
+                    subject.rating !== null &&
+                    subject.rating !== undefined
+            );
+
+
+        if (ratedSubjects.length > 0) {
+
+            const totalCourseRating =
+                ratedSubjects.reduce(
+                    (sum, subject) =>
+                        sum + Number(subject.rating),
+                    0
+                );
+
+
+            const courseAverage =
+                totalCourseRating /
+                ratedSubjects.length;
+
+
+            course.rating =
+                Number(courseAverage.toFixed(1));
+
+
+            await course.save();
+        }
+
+
+        // =========================================
+        // UPDATE CLASS / INSTITUTE RATING
+        // =========================================
+
+        const classId = course.classId;
+
+
+        const classExists =
+            await Class.findById(classId);
+
+
+        if (classExists) {
+
+            const classCourses =
+                await Course.find({
+                    classId: classId
+                });
+
+
+            const ratedCourses =
+                classCourses.filter(
+                    (item) =>
+                        item.rating !== null &&
+                        item.rating !== undefined
+                );
+
+
+            if (ratedCourses.length > 0) {
+
+                const totalClassRating =
+                    ratedCourses.reduce(
+                        (sum, item) =>
+                            sum + Number(item.rating),
+                        0
+                    );
+
+
+                const classAverage =
+                    totalClassRating /
+                    ratedCourses.length;
+
+
+                classExists.rating =
+                    Number(classAverage.toFixed(1));
+
+
+                await classExists.save();
+            }
+        }
+
 
         // =========================================
         // RESPONSE
         // =========================================
 
         return res.status(201).json({
-            message: "Review submitted successfully",
+            message:
+                "Review submitted successfully",
+
             review
         });
+
 
     } catch (error) {
 
@@ -198,7 +363,8 @@ const createReview = async (req, res) => {
         // Duplicate review protection
         if (error.code === 11000) {
             return res.status(409).json({
-                message: "You have already reviewed this subject"
+                message:
+                    "You have already reviewed this subject"
             });
         }
 
@@ -218,6 +384,9 @@ const createReview = async (req, res) => {
 };
 
 
+// =========================================
+// GET REVIEWS FOR A SUBJECT
+// =========================================
 
 // =========================================
 // GET REVIEWS FOR A SUBJECT
@@ -270,15 +439,34 @@ const getReviewsBySubject = async (req, res) => {
                 "studentId",
                 "name"
             )
+            .populate({
+                path: "subjectId",
+                select: "name description courseId",
+
+                populate: {
+                    path: "courseId",
+                    select:
+                        "name description fees duration classId",
+
+                    populate: {
+                        path: "classId",
+                        select:
+                            "name location address"
+                    }
+                }
+            })
             .sort({
                 createdAt: -1
             });
 
 
         return res.status(200).json({
-            message: "Reviews fetched successfully",
+            message:
+                "Reviews fetched successfully",
+
             reviews
         });
+
 
     } catch (error) {
 
@@ -294,7 +482,9 @@ const getReviewsBySubject = async (req, res) => {
     }
 };
 
-
+// =========================================
+// GET REVIEWS OF LOGGED-IN STUDENT
+// =========================================
 
 // =========================================
 // GET REVIEWS OF LOGGED-IN STUDENT
@@ -322,18 +512,37 @@ const getMyReviews = async (req, res) => {
             studentId: req.user.userId
         })
             .populate(
-                "subjectId",
-                "name description"
+                "studentId",
+                "name"
             )
+            .populate({
+                path: "subjectId",
+                select: "name description courseId",
+
+                populate: {
+                    path: "courseId",
+                    select:
+                        "name description fees duration classId",
+
+                    populate: {
+                        path: "classId",
+                        select:
+                            "name location address"
+                    }
+                }
+            })
             .sort({
                 createdAt: -1
             });
 
 
         return res.status(200).json({
-            message: "My reviews fetched successfully",
+            message:
+                "My reviews fetched successfully",
+
             reviews
         });
+
 
     } catch (error) {
 
@@ -348,8 +557,6 @@ const getMyReviews = async (req, res) => {
         });
     }
 };
-
-
 
 // =========================================
 // EXPORTS

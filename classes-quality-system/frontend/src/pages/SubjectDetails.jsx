@@ -462,7 +462,7 @@ function SubjectDetails() {
 
                     <div>
 
-                        {reviews.map((review) => (
+                        {reviews.slice(0, 2).map((review) => (
 
                             <div
                                 key={review._id}
@@ -579,6 +579,23 @@ function SubjectDetails() {
                             </div>
 
                         ))}
+
+                    </div>
+
+                )}
+
+                {/* VIEW MORE REVIEWS */}
+
+                {reviews.length > 0 && (
+
+                    <div style={{ marginTop: "20px" }}>
+
+                        <Link
+                            to={`/reviews/subject/${id}`}
+                            className="demo-cta-btn"
+                        >
+                            View More Reviews →
+                        </Link>
 
                     </div>
 

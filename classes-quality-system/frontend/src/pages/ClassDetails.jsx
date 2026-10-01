@@ -23,7 +23,10 @@ function ClassDetails() {
             // =========================================
 
             const classResponse = await fetch(
-                `http://localhost:8080/api/classes/${id}`
+                `http://localhost:8080/api/classes/${id}`,
+                {
+                    cache: "no-store"
+                }
             );
 
             const classResult = await classResponse.json();

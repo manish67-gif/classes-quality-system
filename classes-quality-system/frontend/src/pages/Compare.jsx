@@ -1,32 +1,25 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import "../styles/Compare.css";
+import "../styles/compare.css";
 
 const API = "http://localhost:8080/api";
 
 function Compare() {
     const [courses, setCourses] = useState([]);
-
-    // Courses selected for comparison
     const [selected, setSelected] = useState([]);
 
-    // Which + button is currently open
     const [activeSlot, setActiveSlot] = useState(null);
-
-    // Selection step:
-    // "classes" = show classes
-    // "courses" = show courses
     const [selectionStep, setSelectionStep] = useState(null);
-
-    // Class selected inside the current selection
     const [selectedClass, setSelectedClass] = useState(null);
 
+    const [comparisonData, setComparisonData] = useState({});
     const [loading, setLoading] = useState(true);
+    const [comparisonLoading, setComparisonLoading] = useState(false);
     const [error, setError] = useState("");
 
-    // ----------------------------------------
-    // FETCH COURSES
-    // ----------------------------------------
+    // =========================================
+    // FETCH ALL COURSES
+    // =========================================
 
     const fetchCourses = useCallback(async () => {
         try {
@@ -43,6 +36,7 @@ function Compare() {
             }
 
             setCourses(data.courses || []);
+
         } catch (error) {
             console.error("Fetch courses error:", error);
             setError(error.message);
@@ -56,9 +50,9 @@ function Compare() {
     }, [fetchCourses]);
 
 
-    // ----------------------------------------
+    // =========================================
     // GET UNIQUE CLASSES
-    // ----------------------------------------
+    // =========================================
 
     const classes = [];
 
@@ -79,9 +73,9 @@ function Compare() {
     });
 
 
-    // ----------------------------------------
+    // =========================================
     // OPEN + BUTTON
-    // ----------------------------------------
+    // =========================================
 
     const openAddSlot = (slotIndex) => {
         setActiveSlot(slotIndex);
@@ -90,9 +84,9 @@ function Compare() {
     };
 
 
-    // ----------------------------------------
+    // =========================================
     // SELECT CLASS
-    // ----------------------------------------
+    // =========================================
 
     const handleClassSelect = (institute) => {
         setSelectedClass(institute);
@@ -100,17 +94,15 @@ function Compare() {
     };
 
 
-    // ----------------------------------------
+    // =========================================
     // SELECT COURSE
-    // ----------------------------------------
+    // =========================================
 
     const handleCourseSelect = (course) => {
         if (activeSlot === null) {
             return;
         }
 
-        // Do not allow the exact same course
-        // from the same institute twice
         const alreadySelected = selected.some(
             (item) => item._id === course._id
         );
@@ -119,8 +111,13 @@ function Compare() {
             return;
         }
 
-        // First course determines what course
-        // can be compared afterwards.
+        /*
+         * The first selected course determines
+         * which course can be compared.
+         *
+         * Example:
+         * JEE → JEE → JEE
+         */
         if (
             selected.length > 0 &&
             course.name.toLowerCase() !==
@@ -135,16 +132,15 @@ function Compare() {
 
         setSelected(updatedSelected);
 
-        // Close selection panel
         setActiveSlot(null);
         setSelectionStep(null);
         setSelectedClass(null);
     };
 
 
-    // ----------------------------------------
-    // REMOVE SELECTED COURSE
-    // ----------------------------------------
+    // =========================================
+    // REMOVE COURSE
+    // =========================================
 
     const removeCourse = (index) => {
         const updatedSelected = selected.filter(
@@ -152,12 +148,25 @@ function Compare() {
         );
 
         setSelected(updatedSelected);
+
+        /*
+         * Remove old comparison data also.
+         */
+        setComparisonData((previous) => {
+            const updated = { ...previous };
+
+            if (selected[index]?._id) {
+                delete updated[selected[index]._id];
+            }
+
+            return updated;
+        });
     };
 
 
-    // ----------------------------------------
+    // =========================================
     // CLOSE SELECTION
-    // ----------------------------------------
+    // =========================================
 
     const closeSelection = () => {
         setActiveSlot(null);
@@ -166,9 +175,9 @@ function Compare() {
     };
 
 
-    // ----------------------------------------
+    // =========================================
     // GET COURSES OF SELECTED CLASS
-    // ----------------------------------------
+    // =========================================
 
     const classCourses = selectedClass
         ? courses.filter(
@@ -178,9 +187,9 @@ function Compare() {
         : [];
 
 
-    // ----------------------------------------
+    // =========================================
     // FORMAT FEES
-    // ----------------------------------------
+    // =========================================
 
     const formatFees = (fees) => {
         if (
@@ -195,9 +204,248 @@ function Compare() {
     };
 
 
-    // ----------------------------------------
+    // =========================================
+    // FORMAT RATING
+    // =========================================
+
+    const formatRating = (rating) => {
+        if (
+            rating === undefined ||
+            rating === null ||
+            rating === ""
+        ) {
+            return "Not rated";
+        }
+
+        return Number(rating).toFixed(1);
+    };
+
+
+    // =========================================
+    // FETCH REVIEWS FOR ONE COURSE
+    // =========================================
+
+    const fetchCourseReviewData = async (course) => {
+        try {
+            /*
+             * First get subjects belonging to the course.
+             */
+            const subjectResponse = await fetch(
+                `${API}/subjects/course/${course._id}`
+            );
+
+            const subjectData =
+                await subjectResponse.json();
+
+            if (!subjectResponse.ok) {
+                throw new Error(
+                    subjectData.message ||
+                    "Failed to fetch subjects"
+                );
+            }
+
+            const subjects =
+                subjectData.subjects || [];
+
+            /*
+             * Get reviews for every subject.
+             */
+            const reviewRequests = subjects.map(
+                async (subject) => {
+                    const response = await fetch(
+                        `${API}/reviews/subject/${subject._id}`
+                    );
+
+                    const data =
+                        await response.json();
+
+                    if (!response.ok) {
+                        return [];
+                    }
+
+                    return data.reviews || [];
+                }
+            );
+
+            const reviewResults =
+                await Promise.all(reviewRequests);
+
+            const reviews =
+                reviewResults.flat();
+
+            /*
+             * No reviews.
+             */
+            if (reviews.length === 0) {
+                return {
+                    reviewCount: 0,
+                    overallRating: null,
+                    teachingQuality: null,
+                    conceptClarity: null,
+                    doubtSolving: null,
+                    studyMaterial: null
+                };
+            }
+
+            /*
+             * Calculate average of every
+             * review aspect.
+             */
+            const calculateAverage = (field) => {
+                const total = reviews.reduce(
+                    (sum, review) =>
+                        sum + Number(review[field] || 0),
+                    0
+                );
+
+                return (
+                    total / reviews.length
+                ).toFixed(1);
+            };
+
+            return {
+                reviewCount: reviews.length,
+
+                overallRating:
+                    calculateAverage(
+                        "overallRating"
+                    ),
+
+                teachingQuality:
+                    calculateAverage(
+                        "teachingQuality"
+                    ),
+
+                conceptClarity:
+                    calculateAverage(
+                        "conceptClarity"
+                    ),
+
+                doubtSolving:
+                    calculateAverage(
+                        "doubtSolving"
+                    ),
+
+                studyMaterial:
+                    calculateAverage(
+                        "studyMaterial"
+                    )
+            };
+
+        } catch (error) {
+            console.error(
+                "Course review fetch error:",
+                error
+            );
+
+            return {
+                reviewCount: 0,
+                overallRating: null,
+                teachingQuality: null,
+                conceptClarity: null,
+                doubtSolving: null,
+                studyMaterial: null
+            };
+        }
+    };
+
+
+    // =========================================
+    // LOAD COMPARISON DATA
+    // =========================================
+
+    const loadComparisonData = async () => {
+        if (selected.length < 2) {
+            return;
+        }
+
+        try {
+            setComparisonLoading(true);
+
+            const results =
+                await Promise.all(
+                    selected.map(
+                        async (course) => {
+                            const reviewData =
+                                await fetchCourseReviewData(
+                                    course
+                                );
+
+                            return {
+                                courseId:
+                                    course._id,
+                                reviewData
+                            };
+                        }
+                    )
+                );
+
+            const newData = {};
+
+            results.forEach((item) => {
+                newData[item.courseId] =
+                    item.reviewData;
+            });
+
+            setComparisonData(newData);
+
+            setTimeout(() => {
+                document
+                    .getElementById(
+                        "comparison-table"
+                    )
+                    ?.scrollIntoView({
+                        behavior: "smooth"
+                    });
+            }, 100);
+
+        } catch (error) {
+            console.error(
+                "Comparison data error:",
+                error
+            );
+        } finally {
+            setComparisonLoading(false);
+        }
+    };
+
+
+    // =========================================
+    // GET REVIEW VALUE
+    // =========================================
+
+    const getReviewValue = (
+        course,
+        field
+    ) => {
+        const data =
+            comparisonData[course._id];
+
+        if (!data) {
+            return "—";
+        }
+
+        if (
+            data[field] === null ||
+            data[field] === undefined
+        ) {
+            return "Not rated";
+        }
+
+        return (
+            <>
+                ⭐ {data[field]}
+                <span className="rating-out-of">
+                    /5
+                </span>
+            </>
+        );
+    };
+
+
+    // =========================================
     // LOADING
-    // ----------------------------------------
+    // =========================================
 
     if (loading) {
         return (
@@ -210,9 +458,9 @@ function Compare() {
     }
 
 
-    // ----------------------------------------
+    // =========================================
     // ERROR
-    // ----------------------------------------
+    // =========================================
 
     if (error) {
         return (
@@ -228,9 +476,9 @@ function Compare() {
     return (
         <div className="compare-page">
 
-            {/* ==================================
+            {/* =================================
                 HEADER
-            ================================== */}
+            ================================= */}
 
             <div className="compare-header">
 
@@ -238,7 +486,9 @@ function Compare() {
                     COURSE COMPARISON
                 </span>
 
-                <h1>Compare</h1>
+                <h1>
+                    Compare Coaching Classes
+                </h1>
 
                 <p>
                     Compare the same course across
@@ -248,127 +498,133 @@ function Compare() {
             </div>
 
 
-            {/* ==================================
-                COMPARISON HIERARCHY
-            ================================== */}
+            {/* =================================
+                COMPARISON BUILDER
+            ================================= */}
 
             <div className="comparison-builder">
 
-                {/* --------------------------------
-                    SELECTED COURSES
-                -------------------------------- */}
-
                 <div className="comparison-items">
 
-                    {selected.map((course, index) => (
+                    {selected.map(
+                        (course, index) => (
 
-                        <div
-                            className="comparison-item-wrapper"
-                            key={course._id}
-                        >
+                            <div
+                                className="comparison-item-wrapper"
+                                key={course._id}
+                            >
 
-                            <div className="comparison-item">
+                                <div className="comparison-item">
 
-                                <div className="comparison-item-number">
-                                    {index + 1}
-                                </div>
+                                    <div className="comparison-item-number">
+                                        {index + 1}
+                                    </div>
 
-                                <div className="comparison-item-content">
+                                    <div className="comparison-item-content">
 
-                                    <h3>
-                                        {course.name}
-                                    </h3>
+                                        <span className="comparison-item-label">
+                                            INSTITUTE
+                                        </span>
 
-                                    <p>
-                                        {course.classId?.name ||
-                                            "Institute"}
-                                    </p>
-
-                                    {course.classId?.location && (
-                                        <small>
+                                        <h3>
                                             {
-                                                course.classId
-                                                    .location
+                                                course
+                                                    .classId
+                                                    ?.name ||
+                                                "Institute"
                                             }
-                                        </small>
-                                    )}
+                                        </h3>
 
-                                </div>
+                                        <p>
+                                            {course.name}
+                                        </p>
 
-                                <button
-                                    type="button"
-                                    className="remove-item-button"
-                                    onClick={() =>
-                                        removeCourse(index)
-                                    }
-                                    title="Remove"
-                                >
-                                    ×
-                                </button>
+                                        {course.classId?.location && (
+                                            <small>
+                                                📍{" "}
+                                                {
+                                                    course
+                                                        .classId
+                                                        .location
+                                                }
+                                            </small>
+                                        )}
 
-                            </div>
-
-
-                            {/* PLUS AFTER EVERY SELECTED COURSE */}
-
-                            {selected.length < 3 && (
-                                <div className="plus-connector">
-
-                                    <span className="connector-line"></span>
+                                    </div>
 
                                     <button
                                         type="button"
-                                        className="plus-button small-plus"
+                                        className="remove-item-button"
                                         onClick={() =>
-                                            openAddSlot(
-                                                index + 1
+                                            removeCourse(
+                                                index
                                             )
                                         }
-                                        title="Add another course"
+                                        title="Remove"
                                     >
-                                        +
+                                        ×
                                     </button>
 
                                 </div>
-                            )}
-
-                        </div>
-
-                    ))}
 
 
-                    {/* --------------------------------
-                        FIRST PLUS
-                        --------------------------------
-                        Show when no course has been
-                        selected.
-                    -------------------------------- */}
+                                {selected.length < 3 && (
+                                    <div className="plus-connector">
+
+                                        <span className="connector-line"></span>
+
+                                        <button
+                                            type="button"
+                                            className="plus-button small-plus"
+                                            onClick={() =>
+                                                openAddSlot(
+                                                    index + 1
+                                                )
+                                            }
+                                            title="Add another course"
+                                        >
+                                            +
+                                        </button>
+
+                                    </div>
+                                )}
+
+                            </div>
+                        )
+                    )}
+
+
+                    {/* FIRST PLUS */}
 
                     {selected.length === 0 && (
                         <button
                             type="button"
                             className="plus-button first-plus"
-                            onClick={() => openAddSlot(0)}
+                            onClick={() =>
+                                openAddSlot(0)
+                            }
                             title="Add course to compare"
                         >
-                            +
+                            <span>+</span>
+
+                            <small>
+                                Add Institute
+                            </small>
                         </button>
                     )}
 
                 </div>
 
 
-                {/* ==================================
+                {/* =================================
                     SELECTION PANEL
-                ================================== */}
+                ================================= */}
 
                 {selectionStep && (
 
                     <div className="selection-panel">
 
-                        {/* --------------------------------
-                            CLASS LIST
-                        -------------------------------- */}
+                        {/* CLASS LIST */}
 
                         {selectionStep === "classes" && (
 
@@ -377,17 +633,20 @@ function Compare() {
                                 <div className="selection-title-row">
 
                                     <div>
+
                                         <span className="selection-step">
                                             STEP 1
                                         </span>
 
                                         <h2>
-                                            List of Classes
+                                            Select Institute
                                         </h2>
 
                                         <p>
-                                            Select an institute.
+                                            Choose a coaching
+                                            class to compare.
                                         </p>
+
                                     </div>
 
                                     <button
@@ -406,9 +665,12 @@ function Compare() {
                                 <div className="selection-list">
 
                                     {classes.length === 0 ? (
+
                                         <p className="empty-selection">
-                                            No classes available.
+                                            No institutes
+                                            available.
                                         </p>
+
                                     ) : (
 
                                         classes.map(
@@ -431,14 +693,17 @@ function Compare() {
 
                                                         <strong>
                                                             {
-                                                                institute.name
+                                                                institute
+                                                                    .name
                                                             }
                                                         </strong>
 
                                                         {institute.location && (
                                                             <small>
+                                                                📍{" "}
                                                                 {
-                                                                    institute.location
+                                                                    institute
+                                                                        .location
                                                                 }
                                                             </small>
                                                         )}
@@ -450,22 +715,17 @@ function Compare() {
                                                     </span>
 
                                                 </button>
-
                                             )
                                         )
-
                                     )}
 
                                 </div>
 
                             </div>
-
                         )}
 
 
-                        {/* --------------------------------
-                            COURSE LIST
-                        -------------------------------- */}
+                        {/* COURSE LIST */}
 
                         {selectionStep === "courses" && (
 
@@ -480,11 +740,14 @@ function Compare() {
                                         </span>
 
                                         <h2>
-                                            List of Courses
+                                            Select Course
                                         </h2>
 
                                         <p>
-                                            {selectedClass?.name}
+                                            {
+                                                selectedClass
+                                                    ?.name
+                                            }
                                         </p>
 
                                     </div>
@@ -509,12 +772,11 @@ function Compare() {
 
                                 <div className="selection-list">
 
-                                    {classCourses.length ===
-                                        0 ? (
+                                    {classCourses.length === 0 ? (
 
                                         <p className="empty-selection">
-                                            This class has no
-                                            courses yet.
+                                            This institute has
+                                            no courses yet.
                                         </p>
 
                                     ) : (
@@ -540,7 +802,6 @@ function Compare() {
                                                     differentCourse;
 
                                                 return (
-
                                                     <button
                                                         type="button"
                                                         key={
@@ -570,7 +831,6 @@ function Compare() {
                                                             </strong>
 
                                                             <small>
-                                                                Fees:{" "}
                                                                 {formatFees(
                                                                     course.fees
                                                                 )}
@@ -584,56 +844,56 @@ function Compare() {
                                                         <span>
                                                             {alreadySelected
                                                                 ? "✓"
-                                                                : "+"}
+                                                                : differentCourse
+                                                                    ? "—"
+                                                                    : "+"}
                                                         </span>
 
                                                     </button>
-
                                                 );
                                             }
                                         )
-
                                     )}
 
                                 </div>
 
                             </div>
-
                         )}
 
                     </div>
-
                 )}
 
 
-                {/* ==================================
+                {/* =================================
                     COMPARE BUTTON
-                ================================== */}
+                ================================= */}
 
                 {selected.length >= 2 && (
+
                     <button
                         type="button"
                         className="compare-button"
-                        onClick={() =>
-                            document
-                                .getElementById(
-                                    "comparison-table"
-                                )
-                                ?.scrollIntoView({
-                                    behavior: "smooth"
-                                })
+                        onClick={
+                            loadComparisonData
+                        }
+                        disabled={
+                            comparisonLoading
                         }
                     >
-                        Compare
+
+                        {comparisonLoading
+                            ? "Loading comparison..."
+                            : "Compare Selected Classes"}
+
                     </button>
                 )}
 
             </div>
 
 
-            {/* ==================================
-                COMPARISON TABLE
-            ================================== */}
+            {/* =================================
+                COMPARISON RESULT
+            ================================= */}
 
             {selected.length >= 2 && (
 
@@ -645,20 +905,61 @@ function Compare() {
                     <div className="comparison-result-header">
 
                         <span>
-                            RESULT
+                            COMPARISON RESULT
                         </span>
 
                         <h2>
-                            Comparison Table
+                            Compare Side by Side
                         </h2>
 
                         <p>
-                            Compare the selected institutes
-                            for the same course.
+                            Compare fees, course details,
+                            ratings and student feedback.
                         </p>
 
                     </div>
 
+
+                    {/* SELECTED INSTITUTE CARDS */}
+
+                    <div className="comparison-summary">
+
+                        {selected.map(
+                            (course) => (
+
+                                <div
+                                    className="summary-card"
+                                    key={course._id}
+                                >
+
+                                    <div className="summary-icon">
+                                        🎓
+                                    </div>
+
+                                    <div>
+
+                                        <h3>
+                                            {
+                                                course
+                                                    .classId
+                                                    ?.name
+                                            }
+                                        </h3>
+
+                                        <p>
+                                            {course.name}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+                            )
+                        )}
+
+                    </div>
+
+
+                    {/* TABLE */}
 
                     <div className="table-container">
 
@@ -696,7 +997,6 @@ function Compare() {
                                                 </small>
 
                                             </th>
-
                                         )
                                     )}
 
@@ -707,6 +1007,19 @@ function Compare() {
 
                             <tbody>
 
+                                {/* COURSE DETAILS */}
+
+                                <tr className="table-section-row">
+
+                                    <td colSpan={
+                                        selected.length + 1
+                                    }>
+                                        COURSE DETAILS
+                                    </td>
+
+                                </tr>
+
+
                                 <tr>
 
                                     <td>
@@ -715,7 +1028,6 @@ function Compare() {
 
                                     {selected.map(
                                         (course) => (
-
                                             <td
                                                 key={
                                                     course._id
@@ -725,7 +1037,6 @@ function Compare() {
                                                     course.name
                                                 }
                                             </td>
-
                                         )
                                     )}
 
@@ -740,17 +1051,17 @@ function Compare() {
 
                                     {selected.map(
                                         (course) => (
-
                                             <td
                                                 key={
                                                     course._id
                                                 }
                                             >
-                                                {formatFees(
-                                                    course.fees
-                                                )}
+                                                <strong>
+                                                    {formatFees(
+                                                        course.fees
+                                                    )}
+                                                </strong>
                                             </td>
-
                                         )
                                     )}
 
@@ -765,16 +1076,16 @@ function Compare() {
 
                                     {selected.map(
                                         (course) => (
-
                                             <td
                                                 key={
                                                     course._id
                                                 }
                                             >
-                                                {course.duration ||
-                                                    "Not available"}
+                                                {
+                                                    course.duration ||
+                                                    "Not available"
+                                                }
                                             </td>
-
                                         )
                                     )}
 
@@ -789,23 +1100,210 @@ function Compare() {
 
                                     {selected.map(
                                         (course) => (
-
                                             <td
                                                 key={
                                                     course._id
                                                 }
                                             >
-                                                {course
-                                                    .classId
-                                                    ?.location ||
-                                                    "Not available"}
+                                                {
+                                                    course
+                                                        .classId
+                                                        ?.location ||
+                                                    "Not available"
+                                                }
                                             </td>
-
                                         )
                                     )}
 
                                 </tr>
 
+
+                                {/* REVIEW SECTION */}
+
+                                <tr className="table-section-row">
+
+                                    <td colSpan={
+                                        selected.length + 1
+                                    }>
+                                        STUDENT REVIEWS & RATINGS
+                                    </td>
+
+                                </tr>
+
+
+                                {/* OVERALL */}
+
+                                <tr className="rating-row">
+
+                                    <td>
+                                        Overall Rating
+                                    </td>
+
+                                    {selected.map(
+                                        (course) => (
+                                            <td
+                                                key={
+                                                    course._id
+                                                }
+                                                className="rating-value-cell"
+                                            >
+                                                {getReviewValue(
+                                                    course,
+                                                    "overallRating"
+                                                )}
+                                            </td>
+                                        )
+                                    )}
+
+                                </tr>
+
+
+                                {/* TEACHING */}
+
+                                <tr>
+
+                                    <td>
+                                        Teaching Quality
+                                    </td>
+
+                                    {selected.map(
+                                        (course) => (
+                                            <td
+                                                key={
+                                                    course._id
+                                                }
+                                                className="rating-value-cell"
+                                            >
+                                                {getReviewValue(
+                                                    course,
+                                                    "teachingQuality"
+                                                )}
+                                            </td>
+                                        )
+                                    )}
+
+                                </tr>
+
+
+                                {/* CONCEPT */}
+
+                                <tr>
+
+                                    <td>
+                                        Concept Clarity
+                                    </td>
+
+                                    {selected.map(
+                                        (course) => (
+                                            <td
+                                                key={
+                                                    course._id
+                                                }
+                                                className="rating-value-cell"
+                                            >
+                                                {getReviewValue(
+                                                    course,
+                                                    "conceptClarity"
+                                                )}
+                                            </td>
+                                        )
+                                    )}
+
+                                </tr>
+
+
+                                {/* DOUBT */}
+
+                                <tr>
+
+                                    <td>
+                                        Doubt Solving
+                                    </td>
+
+                                    {selected.map(
+                                        (course) => (
+                                            <td
+                                                key={
+                                                    course._id
+                                                }
+                                                className="rating-value-cell"
+                                            >
+                                                {getReviewValue(
+                                                    course,
+                                                    "doubtSolving"
+                                                )}
+                                            </td>
+                                        )
+                                    )}
+
+                                </tr>
+
+
+                                {/* STUDY MATERIAL */}
+
+                                <tr>
+
+                                    <td>
+                                        Study Material
+                                    </td>
+
+                                    {selected.map(
+                                        (course) => (
+                                            <td
+                                                key={
+                                                    course._id
+                                                }
+                                                className="rating-value-cell"
+                                            >
+                                                {getReviewValue(
+                                                    course,
+                                                    "studyMaterial"
+                                                )}
+                                            </td>
+                                        )
+                                    )}
+
+                                </tr>
+
+
+                                {/* REVIEW COUNT */}
+
+                                <tr>
+
+                                    <td>
+                                        Student Reviews
+                                    </td>
+
+                                    {selected.map(
+                                        (course) => {
+
+                                            const data =
+                                                comparisonData[
+                                                course._id
+                                                ];
+
+                                            return (
+                                                <td
+                                                    key={
+                                                        course._id
+                                                    }
+                                                >
+                                                    {data
+                                                        ? data.reviewCount
+                                                        : "—"}
+                                                    {" "}
+                                                    {data?.reviewCount === 1
+                                                        ? "review"
+                                                        : "reviews"}
+                                                </td>
+                                            );
+                                        }
+                                    )}
+
+                                </tr>
+
+
+                                {/* DETAILS */}
 
                                 <tr>
 
@@ -842,8 +1340,25 @@ function Compare() {
 
                     </div>
 
-                </section>
 
+                    {/* NOTE */}
+
+                    <div className="comparison-note">
+
+                        <strong>
+                            How ratings are calculated
+                        </strong>
+
+                        <p>
+                            Review ratings shown here are
+                            averages of student reviews
+                            across the subjects belonging
+                            to each selected course.
+                        </p>
+
+                    </div>
+
+                </section>
             )}
 
         </div>

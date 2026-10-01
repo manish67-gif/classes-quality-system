@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 function Profile() {
 
@@ -9,33 +10,45 @@ function Profile() {
     const [error, setError] = useState("");
 
 
+    // =========================================
+    // FETCH PROFILE + MY REVIEWS
+    // =========================================
+
     const fetchProfile = useCallback(async () => {
 
         try {
 
             setError("");
 
-            const token = localStorage.getItem("token");
+            const token =
+                localStorage.getItem("token");
 
+
+            // =========================================
+            // CHECK LOGIN
+            // =========================================
 
             if (!token) {
+
                 setError(
                     "Please login to view your profile."
                 );
 
                 setLoading(false);
+
                 return;
             }
 
 
-            // =========================
+            // =========================================
             // GET PROFILE
-            // =========================
+            // =========================================
 
             const response = await fetch(
                 "http://localhost:8080/api/users/profile",
                 {
                     method: "GET",
+
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
@@ -54,6 +67,7 @@ function Profile() {
                     errorText
                 );
 
+
                 if (
                     response.status === 401 ||
                     response.status === 403
@@ -66,6 +80,7 @@ function Profile() {
                         "Your login session has expired. Please login again."
                     );
                 }
+
 
                 throw new Error(
                     `Profile request failed (${response.status})`
@@ -109,9 +124,9 @@ function Profile() {
             setUser(data.user);
 
 
-            // =========================
+            // =========================================
             // GET MY REVIEWS
-            // =========================
+            // =========================================
 
             const reviewResponse =
                 await fetch(
@@ -196,21 +211,30 @@ function Profile() {
 
             setLoading(false);
         }
+
     }, []);
 
+
+    // =========================================
+    // LOAD PROFILE
+    // =========================================
+
     useEffect(() => {
+
         // oxlint-disable-next-line react/set-state-in-effect
         fetchProfile();
+
     }, [fetchProfile]);
 
 
-    // =========================
+    // =========================================
     // LOADING
-    // =========================
+    // =========================================
 
     if (loading) {
 
         return (
+
             <div className="message">
 
                 <h1>
@@ -218,17 +242,20 @@ function Profile() {
                 </h1>
 
             </div>
+
         );
+
     }
 
 
-    // =========================
+    // =========================================
     // ERROR
-    // =========================
+    // =========================================
 
     if (error) {
 
         return (
+
             <div className="profile-page">
 
                 <h1>
@@ -240,7 +267,9 @@ function Profile() {
                 </p>
 
             </div>
+
         );
+
     }
 
 
@@ -248,9 +277,10 @@ function Profile() {
 
         <div className="profile-page">
 
-            {/* =========================
+
+            {/* =========================================
                 PROFILE
-            ========================= */}
+            ========================================= */}
 
             <h1>
                 My Profile
@@ -262,8 +292,13 @@ function Profile() {
                 <div className="profile-card">
 
                     <div className="avatar">
-                        {user.name?.charAt(0).toUpperCase()}
+
+                        {user.name
+                            ?.charAt(0)
+                            .toUpperCase()}
+
                     </div>
+
 
                     <h2>
                         {user.name}
@@ -271,24 +306,31 @@ function Profile() {
 
 
                     <p>
+
                         <strong>
                             Email:
                         </strong>{" "}
+
                         {user.email}
+
                     </p>
 
 
                     <p>
+
                         <strong>
                             Role:
                         </strong>{" "}
+
                         {user.role}
+
                     </p>
 
 
                     {user.createdAt && (
 
                         <p>
+
                             <strong>
                                 Member since:
                             </strong>{" "}
@@ -309,9 +351,9 @@ function Profile() {
             <hr />
 
 
-            {/* =========================
+            {/* =========================================
                 MY REVIEWS
-            ========================= */}
+            ========================================= */}
 
             <h2>
                 My Reviews
@@ -333,91 +375,216 @@ function Profile() {
 
                 <div>
 
-                    {reviews.map((review) => (
+
+                    {/* =================================
+                        SHOW ONLY FIRST 2 REVIEWS
+                    ================================= */}
+
+                    {reviews
+                        .slice(0, 2)
+                        .map((review) => {
+
+                            const subject =
+                                review.subjectId;
+
+                            const course =
+                                subject?.courseId;
+
+                            const classItem =
+                                course?.classId;
+
+
+                            return (
+
+                                <div
+                                    key={review._id}
+                                    className="profile-review-card"
+                                >
+
+
+                                    {/* =========================
+                                        SUBJECT
+                                    ========================= */}
+
+                                    <h3>
+
+                                        {subject?.name ||
+                                            "Subject"}
+
+                                    </h3>
+
+
+                                    {/* =========================
+                                        COURSE
+                                    ========================= */}
+
+                                    <p>
+
+                                        <strong>
+                                            Course:
+                                        </strong>{" "}
+
+                                        {course?.name ||
+                                            "Unknown Course"}
+
+                                    </p>
+
+
+                                    {/* =========================
+                                        INSTITUTE
+                                    ========================= */}
+
+                                    <p>
+
+                                        <strong>
+                                            Institute:
+                                        </strong>{" "}
+
+                                        {classItem?.name ||
+                                            "Unknown Institute"}
+
+                                    </p>
+
+
+                                    {/* =========================
+                                        OVERALL RATING
+                                    ========================= */}
+
+                                    <p className="profile-review-rating">
+
+                                        ⭐{" "}
+
+                                        {Number(
+                                            review.overallRating
+                                        ).toFixed(1)}
+
+                                        /5
+
+                                    </p>
+
+
+                                    {/* =========================
+                                        COMMENT
+                                    ========================= */}
+
+                                    {review.comment && (
+
+                                        <p className="profile-review-comment">
+
+                                            {review.comment}
+
+                                        </p>
+
+                                    )}
+
+
+                                    <hr />
+
+
+                                    {/* =========================
+                                        CATEGORY RATINGS
+                                    ========================= */}
+
+                                    <p>
+
+                                        <strong>
+                                            Teaching Quality:
+                                        </strong>{" "}
+
+                                        {review.teachingQuality}/5
+
+                                    </p>
+
+
+                                    <p>
+
+                                        <strong>
+                                            Concept Clarity:
+                                        </strong>{" "}
+
+                                        {review.conceptClarity}/5
+
+                                    </p>
+
+
+                                    <p>
+
+                                        <strong>
+                                            Doubt Solving:
+                                        </strong>{" "}
+
+                                        {review.doubtSolving}/5
+
+                                    </p>
+
+
+                                    <p>
+
+                                        <strong>
+                                            Study Material:
+                                        </strong>{" "}
+
+                                        {review.studyMaterial}/5
+
+                                    </p>
+
+
+                                    {/* =========================
+                                        DATE
+                                    ========================= */}
+
+                                    {review.createdAt && (
+
+                                        <small className="review-date">
+
+                                            Submitted on{" "}
+
+                                            {new Date(
+                                                review.createdAt
+                                            ).toLocaleDateString()}
+
+                                        </small>
+
+                                    )}
+
+                                </div>
+
+                            );
+
+                        })}
+
+
+                    {/* =========================================
+                        VIEW MORE REVIEWS
+                    ========================================= */}
+
+                    {reviews.length > 0 && (
 
                         <div
-                            key={review._id}
-                            className="profile-review-card"
+                            style={{
+                                marginTop: "20px"
+                            }}
                         >
 
-                            <h3>
-                                {review.subjectId?.name ||
-                                    "Subject"}
-                            </h3>
-
-
-                            <p className="profile-review-rating">
-
-                                ⭐{" "}
-                                {review.overallRating}/5
-
-                            </p>
-
-
-                            <p className="profile-review-comment">
-                                {review.comment}
-                            </p>
-
-
-                            <hr />
-
-
-                            <p>
-                                <strong>
-                                    Teaching Quality:
-                                </strong>{" "}
-                                {review.teachingQuality}/5
-                            </p>
-
-
-                            <p>
-                                <strong>
-                                    Concept Clarity:
-                                </strong>{" "}
-                                {review.conceptClarity}/5
-                            </p>
-
-
-                            <p>
-                                <strong>
-                                    Doubt Solving:
-                                </strong>{" "}
-                                {review.doubtSolving}/5
-                            </p>
-
-
-                            <p>
-                                <strong>
-                                    Study Material:
-                                </strong>{" "}
-                                {review.studyMaterial}/5
-                            </p>
-
-
-                            {review.createdAt && (
-
-                                <small className="review-date">
-
-                                    Submitted on{" "}
-
-                                    {new Date(
-                                        review.createdAt
-                                    ).toLocaleDateString()}
-
-                                </small>
-
-                            )}
+                            <Link
+                                to="/reviews/my-reviews"
+                                className="demo-cta-btn"
+                            >
+                                View More Reviews →
+                            </Link>
 
                         </div>
 
-                    ))}
+                    )}
 
                 </div>
 
             )}
 
         </div>
+
     );
+
 }
 
 export default Profile;
