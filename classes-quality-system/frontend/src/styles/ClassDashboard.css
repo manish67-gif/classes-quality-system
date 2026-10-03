@@ -1,0 +1,343 @@
+.class-dashboard-page {
+    min-height: 100vh;
+    background: #f5f7fb;
+    padding: 40px 6%;
+    color: #172033;
+}
+
+.class-dashboard-header {
+    margin-bottom: 28px;
+}
+
+.class-dashboard-label,
+.class-section-label,
+.class-card-label {
+    display: block;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+}
+
+.class-dashboard-header h1 {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1.2;
+}
+
+.class-dashboard-header p {
+    margin: 8px 0 0;
+    color: #667085;
+    font-size: 15px;
+}
+
+.class-dashboard-message {
+    background: #ffffff;
+    border: 1px solid #e4e7ec;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+    color: #344054;
+}
+
+.class-dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.class-stat-card {
+    background: #ffffff;
+    border: 1px solid #e4e7ec;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+}
+
+.class-stat-label {
+    display: block;
+    color: #667085;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.class-stat-card strong {
+    display: block;
+    font-size: 28px;
+}
+
+.class-dashboard-section {
+    background: #ffffff;
+    border: 1px solid #e4e7ec;
+    border-radius: 16px;
+    padding: 26px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
+}
+
+.class-section-header {
+    margin-bottom: 20px;
+}
+
+.class-section-header h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.class-section-header p {
+    margin: 6px 0 0;
+    color: #667085;
+    font-size: 14px;
+}
+
+.class-courses-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.class-institute-card {
+    border: 1px solid #e4e7ec;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.class-institute-card h3 {
+    margin: 0 0 8px;
+    font-size: 20px;
+}
+
+.class-institute-card>p {
+    color: #667085;
+    margin: 0 0 18px;
+    line-height: 1.6;
+}
+
+.class-institute-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.class-institute-details span {
+    background: #f5f7fb;
+    border-radius: 8px;
+    padding: 8px 10px;
+    color: #475467;
+    font-size: 13px;
+}
+
+.class-primary-button,
+.class-danger-button {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.class-primary-button {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.class-primary-button:hover {
+    background: #1d4ed8;
+}
+
+.class-danger-button {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.class-danger-button:hover {
+    background: #b91c1c;
+}
+
+.class-form-card {
+    border: 1px solid #e4e7ec;
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.class-form-card h3 {
+    margin: 0 0 18px;
+    font-size: 18px;
+}
+
+.class-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.class-form-group {
+    margin-bottom: 16px;
+}
+
+.class-form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #344054;
+    margin-bottom: 6px;
+}
+
+.class-form-group input,
+.class-form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #d0d5dd;
+    border-radius: 8px;
+    padding: 11px 12px;
+    font: inherit;
+    background: #ffffff;
+    color: #172033;
+}
+
+.class-form-group input:focus,
+.class-form-group textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+.class-form-group textarea {
+    resize: vertical;
+}
+
+.class-course-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.class-course-card {
+    border: 1px solid #e4e7ec;
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 220px;
+}
+
+.class-course-card-content h3 {
+    margin: 0 0 8px;
+    font-size: 19px;
+}
+
+.class-course-card-content p {
+    color: #667085;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 0 0 18px;
+}
+
+.class-course-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.class-course-meta span {
+    background: #f5f7fb;
+    color: #475467;
+    border-radius: 7px;
+    padding: 7px 9px;
+    font-size: 12px;
+}
+
+.class-card-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.class-empty-card {
+    border: 1px dashed #d0d5dd;
+    border-radius: 12px;
+    padding: 28px;
+    text-align: center;
+}
+
+.class-empty-card h3 {
+    margin: 0 0 6px;
+}
+
+.class-empty-card p {
+    margin: 0;
+    color: #667085;
+    font-size: 14px;
+}
+
+.class-dashboard-loading {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.class-dashboard-loading h2 {
+    margin-bottom: 8px;
+}
+
+.class-dashboard-loading p {
+    color: #667085;
+}
+
+@media (max-width: 750px) {
+    .class-dashboard-page {
+        padding: 28px 20px;
+    }
+
+    .class-dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .class-course-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .class-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .class-courses-header {
+        flex-direction: column;
+    }
+
+    .class-courses-header .class-primary-button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 500px) {
+    .class-dashboard-page {
+        padding: 22px 15px;
+    }
+
+    .class-dashboard-header h1 {
+        font-size: 26px;
+    }
+
+    .class-dashboard-section {
+        padding: 18px;
+    }
+
+    .class-card-actions {
+        flex-direction: column;
+    }
+
+    .class-card-actions button {
+        width: 100%;
+    }
+}

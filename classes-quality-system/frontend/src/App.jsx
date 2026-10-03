@@ -17,6 +17,8 @@ import DemoLectures from "./pages/DemoLectures";
 import Profile from "./pages/Profile";
 import Compare from "./pages/Compare";
 import ClassDashboard from "./pages/ClassDashboard";
+import ClassCourseDetails from "./pages/ClassCourseDetails";
+import ClassSubjectDetails from "./pages/ClassSubjectDetails";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminStudents from "./pages/AdminStudents";
 import AdminClasses from "./pages/AdminClasses";
@@ -49,6 +51,23 @@ function App() {
           }
         />
 
+        <Route
+          path="/class/classes/:classId/courses/:courseId"
+          element={
+            <ProtectedRoute allowedRoles={["class"]}>
+              <ClassCourseDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/class/classes/:classId/courses/:courseId/subjects/:subjectId"
+          element={
+            <ProtectedRoute allowedRoles={["class"]}>
+              <ClassSubjectDetails />
+            </ProtectedRoute>
+          }
+        />
 
         {/* =========================================
             ADMIN DASHBOARD
