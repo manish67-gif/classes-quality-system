@@ -1,0 +1,358 @@
+.admin-subject-page {
+    min-height: 100vh;
+    background: #f5f7fb;
+    padding: 30px 20px 60px;
+}
+
+.admin-subject-container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.admin-subject-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 25px;
+    font-size: 14px;
+    color: #6b7280;
+    flex-wrap: wrap;
+}
+
+.admin-subject-breadcrumb a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.admin-subject-breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.admin-subject-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.admin-subject-header h1 {
+    margin: 0;
+    font-size: 30px;
+    color: #111827;
+}
+
+.admin-subject-header p {
+    margin: 6px 0 0;
+    color: #6b7280;
+}
+
+.admin-subject-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.admin-subject-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.admin-subject-card-header h2 {
+    margin: 0;
+    font-size: 21px;
+    color: #111827;
+}
+
+.admin-subject-card-header p {
+    margin: 5px 0 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.admin-subject-count {
+    min-width: 35px;
+    height: 35px;
+    padding: 0 10px;
+    border-radius: 20px;
+    background: #eff6ff;
+    color: #2563eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.admin-subject-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+}
+
+.admin-subject-info-grid>div {
+    padding: 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #f9fafb;
+}
+
+.admin-subject-info-grid span {
+    display: block;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 7px;
+}
+
+.admin-subject-info-grid strong {
+    color: #111827;
+    font-size: 16px;
+}
+
+.admin-subject-edit-btn,
+.admin-subject-save-btn,
+.admin-subject-cancel-btn,
+.admin-subject-delete-btn,
+.admin-demo-delete-btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.admin-subject-edit-btn {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.admin-subject-edit-btn:hover {
+    background: #dbeafe;
+}
+
+.admin-subject-delete-btn {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.admin-subject-delete-btn:hover {
+    background: #fecaca;
+}
+
+.admin-subject-form {
+    display: grid;
+    gap: 18px;
+}
+
+.admin-subject-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.admin-subject-form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.admin-subject-form-group input {
+    padding: 11px 13px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+}
+
+.admin-subject-form-group input:focus {
+    border-color: #2563eb;
+}
+
+.admin-subject-form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.admin-subject-save-btn {
+    background: #2563eb;
+    color: white;
+}
+
+.admin-subject-save-btn:hover {
+    background: #1d4ed8;
+}
+
+.admin-subject-cancel-btn {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.admin-demo-list,
+.admin-review-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.admin-demo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 18px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fafafa;
+}
+
+.admin-demo-info h3 {
+    margin: 0 0 7px;
+    color: #111827;
+    font-size: 17px;
+}
+
+.admin-demo-info p {
+    margin: 0 0 8px;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.admin-demo-info a {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.admin-demo-info a:hover {
+    text-decoration: underline;
+}
+
+.admin-demo-delete-btn {
+    background: #fee2e2;
+    color: #dc2626;
+    white-space: nowrap;
+}
+
+.admin-demo-delete-btn:hover {
+    background: #fecaca;
+}
+
+.admin-review-item {
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fafafa;
+}
+
+.admin-review-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+.admin-review-header strong {
+    color: #111827;
+}
+
+.admin-review-header span {
+    color: #2563eb;
+    font-weight: 600;
+}
+
+.admin-review-ratings {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.admin-review-ratings span {
+    padding: 5px 9px;
+    border-radius: 6px;
+    background: #f3f4f6;
+    color: #4b5563;
+    font-size: 12px;
+}
+
+.admin-review-comment {
+    margin: 10px 0;
+    color: #374151;
+    line-height: 1.5;
+}
+
+.admin-review-item small {
+    color: #9ca3af;
+}
+
+.admin-subject-empty {
+    text-align: center;
+    padding: 35px 20px;
+    border: 1px dashed #d1d5db;
+    border-radius: 10px;
+}
+
+.admin-subject-empty h3 {
+    margin: 0 0 6px;
+    color: #374151;
+}
+
+.admin-subject-empty p {
+    margin: 0;
+    color: #6b7280;
+}
+
+.admin-subject-loading,
+.admin-subject-error {
+    max-width: 700px;
+    margin: 80px auto;
+    background: white;
+    border-radius: 14px;
+    padding: 35px;
+    text-align: center;
+}
+
+.admin-subject-error h2 {
+    margin-top: 0;
+}
+
+.admin-subject-error p {
+    color: #dc2626;
+}
+
+.admin-subject-error a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+@media (max-width: 700px) {
+    .admin-subject-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-subject-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-demo-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-review-header {
+        flex-direction: column;
+    }
+
+    .admin-demo-delete-btn {
+        width: 100%;
+    }
+}

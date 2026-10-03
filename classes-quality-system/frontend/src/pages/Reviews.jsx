@@ -389,6 +389,17 @@ function Reviews() {
                             </p>
 
 
+                            <p>
+
+                                <strong>
+                                    Exam Preparation:
+                                </strong>{" "}
+
+                                {review.examPreparation}/5
+
+                            </p>
+
+
                             {/* =================================
                                 DATE
                             ================================= */}

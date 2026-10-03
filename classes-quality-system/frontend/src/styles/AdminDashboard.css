@@ -1,0 +1,242 @@
+/* =========================================
+   ADMIN DASHBOARD
+========================================= */
+
+.admin-dashboard-page {
+    min-height: calc(100vh - 80px);
+    background: #f5f7fb;
+    padding: 40px 6%;
+    box-sizing: border-box;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.admin-dashboard-header {
+    margin-bottom: 35px;
+}
+
+.admin-dashboard-header h1 {
+    margin: 0;
+    color: #172033;
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.admin-dashboard-header p {
+    margin-top: 8px;
+    color: #667085;
+    font-size: 16px;
+}
+
+
+/* =========================================
+   ERROR / MESSAGE
+========================================= */
+
+.admin-dashboard-error {
+    background: #fee4e2;
+    color: #b42318;
+    border: 1px solid #fecdca;
+    padding: 14px 18px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+
+/* =========================================
+   SECTION
+========================================= */
+
+.admin-dashboard-section {
+    margin-bottom: 40px;
+}
+
+.admin-section-heading {
+    margin-bottom: 20px;
+}
+
+.admin-section-heading h2 {
+    margin: 0 0 6px;
+    color: #172033;
+    font-size: 24px;
+}
+
+.admin-section-heading p {
+    margin: 0;
+    color: #667085;
+}
+
+
+/* =========================================
+   ROLE CARDS
+========================================= */
+
+.admin-role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,
+            minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.admin-role-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    background: #ffffff;
+    border: 1px solid #e4e7ec;
+    border-radius: 16px;
+
+    padding: 25px;
+
+    text-decoration: none;
+    color: inherit;
+
+    box-shadow: 0 4px 12px rgba(16, 24, 40, 0.05);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.admin-role-card:hover {
+    transform: translateY(-3px);
+    border-color: #b2c7ff;
+    box-shadow: 0 8px 20px rgba(16, 24, 40, 0.08);
+}
+
+
+/* =========================================
+   ROLE ICON
+========================================= */
+
+.admin-role-icon {
+    width: 65px;
+    height: 65px;
+
+    border-radius: 14px;
+
+    background: #eef4ff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 30px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   ROLE CONTENT
+========================================= */
+
+.admin-role-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.admin-role-content h3 {
+    margin: 0;
+    color: #172033;
+    font-size: 21px;
+}
+
+.admin-role-content p {
+    margin: 5px 0 10px;
+    color: #667085;
+    font-size: 14px;
+}
+
+.admin-role-content strong {
+    color: #2563eb;
+    font-size: 28px;
+}
+
+.admin-role-content span {
+    margin-top: 5px;
+    color: #2563eb;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+/* =========================================
+   OVERVIEW
+========================================= */
+
+.admin-overview-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(180px, 1fr));
+
+    gap: 20px;
+}
+
+.admin-overview-card {
+    background: #ffffff;
+
+    border: 1px solid #e4e7ec;
+    border-radius: 14px;
+
+    padding: 25px;
+
+    box-shadow:
+        0 4px 12px rgba(16, 24, 40, 0.04);
+}
+
+.admin-overview-card span {
+    display: block;
+
+    font-size: 32px;
+    font-weight: 700;
+
+    color: #172033;
+}
+
+.admin-overview-card p {
+    margin: 5px 0 0;
+
+    color: #667085;
+}
+
+
+/* =========================================
+   LOADING
+========================================= */
+
+.admin-loading {
+    text-align: center;
+    padding: 80px 20px;
+
+    font-size: 20px;
+    color: #667085;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+
+    .admin-dashboard-page {
+        padding: 25px 18px;
+    }
+
+    .admin-dashboard-header h1 {
+        font-size: 30px;
+    }
+
+    .admin-role-card {
+        padding: 20px;
+    }
+
+}

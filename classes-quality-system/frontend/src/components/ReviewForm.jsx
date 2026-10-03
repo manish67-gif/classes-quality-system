@@ -6,6 +6,7 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
         conceptClarity: 5,
         doubtSolving: 5,
         studyMaterial: 5,
+        examPreparation: 5,
         comment: ""
     });
 
@@ -65,6 +66,7 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                         conceptClarity: formData.conceptClarity,
                         doubtSolving: formData.doubtSolving,
                         studyMaterial: formData.studyMaterial,
+                        examPreparation: formData.examPreparation,
                         comment: formData.comment
                     })
                 }
@@ -98,6 +100,7 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                 conceptClarity: 5,
                 doubtSolving: 5,
                 studyMaterial: 5,
+                examPreparation: 5,
                 comment: ""
             });
 
@@ -285,6 +288,44 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
                         <select
                             name="studyMaterial"
                             value={formData.studyMaterial}
+                            onChange={handleChange}
+                            disabled={loading}
+                        >
+                            <option value="1">
+                                1 - Poor
+                            </option>
+
+                            <option value="2">
+                                2
+                            </option>
+
+                            <option value="3">
+                                3 - Average
+                            </option>
+
+                            <option value="4">
+                                4
+                            </option>
+
+                            <option value="5">
+                                5 - Excellent
+                            </option>
+                        </select>
+
+                    </div>
+
+
+                    {/* Exam Preparation */}
+
+                    <div className="rating-field">
+
+                        <label>
+                            Exam Preparation
+                        </label>
+
+                        <select
+                            name="examPreparation"
+                            value={formData.examPreparation}
                             onChange={handleChange}
                             disabled={loading}
                         >

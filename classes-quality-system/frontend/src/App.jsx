@@ -18,6 +18,11 @@ import Profile from "./pages/Profile";
 import Compare from "./pages/Compare";
 import ClassDashboard from "./pages/ClassDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminStudents from "./pages/AdminStudents";
+import AdminClasses from "./pages/AdminClasses";
+import AdminClassDetails from "./pages/AdminClassDetails";
+import AdminCourseDetails from "./pages/AdminCourseDetails";
+import AdminSubjectDetails from "./pages/AdminSubjectDetails";
 import Reviews from "./pages/Reviews";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -58,6 +63,50 @@ function App() {
           }
         />
 
+        <Route
+          path="/admin/students"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminStudents />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/classes"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminClasses />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/classes/:id"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminClassDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/classes/:classId/courses/:courseId"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminCourseDetails />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/classes/:classId/courses/:courseId/subjects/:subjectId"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminSubjectDetails />
+            </ProtectedRoute>
+          }
+        />
 
         {/* =========================================
             HOME

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import "../styles/dashboard.css";
 const API = "http://localhost:8080/api";
 
 function ManagementDashboard() {
@@ -537,11 +537,15 @@ function ManagementDashboard() {
 
             <div className="dashboard-header">
                 <div>
+                    <span className="dashboard-kicker">
+                        CLASS MANAGEMENT
+                    </span>
+
                     <h1>My Institute</h1>
 
                     <p>
                         Manage your institute, courses,
-                        subjects and demo lectures.
+                        subjects and demo lectures from one place.
                     </p>
                 </div>
             </div>
@@ -551,6 +555,67 @@ function ManagementDashboard() {
                     {message}
                 </div>
             )}
+
+            {/* =================================================
+    DASHBOARD STATS
+================================================= */}
+
+            <div className="dashboard-stats">
+
+                <div className="dashboard-stat-card">
+                    <div className="dashboard-stat-icon">
+                        📚
+                    </div>
+
+                    <div>
+                        <p className="dashboard-stat-label">
+                            Courses
+                        </p>
+
+                        <h3 className="dashboard-stat-value">
+                            {courses.length}
+                        </h3>
+                    </div>
+                </div>
+
+                <div className="dashboard-stat-card">
+                    <div className="dashboard-stat-icon">
+                        📖
+                    </div>
+
+                    <div>
+                        <p className="dashboard-stat-label">
+                            Subjects
+                        </p>
+
+                        <h3 className="dashboard-stat-value">
+                            {subjects.length}
+                        </h3>
+                    </div>
+                </div>
+
+                <div className="dashboard-stat-card">
+                    <div className="dashboard-stat-icon">
+                        🎥
+                    </div>
+
+                    <div>
+                        <p className="dashboard-stat-label">
+                            Demo Lectures
+                        </p>
+
+                        <h3 className="dashboard-stat-value">
+                            {subjects.reduce(
+                                (total, subject) =>
+                                    total +
+                                    (subject.demoLectures?.length || 0),
+                                0
+                            )}
+                        </h3>
+                    </div>
+                </div>
+
+            </div>
 
             {/* =================================================
                 INSTITUTE
@@ -722,9 +787,9 @@ function ManagementDashboard() {
 
                             <div
                                 className={`course-card ${selectedCourse?._id ===
-                                        course._id
-                                        ? "selected"
-                                        : ""
+                                    course._id
+                                    ? "selected"
+                                    : ""
                                     }`}
                                 key={course._id}
                             >
@@ -881,9 +946,9 @@ function ManagementDashboard() {
 
                                 <div
                                     className={`subject-card ${selectedSubject?._id ===
-                                            subject._id
-                                            ? "selected"
-                                            : ""
+                                        subject._id
+                                        ? "selected"
+                                        : ""
                                         }`}
                                     key={subject._id}
                                 >

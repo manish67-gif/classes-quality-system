@@ -19,6 +19,7 @@ const createReview = async (req, res) => {
             conceptClarity,
             doubtSolving,
             studyMaterial,
+            examPreparation,
             comment
         } = req.body;
 
@@ -64,7 +65,8 @@ const createReview = async (req, res) => {
             teachingQuality === undefined ||
             conceptClarity === undefined ||
             doubtSolving === undefined ||
-            studyMaterial === undefined
+            studyMaterial === undefined ||
+            examPreparation === undefined
         ) {
             return res.status(400).json({
                 message:
@@ -104,6 +106,9 @@ const createReview = async (req, res) => {
         const studyMaterialValue =
             Number(studyMaterial);
 
+        const examPreparationValue =
+            Number(examPreparation);
+
 
         // =========================================
         // VALIDATE RATINGS
@@ -120,7 +125,10 @@ const createReview = async (req, res) => {
                 doubtSolvingValue,
 
             studyMaterial:
-                studyMaterialValue
+                studyMaterialValue,
+
+            examPreparation:
+                examPreparationValue
         };
 
 
@@ -153,8 +161,9 @@ const createReview = async (req, res) => {
                         teachingQualityValue +
                         conceptClarityValue +
                         doubtSolvingValue +
-                        studyMaterialValue
-                    ) / 4
+                        studyMaterialValue +
+                        examPreparationValue
+                    ) / 5
                 ).toFixed(1)
             );
 
@@ -216,6 +225,9 @@ const createReview = async (req, res) => {
 
                 studyMaterial:
                     studyMaterialValue,
+
+                examPreparation:
+                    examPreparationValue,
 
                 overallRating,
 

@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
+import "../styles/AdminDashboard.css";
 
 const API = "http://localhost:8080/api";
 
 function AdminDashboard() {
     const token = localStorage.getItem("token");
 
+    const [students, setStudents] = useState([]);
     const [classes, setClasses] = useState([]);
-    const [courses, setCourses] = useState([]);
-    const [subjects, setSubjects] = useState([]);
 
     const [loading, setLoading] = useState(true);
     const [message, setMessage] = useState("");
@@ -16,547 +18,233 @@ function AdminDashboard() {
         Authorization: `Bearer ${token}`
     };
 
-    // --------------------------------------------------
-    // LOAD INSTITUTES
-    // --------------------------------------------------
-
-    const loadClasses = async () => {
+    const loadStudents = async () => {
         try {
-            const response = await fetch(`${API}/classes`, {
-                headers
-            });
+            const response = await fetch(
+                `${API}/users?role=student`,
+                { headers }
+            );
 
             const data = await response.json();
 
             if (!response.ok) {
                 throw new Error(
-                    data.message || "Failed to load institutes"
+                    data.message || "Failed to load students"
+                );
+            }
+
+            setStudents(data.users || []);
+
+        } catch (error) {
+            console.error("Load students error:", error);
+            setMessage(error.message);
+        }
+    };
+
+    const loadClasses = async () => {
+        try {
+            const response = await fetch(
+                `${API}/classes`,
+                { headers }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.message || "Failed to load classes"
                 );
             }
 
             setClasses(data.classes || []);
+
         } catch (error) {
-            console.error("Load institutes error:", error);
+            console.error("Load classes error:", error);
             setMessage(error.message);
         }
     };
-
-    // --------------------------------------------------
-    // LOAD COURSES
-    // --------------------------------------------------
-
-    const loadCourses = async () => {
-        try {
-            const response = await fetch(`${API}/courses`, {
-                headers
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.message || "Failed to load courses"
-                );
-            }
-
-            setCourses(data.courses || []);
-        } catch (error) {
-            console.error("Load courses error:", error);
-            setMessage(error.message);
-        }
-    };
-
-    // --------------------------------------------------
-    // LOAD SUBJECTS
-    // --------------------------------------------------
-
-    const loadSubjects = async () => {
-        try {
-            const response = await fetch(`${API}/subjects`, {
-                headers
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.message || "Failed to load subjects"
-                );
-            }
-
-            setSubjects(data.subjects || []);
-        } catch (error) {
-            console.error("Load subjects error:", error);
-            setMessage(error.message);
-        }
-    };
-
-    // --------------------------------------------------
-    // INITIAL LOAD
-    // --------------------------------------------------
 
     useEffect(() => {
-        const loadData = async () => {
+        const loadDashboard = async () => {
             setLoading(true);
+            setMessage("");
 
             await Promise.all([
-                loadClasses(),
-                loadCourses(),
-                loadSubjects()
+                loadStudents(),
+                loadClasses()
             ]);
 
             setLoading(false);
         };
 
-        loadData();
+        loadDashboard();
     }, []);
-
-    // --------------------------------------------------
-    // DELETE INSTITUTE
-    // --------------------------------------------------
-
-    const deleteClass = async (classId) => {
-        const confirmDelete = window.confirm(
-            "Delete this institute? Its courses, subjects and reviews will also be deleted."
-        );
-
-        if (!confirmDelete) return;
-
-        try {
-            const response = await fetch(
-                `${API}/classes/${classId}`,
-                {
-                    method: "DELETE",
-                    headers
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.message || "Failed to delete institute"
-                );
-            }
-
-            setMessage("Institute deleted successfully.");
-
-            await loadClasses();
-            await loadCourses();
-            await loadSubjects();
-        } catch (error) {
-            console.error("Delete institute error:", error);
-            setMessage(error.message);
-        }
-    };
-
-    // --------------------------------------------------
-    // DELETE COURSE
-    // --------------------------------------------------
-
-    const deleteCourse = async (courseId) => {
-        const confirmDelete = window.confirm(
-            "Delete this course? Its subjects and reviews will also be deleted."
-        );
-
-        if (!confirmDelete) return;
-
-        try {
-            const response = await fetch(
-                `${API}/courses/${courseId}`,
-                {
-                    method: "DELETE",
-                    headers
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(
-                    data.message || "Failed to delete course"
-                );
-            }
-
-            setMessage("Course deleted successfully.");
-
-            await loadCourses();
-            await loadSubjects();
-        } catch (error) {
-            console.error("Delete course error:", error);
-            setMessage(error.message);
-        }
-    };
-
-    // --------------------------------------------------
-    // LOADING
-    // --------------------------------------------------
 
     if (loading) {
         return (
-            <div className="management-dashboard">
-                <h2>Loading Admin Dashboard...</h2>
+            <div className="admin-dashboard-page">
+                <div className="admin-loading">
+                    Loading Admin Dashboard...
+                </div>
             </div>
         );
     }
 
-    // --------------------------------------------------
-    // UI
-    // --------------------------------------------------
-
     return (
-        <div className="management-dashboard">
+        <div className="admin-dashboard-page">
 
             {/* HEADER */}
 
-            <div className="dashboard-header">
+            <div className="admin-dashboard-header">
+
                 <div>
                     <h1>Admin Dashboard</h1>
 
                     <p>
-                        Manage and monitor institutes,
-                        courses and academic content.
+                        Manage students, classes and academic content.
                     </p>
                 </div>
+
             </div>
 
+
+            {/* MESSAGE */}
+
             {message && (
-                <div className="dashboard-message">
+                <div className="admin-dashboard-error">
                     {message}
                 </div>
             )}
 
-            {/* =================================================
-                OVERVIEW
-            ================================================= */}
 
-            <section className="management-section">
+            {/* USER MANAGEMENT */}
 
-                <div className="section-header">
-                    <div>
-                        <h2>Overview</h2>
+            <section className="admin-dashboard-section">
 
-                        <p>
-                            Platform statistics
-                        </p>
-                    </div>
+                <div className="admin-section-heading">
+
+                    <h2>User Management</h2>
+
+                    <p>
+                        Select a user role to view registered users.
+                    </p>
+
                 </div>
 
-                <div className="course-list">
 
-                    <div className="course-card">
-                        <div className="course-content">
+                <div className="admin-role-grid">
+
+                    {/* STUDENTS */}
+
+                    <Link
+                        to="/admin/students"
+                        className="admin-role-card"
+                    >
+
+                        <div className="admin-role-icon">
+                            👨‍🎓
+                        </div>
+
+                        <div className="admin-role-content">
+
                             <h3>
+                                Students
+                            </h3>
+
+                            <p>
+                                Registered student accounts
+                            </p>
+
+                            <strong>
+                                {students.length}
+                            </strong>
+
+                            <span>
+                                View Students →
+                            </span>
+
+                        </div>
+
+                    </Link>
+
+
+                    {/* CLASSES */}
+
+                    <Link
+                        to="/admin/classes"
+                        className="admin-role-card"
+                    >
+
+                        <div className="admin-role-icon">
+                            🏫
+                        </div>
+
+                        <div className="admin-role-content">
+
+                            <h3>
+                                Classes
+                            </h3>
+
+                            <p>
+                                Registered coaching classes
+                            </p>
+
+                            <strong>
                                 {classes.length}
-                            </h3>
+                            </strong>
 
-                            <p>
-                                Total Institutes
-                            </p>
+                            <span>
+                                View Classes →
+                            </span>
+
                         </div>
-                    </div>
 
-                    <div className="course-card">
-                        <div className="course-content">
-                            <h3>
-                                {courses.length}
-                            </h3>
-
-                            <p>
-                                Total Courses
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="course-card">
-                        <div className="course-content">
-                            <h3>
-                                {subjects.length}
-                            </h3>
-
-                            <p>
-                                Total Subjects
-                            </p>
-                        </div>
-                    </div>
+                    </Link>
 
                 </div>
 
             </section>
 
-            {/* =================================================
-                INSTITUTES
-            ================================================= */}
 
-            <section className="management-section">
+            {/* PLATFORM OVERVIEW */}
 
-                <div className="section-header">
+            <section className="admin-dashboard-section">
 
-                    <div>
-                        <h2>Institutes</h2>
+                <div className="admin-section-heading">
+
+                    <h2>
+                        Platform Overview
+                    </h2>
+
+                </div>
+
+
+                <div className="admin-overview-grid">
+
+                    <div className="admin-overview-card">
+
+                        <span>
+                            {students.length}
+                        </span>
 
                         <p>
-                            All registered institutes
+                            Students
                         </p>
+
                     </div>
 
-                </div>
 
-                <div className="course-list">
+                    <div className="admin-overview-card">
 
-                    {classes.length === 0 ? (
-                        <div className="empty-state">
-                            <p>
-                                No institutes registered.
-                            </p>
-                        </div>
-                    ) : (
-                        classes.map((classItem) => (
-
-                            <div
-                                className="course-card"
-                                key={classItem._id}
-                            >
-
-                                <div className="course-content">
-
-                                    <h3>
-                                        {classItem.name}
-                                    </h3>
-
-                                    <p>
-                                        {classItem.description ||
-                                            "No description"}
-                                    </p>
-
-                                    <div className="course-info">
-
-                                        {classItem.location && (
-                                            <span>
-                                                📍{" "}
-                                                {
-                                                    classItem.location
-                                                }
-                                            </span>
-                                        )}
-
-                                        {classItem.contactNumber && (
-                                            <span>
-                                                📞{" "}
-                                                {
-                                                    classItem.contactNumber
-                                                }
-                                            </span>
-                                        )}
-
-                                        {classItem.rating !==
-                                            null &&
-                                            classItem.rating !==
-                                            undefined && (
-                                                <span>
-                                                    ⭐{" "}
-                                                    {
-                                                        classItem.rating
-                                                    }
-                                                </span>
-                                            )}
-
-                                    </div>
-
-                                </div>
-
-                                <button
-                                    className="danger-button"
-                                    onClick={() =>
-                                        deleteClass(
-                                            classItem._id
-                                        )
-                                    }
-                                >
-                                    Delete
-                                </button>
-
-                            </div>
-
-                        ))
-                    )}
-
-                </div>
-
-            </section>
-
-            {/* =================================================
-                COURSES
-            ================================================= */}
-
-            <section className="management-section">
-
-                <div className="section-header">
-
-                    <div>
-                        <h2>Courses</h2>
+                        <span>
+                            {classes.length}
+                        </span>
 
                         <p>
-                            All courses across institutes
+                            Classes
                         </p>
+
                     </div>
-
-                </div>
-
-                <div className="course-list">
-
-                    {courses.length === 0 ? (
-                        <div className="empty-state">
-                            <p>
-                                No courses available.
-                            </p>
-                        </div>
-                    ) : (
-                        courses.map((course) => (
-
-                            <div
-                                className="course-card"
-                                key={course._id}
-                            >
-
-                                <div className="course-content">
-
-                                    <h3>
-                                        {course.name}
-                                    </h3>
-
-                                    <p>
-                                        {course.description ||
-                                            "No description"}
-                                    </p>
-
-                                    <div className="course-info">
-
-                                        <span>
-                                            💰 ₹{course.fees}
-                                        </span>
-
-                                        <span>
-                                            ⏱{" "}
-                                            {course.duration}
-                                        </span>
-
-                                        {course.rating !==
-                                            null &&
-                                            course.rating !==
-                                            undefined && (
-                                                <span>
-                                                    ⭐{" "}
-                                                    {
-                                                        course.rating
-                                                    }
-                                                </span>
-                                            )}
-
-                                    </div>
-
-                                    {course.classId && (
-                                        <p>
-                                            🏫{" "}
-                                            {
-                                                course.classId.name
-                                            }
-                                        </p>
-                                    )}
-
-                                </div>
-
-                                <button
-                                    className="danger-button"
-                                    onClick={() =>
-                                        deleteCourse(
-                                            course._id
-                                        )
-                                    }
-                                >
-                                    Delete
-                                </button>
-
-                            </div>
-
-                        ))
-                    )}
-
-                </div>
-
-            </section>
-
-            {/* =================================================
-                SUBJECTS
-            ================================================= */}
-
-            <section className="management-section">
-
-                <div className="section-header">
-
-                    <div>
-                        <h2>Subjects</h2>
-
-                        <p>
-                            All subjects across courses
-                        </p>
-                    </div>
-
-                </div>
-
-                <div className="subject-list">
-
-                    {subjects.length === 0 ? (
-                        <div className="empty-state">
-                            <p>
-                                No subjects available.
-                            </p>
-                        </div>
-                    ) : (
-                        subjects.map((subject) => (
-
-                            <div
-                                className="subject-card"
-                                key={subject._id}
-                            >
-
-                                <div className="subject-content">
-
-                                    <h3>
-                                        {subject.name}
-                                    </h3>
-
-                                    <p>
-                                        {subject.description ||
-                                            "No description"}
-                                    </p>
-
-                                    <div className="subject-info">
-
-                                        <span>
-                                            ⭐{" "}
-                                            {subject.rating ||
-                                                0}
-                                        </span>
-
-                                        <span>
-                                            🎥{" "}
-                                            {
-                                                subject
-                                                    .demoLectures
-                                                    ?.length || 0
-                                            }{" "}
-                                            Demo Lectures
-                                        </span>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        ))
-                    )}
 
                 </div>
 

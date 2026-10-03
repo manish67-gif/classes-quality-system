@@ -1,0 +1,279 @@
+/* =========================================
+   ADMIN STUDENTS PAGE
+========================================= */
+
+.admin-students-page {
+    min-height: calc(100vh - 80px);
+    background: #f5f7fb;
+    padding: 40px 6%;
+}
+
+
+/* =========================================
+   BACK BUTTON
+========================================= */
+
+.admin-students-back {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.admin-students-back:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.admin-students-header {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.admin-students-header h1 {
+    margin: 0;
+    color: #172033;
+    font-size: 34px;
+}
+
+.admin-students-header p {
+    margin-top: 8px;
+    color: #667085;
+}
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+.admin-students-message {
+    padding: 12px 16px;
+
+    background: #ecfdf3;
+    color: #027a48;
+
+    border: 1px solid #abefc6;
+
+    border-radius: 10px;
+
+    margin-bottom: 20px;
+}
+
+
+/* =========================================
+   COUNT
+========================================= */
+
+.admin-students-count {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    background: #ffffff;
+
+    border: 1px solid #e4e7ec;
+    border-radius: 12px;
+
+    padding: 20px;
+
+    margin-bottom: 25px;
+}
+
+.admin-students-count strong {
+    font-size: 30px;
+    color: #2563eb;
+}
+
+.admin-students-count span {
+    color: #667085;
+}
+
+
+/* =========================================
+   STUDENT LIST
+========================================= */
+
+.admin-students-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+
+/* =========================================
+   STUDENT CARD
+========================================= */
+
+.admin-student-card {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    gap: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e4e7ec;
+    border-radius: 14px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 4px 12px rgba(16, 24, 40, 0.04);
+}
+
+
+/* =========================================
+   STUDENT INFO
+========================================= */
+
+.admin-student-info h3 {
+    margin: 0 0 6px;
+
+    color: #172033;
+    font-size: 19px;
+}
+
+.admin-student-info p {
+    margin: 0 0 8px;
+
+    color: #667085;
+}
+
+.admin-student-info span {
+    font-size: 13px;
+
+    color: #475467;
+
+    background: #f2f4f7;
+
+    padding: 4px 9px;
+
+    border-radius: 6px;
+}
+
+
+/* =========================================
+   ACTIONS
+========================================= */
+
+.admin-student-actions {
+    display: flex;
+    gap: 10px;
+
+    align-items: center;
+}
+
+
+/* =========================================
+   VIEW
+========================================= */
+
+.admin-student-view {
+    background: #2563eb;
+
+    color: #ffffff;
+
+    padding: 10px 15px;
+
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+.admin-student-view:hover {
+    background: #1d4ed8;
+}
+
+
+/* =========================================
+   DELETE
+========================================= */
+
+.admin-student-delete {
+    background: #dc2626;
+
+    color: #ffffff;
+
+    border: none;
+
+    padding: 10px 15px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+}
+
+.admin-student-delete:hover {
+    background: #b91c1c;
+}
+
+
+/* =========================================
+   EMPTY
+========================================= */
+
+.admin-students-empty {
+    background: #ffffff;
+
+    padding: 50px;
+
+    text-align: center;
+
+    border-radius: 14px;
+
+    border: 1px solid #e4e7ec;
+
+    color: #667085;
+}
+
+
+/* =========================================
+   LOADING
+========================================= */
+
+.admin-students-loading {
+    text-align: center;
+
+    padding: 80px 20px;
+
+    color: #667085;
+
+    font-size: 20px;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+    .admin-students-page {
+        padding: 25px 18px;
+    }
+
+    .admin-student-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .admin-student-actions {
+        width: 100%;
+    }
+
+    .admin-student-view,
+    .admin-student-delete {
+        flex: 1;
+        text-align: center;
+    }
+
+}

@@ -44,6 +44,12 @@ const reviewSchema = new mongoose.Schema(
             max: [5, "Rating cannot exceed 5"]
         },
 
+        examPreparation: {
+            type: Number,
+            required: [true, "Exam preparation rating is required"],
+            min: [1, "Rating must be at least 1"],
+            max: [5, "Rating cannot exceed 5"]
+        },
         overallRating: {
             type: Number,
             required: [true, "Overall rating is required"],
@@ -71,9 +77,15 @@ reviewSchema.index(
 );
 
 // Helps when fetching reviews for a subject.
-reviewSchema.index({ subjectId: 1, createdAt: -1 });
+reviewSchema.index({
+    subjectId: 1,
+    createdAt: -1
+});
 
 // Helps when fetching reviews submitted by a student.
-reviewSchema.index({ studentId: 1, createdAt: -1 });
+reviewSchema.index({
+    studentId: 1,
+    createdAt: -1
+});
 
 module.exports = mongoose.model("Review", reviewSchema);

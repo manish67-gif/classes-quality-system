@@ -1,0 +1,312 @@
+/* =========================================
+   ADMIN CLASSES PAGE
+========================================= */
+
+.admin-classes-page {
+    min-height: calc(100vh - 80px);
+    background: #f5f7fb;
+    padding: 40px 6%;
+}
+
+
+/* =========================================
+   BACK
+========================================= */
+
+.admin-classes-back {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.admin-classes-back:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.admin-classes-header {
+    margin-top: 25px;
+    margin-bottom: 25px;
+}
+
+.admin-classes-header h1 {
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 34px;
+}
+
+.admin-classes-header p {
+    margin-top: 8px;
+
+    color: #667085;
+}
+
+
+/* =========================================
+   MESSAGE
+========================================= */
+
+.admin-classes-message {
+    padding: 12px 16px;
+
+    background: #ecfdf3;
+
+    color: #027a48;
+
+    border: 1px solid #abefc6;
+
+    border-radius: 10px;
+
+    margin-bottom: 20px;
+}
+
+
+/* =========================================
+   COUNT
+========================================= */
+
+.admin-classes-count {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    background: #ffffff;
+
+    border: 1px solid #e4e7ec;
+
+    border-radius: 12px;
+
+    padding: 20px;
+
+    margin-bottom: 25px;
+}
+
+.admin-classes-count strong {
+    font-size: 30px;
+
+    color: #2563eb;
+}
+
+.admin-classes-count span {
+    color: #667085;
+}
+
+
+/* =========================================
+   LIST
+========================================= */
+
+.admin-classes-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+
+/* =========================================
+   CLASS CARD
+========================================= */
+
+.admin-class-card {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 25px;
+
+    background: #ffffff;
+
+    border: 1px solid #e4e7ec;
+
+    border-radius: 14px;
+
+    padding: 22px;
+
+    box-shadow:
+        0 4px 12px rgba(16, 24, 40, 0.04);
+}
+
+
+/* =========================================
+   INFORMATION
+========================================= */
+
+.admin-class-info {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+.admin-class-info h2 {
+    margin: 0;
+
+    color: #172033;
+
+    font-size: 21px;
+}
+
+.admin-class-info p {
+    margin: 0;
+
+    color: #667085;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================
+   META
+========================================= */
+
+.admin-class-meta {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 15px;
+
+    margin-top: 5px;
+
+    color: #475467;
+
+    font-size: 14px;
+}
+
+
+/* =========================================
+   ACTIONS
+========================================= */
+
+.admin-class-actions {
+    display: flex;
+
+    gap: 10px;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   VIEW
+========================================= */
+
+.admin-class-view {
+    background: #2563eb;
+
+    color: #ffffff;
+
+    padding: 11px 16px;
+
+    border-radius: 8px;
+
+    text-decoration: none;
+
+    font-weight: 600;
+}
+
+.admin-class-view:hover {
+    background: #1d4ed8;
+}
+
+
+/* =========================================
+   DELETE
+========================================= */
+
+.admin-class-delete {
+    background: #dc2626;
+
+    color: #ffffff;
+
+    border: none;
+
+    padding: 11px 16px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+}
+
+.admin-class-delete:hover {
+    background: #b91c1c;
+}
+
+
+/* =========================================
+   EMPTY
+========================================= */
+
+.admin-classes-empty {
+    background: #ffffff;
+
+    padding: 50px;
+
+    text-align: center;
+
+    border-radius: 14px;
+
+    border: 1px solid #e4e7ec;
+
+    color: #667085;
+}
+
+
+/* =========================================
+   LOADING
+========================================= */
+
+.admin-classes-loading {
+    text-align: center;
+
+    padding: 80px 20px;
+
+    color: #667085;
+
+    font-size: 20px;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 750px) {
+
+    .admin-classes-page {
+        padding: 25px 18px;
+    }
+
+    .admin-class-card {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .admin-class-actions {
+        width: 100%;
+    }
+
+    .admin-class-view,
+    .admin-class-delete {
+        flex: 1;
+
+        text-align: center;
+    }
+
+}

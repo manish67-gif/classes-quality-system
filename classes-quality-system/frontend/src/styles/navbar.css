@@ -1,0 +1,285 @@
+/* =========================================================
+   MOBILE NAVIGATION
+========================================================= */
+
+.mobile-menu-button {
+    display: none;
+
+    width: 42px;
+    height: 42px;
+
+    padding: 8px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    cursor: pointer;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+}
+
+.mobile-menu-button span {
+    display: block;
+
+    width: 20px;
+    height: 2px;
+
+    border-radius: 2px;
+
+    background: #0f172a;
+}
+
+
+/* =========================================================
+   MOBILE OVERLAY
+========================================================= */
+
+.mobile-menu-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9998;
+
+    background: rgba(15, 23, 42, 0.45);
+
+    backdrop-filter: blur(2px);
+}
+
+
+/* =========================================================
+   MOBILE SIDEBAR
+========================================================= */
+
+.mobile-sidebar {
+    position: fixed;
+
+    top: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: 9999;
+
+    width: min(320px, 85vw);
+
+    background: #ffffff;
+
+    box-shadow:
+        -10px 0 35px rgba(15, 23, 42, 0.15);
+
+    transform: translateX(100%);
+
+    transition: transform 0.25s ease;
+
+    overflow-y: auto;
+}
+
+.mobile-sidebar-open {
+    transform: translateX(0);
+}
+
+
+/* =========================================================
+   SIDEBAR HEADER
+========================================================= */
+
+.mobile-sidebar-header {
+    height: 64px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 18px;
+
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.mobile-sidebar-logo {
+    color: #2563eb;
+
+    font-size: 24px;
+    font-weight: 800;
+
+    text-decoration: none;
+}
+
+.mobile-close-button {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #f8fafc;
+
+    color: #334155;
+
+    font-size: 28px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.mobile-close-button:hover {
+    background: #f1f5f9;
+}
+
+
+/* =========================================================
+   SIDEBAR LINKS
+========================================================= */
+
+.mobile-sidebar-links {
+    display: flex;
+    flex-direction: column;
+
+    padding: 15px;
+}
+
+.mobile-sidebar-links a,
+.mobile-logout-button {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 13px 14px;
+
+    margin-bottom: 4px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: transparent;
+
+    color: #334155;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+.mobile-sidebar-links a span,
+.mobile-logout-button span {
+    width: 24px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #64748b;
+
+    font-size: 17px;
+}
+
+.mobile-sidebar-links a:hover {
+    background: #f1f5f9;
+
+    color: #2563eb;
+}
+
+.mobile-sidebar-links a:hover span {
+    color: #2563eb;
+}
+
+
+/* ACTIVE CLASS DASHBOARD */
+
+.mobile-sidebar-links .mobile-active-link {
+    background: #eff6ff;
+
+    color: #2563eb;
+}
+
+.mobile-sidebar-links .mobile-active-link span {
+    color: #2563eb;
+}
+
+
+/* =========================================================
+   DIVIDER
+========================================================= */
+
+.mobile-sidebar-divider {
+    height: 1px;
+
+    margin: 13px 4px;
+
+    background: #e5e7eb;
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+.mobile-logout-button {
+    color: #dc2626;
+}
+
+.mobile-logout-button span {
+    color: #dc2626;
+}
+
+.mobile-logout-button:hover {
+    background: #fef2f2;
+}
+
+
+/* =========================================================
+   MOBILE BREAKPOINT
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .navbar {
+        min-height: 58px;
+
+        padding: 0 15px;
+
+        box-sizing: border-box;
+    }
+
+    .nav-links {
+        display: none;
+    }
+
+    .mobile-menu-button {
+        display: flex;
+    }
+
+    .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .logo {
+        font-size: 24px;
+    }
+}
