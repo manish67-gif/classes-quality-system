@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/compare.css";
-
-const API = "http://localhost:8080/api";
+import API from "../config/api";
 
 function Compare() {
     const [courses, setCourses] = useState([]);

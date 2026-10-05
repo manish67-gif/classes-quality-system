@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import "../styles/AdminStudents.css";
 
-const API = "http://localhost:8080/api";
+import API from "../config/api";
 
 function AdminStudents() {
     const token = localStorage.getItem("token");

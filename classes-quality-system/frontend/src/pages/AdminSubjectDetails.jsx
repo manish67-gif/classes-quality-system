@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "../styles/AdminSubjectDetails.css";
+import API from "../config/api";
 
 const AdminSubjectDetails = () => {
     const { classId, courseId, subjectId } = useParams();
@@ -23,8 +24,8 @@ const AdminSubjectDetails = () => {
             setError("");
 
             const [subjectResponse, reviewsResponse] = await Promise.all([
-                fetch(`http://localhost:8080/api/subjects/${subjectId}`),
-                fetch(`http://localhost:8080/api/reviews/subject/${subjectId}`)
+                fetch(`${API}/subjects/${subjectId}`),
+                fetch(`${API}/reviews/subject/${subjectId}`)
             ]);
 
             const subjectData = await subjectResponse.json();
@@ -67,7 +68,7 @@ const AdminSubjectDetails = () => {
 
         try {
             const response = await fetch(
-                `http://localhost:8080/api/subjects/${subjectId}`,
+                `${API}/subjects/${subjectId}`,
                 {
                     method: "PUT",
                     headers: {
@@ -104,7 +105,7 @@ const AdminSubjectDetails = () => {
 
         try {
             const response = await fetch(
-                `http://localhost:8080/api/subjects/${subjectId}`,
+                `${API}/subjects/${subjectId}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -138,7 +139,7 @@ const AdminSubjectDetails = () => {
 
         try {
             const response = await fetch(
-                `http://localhost:8080/api/subjects/${subjectId}/demos/${lectureId}`,
+                `${API}/subjects/${subjectId}/demos/${lectureId}`,
                 {
                     method: "DELETE",
                     headers: {

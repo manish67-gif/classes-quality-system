@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import API from "../config/api";
 
 function CourseDetails() {
     const { id } = useParams();
@@ -16,7 +17,7 @@ function CourseDetails() {
 
             // GET COURSE
             const courseResponse = await fetch(
-                `http://localhost:8080/api/courses/${id}`
+                `${API}/courses/${id}`
             );
 
             const courseResult = await courseResponse.json();
@@ -31,7 +32,7 @@ function CourseDetails() {
 
             // GET SUBJECTS
             const subjectResponse = await fetch(
-                `http://localhost:8080/api/subjects/course/${id}`
+                `${API}/subjects/course/${id}`
             );
 
             const subjectResult = await subjectResponse.json();

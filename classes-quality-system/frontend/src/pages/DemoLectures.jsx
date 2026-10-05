@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import API from "../config/api";
 
 function DemoLectures() {
 
@@ -62,15 +63,14 @@ function DemoLectures() {
             ] = await Promise.all([
 
                 fetch(
-                    `http://localhost:8080/api/subjects/${subjectId}`
+                    `${API}/subjects/${subjectId}`
+                ),
+                fetch(
+                    `${API}/courses/${courseId}`
                 ),
 
                 fetch(
-                    `http://localhost:8080/api/courses/${courseId}`
-                ),
-
-                fetch(
-                    `http://localhost:8080/api/classes/${classId}`
+                    `${API}/classes/${classId}`
                 )
 
             ]);
@@ -586,19 +586,15 @@ function DemoLectures() {
 
 
             {/* =========================================
-                BACK
+                        BACK TO SUBJECT
             ========================================= */}
 
             <div className="demo-back">
 
                 <Link
-                    to={
-                        `/classes/${classId}/courses/${courseId}/subjects`
-                    }
+                    to={`/subjects/${subjectId}`}
                 >
-
-                    ← Back to Subjects
-
+                    ← Back to Subject
                 </Link>
 
             </div>

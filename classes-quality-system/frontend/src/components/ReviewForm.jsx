@@ -1,4 +1,5 @@
 import { useState } from "react";
+import API from "../config/api";
 
 function ReviewForm({ subjectId, onReviewSubmitted }) {
     const [formData, setFormData] = useState({
@@ -53,7 +54,7 @@ function ReviewForm({ subjectId, onReviewSubmitted }) {
 
         try {
             const response = await fetch(
-                "http://localhost:8080/api/reviews",
+                `${API}/reviews`,
                 {
                     method: "POST",
                     headers: {

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import API from "../config/api";
 
 function Profile() {
 
@@ -45,7 +46,7 @@ function Profile() {
             // =========================================
 
             const response = await fetch(
-                "http://localhost:8080/api/users/profile",
+                `${API}/users/profile`,
                 {
                     method: "GET",
 
@@ -130,7 +131,7 @@ function Profile() {
 
             const reviewResponse =
                 await fetch(
-                    "http://localhost:8080/api/reviews/my-reviews",
+                    `${API}/reviews/my-reviews`,
                     {
                         method: "GET",
 

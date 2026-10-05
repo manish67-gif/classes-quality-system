@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import API from "../config/api";
 
 function Classes() {
 
@@ -28,7 +29,7 @@ function Classes() {
             setError("");
 
             const response = await fetch(
-                "http://localhost:8080/api/classes",
+                `${API}/classes`,
                 {
                     cache: "no-store"
                 }

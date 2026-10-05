@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import API from "../config/api";
 
 function ClassDetails() {
 
@@ -23,7 +24,7 @@ function ClassDetails() {
             // =========================================
 
             const classResponse = await fetch(
-                `http://localhost:8080/api/classes/${id}`,
+                `${API}/classes/${id}`,
                 {
                     cache: "no-store"
                 }
@@ -45,7 +46,7 @@ function ClassDetails() {
             // =========================================
 
             const courseResponse = await fetch(
-                `http://localhost:8080/api/courses/class/${id}`,
+                `${API}/courses/class/${id}`,
                 {
                     cache: "no-store"
                 }

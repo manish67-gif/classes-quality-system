@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import ReviewForm from "../components/ReviewForm";
+import API from "../config/api";
 
 function SubjectDetails() {
 
@@ -29,7 +30,7 @@ function SubjectDetails() {
             // =========================================
 
             const subjectResponse = await fetch(
-                `http://localhost:8080/api/subjects/${id}`
+                `${API}/subjects/${id}`
             );
 
             const subjectData =
@@ -49,7 +50,7 @@ function SubjectDetails() {
             setSubject(subjectData.subject);
 
             const courseResponse = await fetch(
-                `http://localhost:8080/api/courses/${subjectData.subject.courseId}`
+                `${API}/courses/${subjectData.subject.courseId}`
             );
 
             const courseData = await courseResponse.json();
@@ -69,7 +70,7 @@ function SubjectDetails() {
             // =========================================
 
             const reviewResponse = await fetch(
-                `http://localhost:8080/api/reviews/subject/${id}`
+                `${API}/reviews/subject/${id}`
             );
 
             const reviewData =

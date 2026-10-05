@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../styles/ClassSubjectDetails.css";
 
-const API = "http://localhost:8080/api";
+import API from "../config/api";
 
 function ClassSubjectDetails() {
-    const { courseId, subjectId } = useParams();
+    const { classId, courseId, subjectId } = useParams();
     const navigate = useNavigate();
 
     const token = localStorage.getItem("token");
@@ -260,7 +260,7 @@ function ClassSubjectDetails() {
             }
 
             navigate(
-                `/class/courses/${courseId}`
+                `/class/classes/${classId}/courses/${courseId}`
             );
         } catch (error) {
             console.error(
@@ -297,7 +297,7 @@ function ClassSubjectDetails() {
                         className="subject-primary-button"
                         onClick={() =>
                             navigate(
-                                `/class/courses/${courseId}`
+                                `/class/classes/${classId}/courses/${courseId}`
                             )
                         }
                     >
@@ -318,7 +318,7 @@ function ClassSubjectDetails() {
                 className="subject-back-button"
                 onClick={() =>
                     navigate(
-                        `/class/courses/${courseId}`
+                        `/class/classes/${classId}/courses/${courseId}`
                     )
                 }
             >

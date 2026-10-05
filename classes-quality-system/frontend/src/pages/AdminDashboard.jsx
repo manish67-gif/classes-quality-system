@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 import "../styles/AdminDashboard.css";
 
-const API = "http://localhost:8080/api";
+import API from "../config/api";
 
 function AdminDashboard() {
     const token = localStorage.getItem("token");

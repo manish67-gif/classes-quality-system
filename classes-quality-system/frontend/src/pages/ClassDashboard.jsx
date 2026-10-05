@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/ClassDashboard.css";
-
-const API = "http://localhost:8080/api";
+import API from "../config/api";
 
 function ClassDashboard() {
     const navigate = useNavigate();
@@ -641,7 +640,7 @@ function ClassDashboard() {
                                         className="class-primary-button"
                                         onClick={() =>
                                             navigate(
-                                                `/class/courses/${course._id}`
+                                                `/class/classes/${institute._id}/courses/${course._id}`
                                             )
                                         }
                                     >

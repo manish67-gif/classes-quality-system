@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
+import API from "../config/api";
 
 function Reviews() {
 
@@ -34,8 +35,8 @@ function Reviews() {
             // =================================
 
             const url = isMyReviews
-                ? "http://localhost:8080/api/reviews/my-reviews"
-                : `http://localhost:8080/api/reviews/subject/${subjectId}`;
+                ? `${API}/reviews/my-reviews`
+                : `${API}/reviews/subject/${subjectId}`;
 
 
             const response = await fetch(url, {

@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 
 import "../styles/AdminClassDetails.css";
 
-const API = "http://localhost:8080/api";
+import API from "../config/api";
 
 function AdminClassDetails() {
     const { id } = useParams();

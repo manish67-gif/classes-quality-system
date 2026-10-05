@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "../styles/AdminCourseDetails.css";
+import API from "../config/api";
 
 const AdminCourseDetails = () => {
     const { classId, courseId } = useParams();
@@ -27,8 +28,8 @@ const AdminCourseDetails = () => {
             setError("");
 
             const [courseResponse, subjectsResponse] = await Promise.all([
-                fetch(`http://localhost:8080/api/courses/${courseId}`),
-                fetch(`http://localhost:8080/api/subjects/course/${courseId}`)
+                fetch(`${API}/courses/${courseId}`),
+                fetch(`${API}/subjects/course/${courseId}`)
             ]);
 
             const courseData = await courseResponse.json();
@@ -76,7 +77,7 @@ const AdminCourseDetails = () => {
 
         try {
             const response = await fetch(
-                `http://localhost:8080/api/courses/${courseId}`,
+                `${API}/courses/${courseId}`,
                 {
                     method: "PUT",
                     headers: {
@@ -115,7 +116,7 @@ const AdminCourseDetails = () => {
 
         try {
             const response = await fetch(
-                `http://localhost:8080/api/courses/${courseId}`,
+                `${API}/courses/${courseId}`,
                 {
                     method: "DELETE",
                     headers: {

@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "../styles/ClassCourseDetails.css";
-
-const API = "http://localhost:8080/api";
+import API from "../config/api";
 
 function ClassCourseDetails() {
-    const { courseId } = useParams();
+    const { classId, courseId } = useParams();
     const navigate = useNavigate();
 
     const token = localStorage.getItem("token");
@@ -483,7 +482,7 @@ function ClassCourseDetails() {
                                         className="course-primary-button"
                                         onClick={() =>
                                             navigate(
-                                                `/class/courses/${courseId}/subjects/${subject._id}`
+                                                `/class/classes/${classId}/courses/${courseId}/subjects/${subject._id}`
                                             )
                                         }
                                     >

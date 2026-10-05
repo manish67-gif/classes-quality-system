@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../config/api";
 
 function Signup() {
 
@@ -41,7 +42,7 @@ function Signup() {
         try {
 
             const response = await fetch(
-                "http://localhost:8080/api/auth/register",
+                `${API}/auth/register`,
                 {
                     method: "POST",
 
