@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-
 const User = require("../models/User");
 const Class = require("../models/Class");
 const Course = require("../models/Course");
@@ -127,7 +126,8 @@ const getUserById = async (req, res) => {
         }
 
         const user = await User.findById(id)
-            .select("-password");
+            .select("-password")
+            .lean();
 
         if (!user) {
             return res.status(404).json({
@@ -135,18 +135,91 @@ const getUserById = async (req, res) => {
             });
         }
 
-        // Admin accounts should not be exposed
-        // through the admin student/class management flow.
         if (!["student", "class"].includes(user.role)) {
-            return res.status(404).json({
-                message: "User not found"
+            return res.status(400).json({
+                message: "Invalid user role"
             });
         }
 
         let classProfile = null;
+        let reviews = [];
+        let averageRating = 0;
 
-        // If this is a class account,
-        // also get its institute profile.
+        /* ---------------- STUDENT DATA ---------------- */
+
+        if (user.role === "student") {
+            reviews = await Review.find({
+                studentId: user._id
+            })
+                .sort({ createdAt: -1 })
+                .populate({
+                    path: "subjectId",
+                    select: "name description courseId"
+                })
+                .lean();
+
+            reviews = await Promise.all(
+                reviews.map(async (review) => {
+                    const subject = review.subjectId;
+
+                    let course = null;
+                    let institute = null;
+
+                    if (subject?.courseId) {
+                        course = await Course.findById(
+                            subject.courseId
+                        )
+                            .select(
+                                "name fees duration classId"
+                            )
+                            .lean();
+
+                        if (course?.classId) {
+                            institute = await Class.findById(
+                                course.classId
+                            )
+                                .select(
+                                    "name location address"
+                                )
+                                .lean();
+                        }
+                    }
+
+                    return {
+                        ...review,
+
+                        subject: subject
+                            ? {
+                                name: subject.name,
+                                description:
+                                    subject.description
+                            }
+                            : null,
+
+                        course,
+
+                        class: institute
+                    };
+                })
+            );
+
+            /* Calculate average rating */
+
+            if (reviews.length > 0) {
+                averageRating =
+                    reviews.reduce(
+                        (sum, review) =>
+                            sum +
+                            Number(
+                                review.overallRating || 0
+                            ),
+                        0
+                    ) / reviews.length;
+            }
+        }
+
+        /* ---------------- CLASS DATA ---------------- */
+
         if (user.role === "class") {
             classProfile = await Class.findOne({
                 ownerId: user._id
@@ -165,7 +238,13 @@ const getUserById = async (req, res) => {
                 updatedAt: user.updatedAt
             },
 
-            classProfile
+            classProfile,
+
+            reviews,
+
+            averageRating: Number(
+                averageRating.toFixed(2)
+            )
         });
 
     } catch (error) {

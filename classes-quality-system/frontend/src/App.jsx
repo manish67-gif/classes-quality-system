@@ -21,6 +21,7 @@ import ClassCourseDetails from "./pages/ClassCourseDetails";
 import ClassSubjectDetails from "./pages/ClassSubjectDetails";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminStudents from "./pages/AdminStudents";
+import AdminStudentDetails from "./pages/AdminStudentDetails";
 import AdminClasses from "./pages/AdminClasses";
 import AdminClassDetails from "./pages/AdminClassDetails";
 import AdminCourseDetails from "./pages/AdminCourseDetails";
@@ -87,6 +88,15 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminStudents />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/students/:id"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminStudentDetails />
             </ProtectedRoute>
           }
         />

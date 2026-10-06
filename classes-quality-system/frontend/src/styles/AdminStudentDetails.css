@@ -1,0 +1,373 @@
+.asd-page {
+    min-height: calc(100vh - 80px);
+    background: #f5f7fb;
+    padding: 32px 6% 55px;
+    color: #172033;
+}
+
+/* ---------------- TOP BAR ---------------- */
+
+.asd-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.asd-back {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.asd-back:hover {
+    text-decoration: underline;
+}
+
+.asd-delete {
+    border: 1px solid #fecaca;
+    background: #fff;
+    color: #dc2626;
+    border-radius: 8px;
+    padding: 8px 13px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.asd-delete:hover {
+    background: #fef2f2;
+}
+
+/* ---------------- HEADER ---------------- */
+
+.asd-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 24px 0 20px;
+}
+
+.asd-eyebrow {
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    margin-bottom: 7px;
+}
+
+.asd-header h1 {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.15;
+}
+
+.asd-header p {
+    margin: 7px 0 0;
+    color: #667085;
+    font-size: 14px;
+}
+
+.asd-role {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #dbeafe;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+/* ---------------- MESSAGE ---------------- */
+
+.asd-message {
+    margin-bottom: 16px;
+    padding: 10px 13px;
+    border: 1px solid #abefc6;
+    border-radius: 9px;
+    background: #ecfdf3;
+    color: #027a48;
+    font-size: 14px;
+}
+
+/* ---------------- COMMON CARDS ---------------- */
+
+.asd-identity-card,
+.asd-stat-card,
+.asd-review-card,
+.asd-empty {
+    background: #fff;
+    border: 1px solid #e4e7ec;
+    box-shadow: 0 3px 12px rgba(16, 24, 40, 0.035);
+}
+
+/* ---------------- IDENTITY ---------------- */
+
+.asd-identity-card {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 18px;
+    border-radius: 13px;
+}
+
+.asd-avatar {
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.asd-identity-main h2 {
+    margin: 0 0 3px;
+    font-size: 17px;
+}
+
+.asd-identity-main p {
+    margin: 0;
+    color: #667085;
+    font-size: 13px;
+}
+
+.asd-meta {
+    display: flex;
+    gap: 24px;
+}
+
+.asd-meta div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.asd-meta span,
+.asd-stat-card span,
+.asd-rating-grid span {
+    color: #667085;
+    font-size: 11px;
+}
+
+.asd-meta strong {
+    font-size: 12px;
+}
+
+/* ---------------- STAT CARDS ---------------- */
+
+.asd-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 14px 0 24px;
+}
+
+.asd-stat-card {
+    border-radius: 11px;
+    padding: 14px 16px;
+}
+
+.asd-stat-card strong {
+    display: block;
+    margin-top: 6px;
+    color: #172033;
+    font-size: 22px;
+}
+
+.asd-stat-card strong small {
+    color: #98a2b3;
+    font-size: 12px;
+}
+
+.asd-stat-role {
+    font-size: 16px !important;
+    color: #2563eb !important;
+}
+
+/* ---------------- SECTION ---------------- */
+
+.asd-section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+.asd-section-head h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.asd-section-head p {
+    margin: 4px 0 0;
+    color: #667085;
+    font-size: 13px;
+}
+
+.asd-section-head>span {
+    color: #667085;
+    font-size: 12px;
+}
+
+/* ---------------- REVIEW GRID ---------------- */
+
+.asd-review-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.asd-review-card {
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.asd-review-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.asd-review-head h3 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.asd-review-head p {
+    margin: 4px 0 0;
+    color: #667085;
+    font-size: 12px;
+}
+
+/* ---------------- RATING ---------------- */
+
+.asd-rating {
+    white-space: nowrap;
+    color: #b45309;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 7px;
+    padding: 5px 8px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.asd-rating span {
+    color: #f59e0b;
+}
+
+/* ---------------- RATING BREAKDOWN ---------------- */
+
+.asd-rating-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin: 13px 0;
+}
+
+.asd-rating-grid div {
+    min-width: 0;
+    padding: 7px 5px;
+    background: #f8fafc;
+    border-radius: 7px;
+    text-align: center;
+}
+
+.asd-rating-grid b {
+    display: block;
+    margin-top: 2px;
+    color: #344054;
+    font-size: 11px;
+}
+
+/* ---------------- COMMENT ---------------- */
+
+.asd-comment {
+    margin: 0;
+    padding: 10px 11px;
+    border-left: 3px solid #2563eb;
+    background: #f8fafc;
+    color: #475467;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 0 7px 7px 0;
+}
+
+/* ---------------- REVIEW FOOTER ---------------- */
+
+.asd-review-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 9px;
+    color: #98a2b3;
+    font-size: 11px;
+}
+
+/* ---------------- EMPTY / STATES ---------------- */
+
+.asd-empty,
+.asd-state {
+    text-align: center;
+    color: #667085;
+}
+
+.asd-empty {
+    padding: 35px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+}
+
+.asd-state {
+    padding: 90px 20px;
+}
+
+.asd-error {
+    margin-top: 20px;
+    color: #b42318;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+
+@media (max-width: 850px) {
+    .asd-identity-card {
+        grid-template-columns: auto 1fr;
+    }
+
+    .asd-meta {
+        grid-column: 1 / -1;
+        padding-top: 2px;
+    }
+
+    .asd-review-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 620px) {
+    .asd-page {
+        padding: 24px 18px 40px;
+    }
+
+    .asd-header {
+        align-items: flex-start;
+    }
+
+    .asd-header h1 {
+        font-size: 25px;
+    }
+
+    .asd-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .asd-rating-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
