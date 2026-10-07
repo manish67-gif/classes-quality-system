@@ -136,7 +136,11 @@ function ClassCourseDetails() {
 
             setShowSubjectForm(false);
 
-            await loadSubjects();
+            // Redirect to the newly created subject
+            navigate(
+                `/class/classes/${classId}/courses/${courseId}/subjects/${data.subject._id}`
+            );
+
         } catch (error) {
             console.error("Create subject error:", error);
             setMessage(error.message);
