@@ -27,25 +27,16 @@ function ClassCourseDetails() {
         Authorization: `Bearer ${token}`
     };
 
-    // --------------------------------------------------
-    // LOAD COURSE
-    // --------------------------------------------------
-
     const loadCourse = async () => {
         try {
             const response = await fetch(
                 `${API}/courses/${courseId}`,
                 { headers }
             );
-
             const data = await response.json();
-
             if (!response.ok) {
-                throw new Error(
-                    data.message || "Failed to load course"
-                );
+                throw new Error(data.message || "Failed to load course");
             }
-
             setCourse(data.course);
         } catch (error) {
             console.error("Load course error:", error);
@@ -53,25 +44,16 @@ function ClassCourseDetails() {
         }
     };
 
-    // --------------------------------------------------
-    // LOAD SUBJECTS
-    // --------------------------------------------------
-
     const loadSubjects = async () => {
         try {
             const response = await fetch(
                 `${API}/subjects/course/${courseId}`,
                 { headers }
             );
-
             const data = await response.json();
-
             if (!response.ok) {
-                throw new Error(
-                    data.message || "Failed to load subjects"
-                );
+                throw new Error(data.message || "Failed to load subjects");
             }
-
             setSubjects(data.subjects || []);
         } catch (error) {
             console.error("Load subjects error:", error);
@@ -82,23 +64,15 @@ function ClassCourseDetails() {
     useEffect(() => {
         const loadPage = async () => {
             setLoading(true);
-
             await loadCourse();
             await loadSubjects();
-
             setLoading(false);
         };
-
         loadPage();
     }, [courseId]);
 
-    // --------------------------------------------------
-    // SUBJECT FORM
-    // --------------------------------------------------
-
     const handleSubjectChange = (event) => {
         const { name, value } = event.target;
-
         setSubjectForm((previous) => ({
             ...previous,
             [name]: value
@@ -136,35 +110,26 @@ function ClassCourseDetails() {
 
             setShowSubjectForm(false);
 
-            await loadSubjects();
+            navigate(
+                `/class/classes/${classId}/courses/${courseId}/subjects/${data.subject._id}`
+            );
         } catch (error) {
             console.error("Create subject error:", error);
             setMessage(error.message);
         }
     };
 
-    // --------------------------------------------------
-    // DELETE SUBJECT
-    // --------------------------------------------------
-
     const deleteSubject = async (subjectId) => {
         const confirmed = window.confirm(
             "Delete this subject and its reviews/demo lectures?"
         );
-
-        if (!confirmed) {
-            return;
-        }
+        if (!confirmed) return;
 
         try {
             const response = await fetch(
                 `${API}/subjects/${subjectId}`,
-                {
-                    method: "DELETE",
-                    headers
-                }
+                { method: "DELETE", headers }
             );
-
             const data = await response.json();
 
             if (!response.ok) {
@@ -174,7 +139,6 @@ function ClassCourseDetails() {
             }
 
             setMessage("Subject deleted successfully.");
-
             await loadSubjects();
         } catch (error) {
             console.error("Delete subject error:", error);
@@ -182,28 +146,17 @@ function ClassCourseDetails() {
         }
     };
 
-    // --------------------------------------------------
-    // DELETE COURSE
-    // --------------------------------------------------
-
     const deleteCourse = async () => {
         const confirmed = window.confirm(
             "Delete this course? Its subjects and reviews will also be deleted."
         );
-
-        if (!confirmed) {
-            return;
-        }
+        if (!confirmed) return;
 
         try {
             const response = await fetch(
                 `${API}/courses/${courseId}`,
-                {
-                    method: "DELETE",
-                    headers
-                }
+                { method: "DELETE", headers }
             );
-
             const data = await response.json();
 
             if (!response.ok) {
@@ -218,10 +171,6 @@ function ClassCourseDetails() {
             setMessage(error.message);
         }
     };
-
-    // --------------------------------------------------
-    // LOADING
-    // --------------------------------------------------
 
     if (loading) {
         return (
@@ -238,13 +187,10 @@ function ClassCourseDetails() {
             <main className="class-course-page">
                 <div className="class-course-error">
                     <h2>Course Not Found</h2>
-
                     <button
                         type="button"
                         className="course-primary-button"
-                        onClick={() =>
-                            navigate("/class/dashboard")
-                        }
+                        onClick={() => navigate("/class/dashboard")}
                     >
                         Back to Dashboard
                     </button>
@@ -255,9 +201,6 @@ function ClassCourseDetails() {
 
     return (
         <main className="class-course-page">
-
-            {/* BACK */}
-
             <button
                 type="button"
                 className="course-back-button"
@@ -266,20 +209,13 @@ function ClassCourseDetails() {
                 ← Back to Dashboard
             </button>
 
-            {/* HEADER */}
-
             <header className="class-course-header">
-
                 <div>
                     <span className="course-page-label">
                         COURSE MANAGEMENT
                     </span>
-
                     <h1>{course.name}</h1>
-
-                    <p>
-                        Manage this course and its subjects.
-                    </p>
+                    <p>Manage this course and its subjects.</p>
                 </div>
 
                 <button
@@ -289,10 +225,7 @@ function ClassCourseDetails() {
                 >
                     Delete Course
                 </button>
-
             </header>
-
-            {/* MESSAGE */}
 
             {message && (
                 <div className="course-message">
@@ -300,71 +233,51 @@ function ClassCourseDetails() {
                 </div>
             )}
 
-            {/* COURSE INFORMATION */}
-
             <section className="course-section">
-
                 <div className="course-section-heading">
                     <span>COURSE</span>
                     <h2>Course Information</h2>
                 </div>
 
                 <div className="course-info-grid">
-
                     <div>
                         <span>Course Name</span>
                         <strong>{course.name}</strong>
                     </div>
-
                     <div>
                         <span>Fees</span>
                         <strong>₹{course.fees}</strong>
                     </div>
-
                     <div>
                         <span>Duration</span>
                         <strong>{course.duration}</strong>
                     </div>
-
                     {course.rating !== undefined &&
                         course.rating !== null && (
                             <div>
                                 <span>Rating</span>
-                                <strong>
-                                    ⭐ {course.rating}
-                                </strong>
+                                <strong>⭐ {course.rating}</strong>
                             </div>
                         )}
-
                 </div>
 
                 <div className="course-description">
                     <span>Description</span>
-
                     <p>
                         {course.description ||
                             "No description available."}
                     </p>
                 </div>
-
             </section>
 
-            {/* SUBJECTS */}
-
             <section className="course-section">
-
                 <div className="course-section-header">
-
                     <div>
                         <span className="course-section-label">
                             SUBJECTS
                         </span>
-
                         <h2>Subjects</h2>
-
-                        <p>
-                            Manage subjects under this course.
-                        </p>
+                        <p>Manage subjects under this course.</p>
                     </div>
 
                     <button
@@ -380,10 +293,7 @@ function ClassCourseDetails() {
                             ? "Cancel"
                             : "+ Add Subject"}
                     </button>
-
                 </div>
-
-                {/* ADD SUBJECT */}
 
                 {showSubjectForm && (
                     <form
@@ -393,10 +303,7 @@ function ClassCourseDetails() {
                         <h3>Add Subject</h3>
 
                         <div className="course-form-group">
-                            <label>
-                                Subject Name
-                            </label>
-
+                            <label>Subject Name</label>
                             <input
                                 type="text"
                                 name="name"
@@ -408,10 +315,7 @@ function ClassCourseDetails() {
                         </div>
 
                         <div className="course-form-group">
-                            <label>
-                                Description
-                            </label>
-
+                            <label>Description</label>
                             <textarea
                                 name="description"
                                 value={subjectForm.description}
@@ -427,23 +331,16 @@ function ClassCourseDetails() {
                         >
                             Add Subject
                         </button>
-
                     </form>
                 )}
-
-                {/* SUBJECT LIST */}
 
                 {subjects.length === 0 ? (
                     <div className="course-empty-card">
                         <h3>No Subjects Yet</h3>
-
-                        <p>
-                            Add subjects to this course.
-                        </p>
+                        <p>Add subjects to this course.</p>
                     </div>
                 ) : (
                     <div className="course-subject-list">
-
                         {subjects.map((subject) => (
                             <article
                                 className="course-subject-card"
@@ -453,9 +350,7 @@ function ClassCourseDetails() {
                                     <span className="course-card-label">
                                         SUBJECT
                                     </span>
-
                                     <h3>{subject.name}</h3>
-
                                     <p>
                                         {subject.description ||
                                             "No description available."}
@@ -466,17 +361,15 @@ function ClassCourseDetails() {
                                             Rating: ⭐{" "}
                                             {subject.rating || 0}
                                         </span>
-
                                         <span>
                                             Demo Lectures:{" "}
-                                            {subject.demoLectures
-                                                ?.length || 0}
+                                            {subject.demoLectures?.length ||
+                                                0}
                                         </span>
                                     </div>
                                 </div>
 
                                 <div className="course-card-actions">
-
                                     <button
                                         type="button"
                                         className="course-primary-button"
@@ -493,23 +386,17 @@ function ClassCourseDetails() {
                                         type="button"
                                         className="course-danger-button"
                                         onClick={() =>
-                                            deleteSubject(
-                                                subject._id
-                                            )
+                                            deleteSubject(subject._id)
                                         }
                                     >
                                         Delete
                                     </button>
-
                                 </div>
                             </article>
                         ))}
-
                     </div>
                 )}
-
             </section>
-
         </main>
     );
 }
