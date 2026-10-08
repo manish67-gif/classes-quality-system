@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import API from "../config/api";
+import "../styles/CourseDetails.css";
 
 function CourseDetails() {
     const { id } = useParams();
